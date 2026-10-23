@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wiktionary Lookup</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="bar">
+    <select id="lang" aria-label="Dictionary language"></select>
+    <input id="q" type="search" placeholder="Search" autocomplete="off" autocapitalize="off" spellcheck="false" disabled>
+    <button id="pen" type="button" aria-label="Handwriting" title="Handwriting" hidden></button>
+  </div>
+  <div id="status" role="status">Loading index...</div>
+  <section id="pad" hidden aria-label="Handwriting">
+    <canvas id="pad-canvas" width="280" height="280"></canvas>
+    <div id="pad-candidates"></div>
+    <div class="pad-actions">
+      <button id="pad-undo" type="button">Undo stroke</button>
+      <button id="pad-clear" type="button">Clear</button>
+      <button id="pad-close" type="button">Close</button>
+    </div>
+    <p id="pad-status" role="status"></p>
+  </section>
+  <div id="speech-hint" hidden><span id="speech-hint-text"></span> <button id="speech-settings" type="button">Speech settings</button></div>
+</header>
+<main>
+  <ol id="results" aria-label="Results"></ol>
+  <section id="detail" hidden>
+    <button id="back" type="button">Back</button>
+    <h2 id="detail-head"></h2>
+    <p id="detail-variants"></p>
+    <div id="detail-pron">
+      <div id="detail-pinyin"></div>
+      <div id="detail-speak-row" class="speak-row"></div>
+    </div>
+    <div id="detail-body"></div>
+  </section>
+  <section id="picker" hidden aria-labelledby="picker-title">
+    <div class="picker-head">
+      <h2 id="picker-title">Languages</h2>
+      <button id="picker-close" type="button">Done</button>
+    </div>
+    <p id="picker-welcome" hidden>Choose the language of your dictionary. Chinese is built in; every other
+      language is downloaded once and then works offline. You can switch later from the menu at the top.</p>
+    <label class="setting">Pronunciation
+      <select id="pron-mode">
+        <option value="auto">Wiktionary audio when available</option>
+        <option value="speech">Always text-to-speech</option>
+      </select>
+    </label>
+    <label class="setting">Handwriting pad (Chinese, Japanese)
+      <select id="pad-mode">
+        <option value="on">Show the pen button</option>
+        <option value="off">Hide</option>
+      </select>
+    </label>
+    <label id="prefetch-setting" class="setting" hidden>Prefetch audio
+      <select id="prefetch-mode">
+        <option value="always">Always</option>
+        <option value="wifi">Wi-Fi only</option>
+        <option value="off">Off</option>
+      </select>
+    </label>
+    <input id="lang-filter" type="search" placeholder="Filter languages" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <p id="picker-status" role="status"></p>
+    <div id="network-actions" hidden>
+      <button id="open-app-settings" type="button">Open app settings</button>
+      <button id="open-data-saver" type="button" hidden>Data saver settings</button>
+    </div>
+    <ul id="lang-list" aria-label="Languages"></ul>
+    <p><button id="about" type="button">About and licenses</button></p>
+  </section>
+</main>
+<div id="changelog" role="dialog" aria-labelledby="changelog-title" hidden>
+  <div class="dialog">
+    <h2 id="changelog-title">What's new</h2>
+    <div id="changelog-body"></div>
+    <button id="changelog-close" type="button">OK</button>
+  </div>
+</div>
+<script>
+// Classic script, so it runs even where app.js cannot: any error before the
+// index is open replaces "Loading index..." with what went wrong.
+window.addEventListener('error', function (event) {
+  // The Android app reports page errors to its crash reporting, when enabled.
+  if (window.WiktionaryNative) {
+    window.WiktionaryNative.reportError(String(event.message), String(event.filename || ''), event.lineno || 0);
+  }
+  if (document.body.getAttribute('data-ready') === 'true') return;
+  document.getElementById('status').textContent = 'Could not start: ' + (event.message || 'script error')
+    + '. Updating Android System WebView (or Chrome) from the Play Store may help.';
+  document.body.setAttribute('data-ready', 'error');
+});
+</script>
+<script>
+window.addEventListener('unhandledrejection', function (event) {
+  var reason = event.reason;
+  if (window.WiktionaryNative) {
+    window.WiktionaryNative.reportError('Unhandled rejection: ' + (reason && reason.message ? reason.message : String(reason)), '', 0);
+  }
+});
+</script>
+<script nomodule>
+document.getElementById('status').textContent = 'This browser is too old for this app: it cannot run module scripts.'
+  + ' Update Android System WebView (or Chrome) from the Play Store.';
+document.body.setAttribute('data-ready', 'error');
+</script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

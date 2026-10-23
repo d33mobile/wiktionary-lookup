@@ -1,0 +1,3303 @@
+{
+ "extracted": "2026-10-21",
+ "dumpDate": "2026-10-01",
+ "languages": [
+  {
+   "code": "ab",
+   "name": "Abkhaz",
+   "senses": 1782,
+   "bytes": 2419789,
+   "url": "https://kaikki.org/dictionary/Abkhaz/kaikki.org-dictionary-Abkhaz.jsonl"
+  },
+  {
+   "code": "ace",
+   "name": "Acehnese",
+   "senses": 763,
+   "bytes": 708763,
+   "url": "https://kaikki.org/dictionary/Acehnese/kaikki.org-dictionary-Acehnese.jsonl"
+  },
+  {
+   "code": "acn",
+   "name": "Achang",
+   "senses": 607,
+   "bytes": 504692,
+   "url": "https://kaikki.org/dictionary/Achang/kaikki.org-dictionary-Achang.jsonl"
+  },
+  {
+   "code": "aa",
+   "name": "Afar",
+   "senses": 2466,
+   "bytes": 11273374,
+   "url": "https://kaikki.org/dictionary/Afar/kaikki.org-dictionary-Afar.jsonl"
+  },
+  {
+   "code": "af",
+   "name": "Afrikaans",
+   "senses": 10956,
+   "bytes": 13828948,
+   "url": "https://kaikki.org/dictionary/Afrikaans/kaikki.org-dictionary-Afrikaans.jsonl"
+  },
+  {
+   "code": "xag",
+   "name": "Aghwan",
+   "senses": 792,
+   "bytes": 1068607,
+   "url": "https://kaikki.org/dictionary/Aghwan/kaikki.org-dictionary-Aghwan.jsonl"
+  },
+  {
+   "code": "aht",
+   "name": "Ahtna",
+   "senses": 6396,
+   "bytes": 6435163,
+   "url": "https://kaikki.org/dictionary/Ahtna/kaikki.org-dictionary-Ahtna.jsonl"
+  },
+  {
+   "code": "ain",
+   "name": "Ainu",
+   "senses": 2550,
+   "bytes": 3350967,
+   "url": "https://kaikki.org/dictionary/Ainu/kaikki.org-dictionary-Ainu.jsonl"
+  },
+  {
+   "code": "ak",
+   "name": "Akan",
+   "senses": 2387,
+   "bytes": 1778083,
+   "url": "https://kaikki.org/dictionary/Akan/kaikki.org-dictionary-Akan.jsonl"
+  },
+  {
+   "code": "akk",
+   "name": "Akkadian",
+   "senses": 2247,
+   "bytes": 3009215,
+   "url": "https://kaikki.org/dictionary/Akkadian/kaikki.org-dictionary-Akkadian.jsonl"
+  },
+  {
+   "code": "sq",
+   "name": "Albanian",
+   "senses": 33499,
+   "bytes": 68378012,
+   "url": "https://kaikki.org/dictionary/Albanian/kaikki.org-dictionary-Albanian.jsonl"
+  },
+  {
+   "code": "gsw",
+   "name": "Alemannic German",
+   "senses": 3017,
+   "bytes": 4305645,
+   "url": "https://kaikki.org/dictionary/Alemannic%20German/kaikki.org-dictionary-AlemannicGerman.jsonl"
+  },
+  {
+   "code": "am",
+   "name": "Amharic",
+   "senses": 3572,
+   "bytes": 4911136,
+   "url": "https://kaikki.org/dictionary/Amharic/kaikki.org-dictionary-Amharic.jsonl"
+  },
+  {
+   "code": "ami",
+   "name": "Amis",
+   "senses": 977,
+   "bytes": 709892,
+   "url": "https://kaikki.org/dictionary/Amis/kaikki.org-dictionary-Amis.jsonl"
+  },
+  {
+   "code": "grc",
+   "name": "Ancient Greek",
+   "senses": 91594,
+   "bytes": 409139523,
+   "url": "https://kaikki.org/dictionary/Ancient%20Greek/kaikki.org-dictionary-AncientGreek.jsonl"
+  },
+  {
+   "code": "awg",
+   "name": "Anguthimri",
+   "senses": 576,
+   "bytes": 356068,
+   "url": "https://kaikki.org/dictionary/Anguthimri/kaikki.org-dictionary-Anguthimri.jsonl"
+  },
+  {
+   "code": "aig",
+   "name": "Antigua and Barbuda Creole English",
+   "senses": 728,
+   "bytes": 722714,
+   "url": "https://kaikki.org/dictionary/Antigua%20and%20Barbuda%20Creole%20English/kaikki.org-dictionary-AntiguaandBarbudaCreoleEnglish.jsonl"
+  },
+  {
+   "code": "ar",
+   "name": "Arabic",
+   "senses": 256920,
+   "bytes": 868082262,
+   "url": "https://kaikki.org/dictionary/Arabic/kaikki.org-dictionary-Arabic.jsonl"
+  },
+  {
+   "code": "an",
+   "name": "Aragonese",
+   "senses": 2303,
+   "bytes": 3764281,
+   "url": "https://kaikki.org/dictionary/Aragonese/kaikki.org-dictionary-Aragonese.jsonl"
+  },
+  {
+   "code": "arc",
+   "name": "Aramaic",
+   "senses": 3235,
+   "bytes": 4469385,
+   "url": "https://kaikki.org/dictionary/Aramaic/kaikki.org-dictionary-Aramaic.jsonl"
+  },
+  {
+   "code": "hy",
+   "name": "Armenian",
+   "senses": 29386,
+   "bytes": 228778042,
+   "url": "https://kaikki.org/dictionary/Armenian/kaikki.org-dictionary-Armenian.jsonl"
+  },
+  {
+   "code": "rup",
+   "name": "Aromanian",
+   "senses": 5710,
+   "bytes": 7630929,
+   "url": "https://kaikki.org/dictionary/Aromanian/kaikki.org-dictionary-Aromanian.jsonl"
+  },
+  {
+   "code": "as",
+   "name": "Assamese",
+   "senses": 6029,
+   "bytes": 38916682,
+   "url": "https://kaikki.org/dictionary/Assamese/kaikki.org-dictionary-Assamese.jsonl"
+  },
+  {
+   "code": "aii",
+   "name": "Assyrian Neo-Aramaic",
+   "senses": 12102,
+   "bytes": 47100533,
+   "url": "https://kaikki.org/dictionary/Assyrian%20Neo-Aramaic/kaikki.org-dictionary-AssyrianNeoAramaic.jsonl"
+  },
+  {
+   "code": "ast",
+   "name": "Asturian",
+   "senses": 43520,
+   "bytes": 49032453,
+   "url": "https://kaikki.org/dictionary/Asturian/kaikki.org-dictionary-Asturian.jsonl"
+  },
+  {
+   "code": "tay",
+   "name": "Atayal",
+   "senses": 663,
+   "bytes": 512937,
+   "url": "https://kaikki.org/dictionary/Atayal/kaikki.org-dictionary-Atayal.jsonl"
+  },
+  {
+   "code": "av",
+   "name": "Avar",
+   "senses": 643,
+   "bytes": 848587,
+   "url": "https://kaikki.org/dictionary/Avar/kaikki.org-dictionary-Avar.jsonl"
+  },
+  {
+   "code": "az",
+   "name": "Azerbaijani",
+   "senses": 23171,
+   "bytes": 193947936,
+   "url": "https://kaikki.org/dictionary/Azerbaijani/kaikki.org-dictionary-Azerbaijani.jsonl"
+  },
+  {
+   "code": "ban",
+   "name": "Balinese",
+   "senses": 1878,
+   "bytes": 1726125,
+   "url": "https://kaikki.org/dictionary/Balinese/kaikki.org-dictionary-Balinese.jsonl"
+  },
+  {
+   "code": "bal",
+   "name": "Baluchi",
+   "senses": 652,
+   "bytes": 646871,
+   "url": "https://kaikki.org/dictionary/Baluchi/kaikki.org-dictionary-Baluchi.jsonl"
+  },
+  {
+   "code": "bm",
+   "name": "Bambara",
+   "senses": 1012,
+   "bytes": 697227,
+   "url": "https://kaikki.org/dictionary/Bambara/kaikki.org-dictionary-Bambara.jsonl"
+  },
+  {
+   "code": "bni",
+   "name": "Bangi",
+   "senses": 517,
+   "bytes": 453418,
+   "url": "https://kaikki.org/dictionary/Bangi/kaikki.org-dictionary-Bangi.jsonl"
+  },
+  {
+   "code": "ba",
+   "name": "Bashkir",
+   "senses": 5309,
+   "bytes": 11891209,
+   "url": "https://kaikki.org/dictionary/Bashkir/kaikki.org-dictionary-Bashkir.jsonl"
+  },
+  {
+   "code": "eu",
+   "name": "Basque",
+   "senses": 20766,
+   "bytes": 61561254,
+   "url": "https://kaikki.org/dictionary/Basque/kaikki.org-dictionary-Basque.jsonl"
+  },
+  {
+   "code": "bbl",
+   "name": "Bats",
+   "senses": 603,
+   "bytes": 880430,
+   "url": "https://kaikki.org/dictionary/Bats/kaikki.org-dictionary-Bats.jsonl"
+  },
+  {
+   "code": "bar",
+   "name": "Bavarian",
+   "senses": 3574,
+   "bytes": 5951484,
+   "url": "https://kaikki.org/dictionary/Bavarian/kaikki.org-dictionary-Bavarian.jsonl"
+  },
+  {
+   "code": "be",
+   "name": "Belarusian",
+   "senses": 17112,
+   "bytes": 55645951,
+   "url": "https://kaikki.org/dictionary/Belarusian/kaikki.org-dictionary-Belarusian.jsonl"
+  },
+  {
+   "code": "bn",
+   "name": "Bengali",
+   "senses": 16050,
+   "bytes": 40392785,
+   "url": "https://kaikki.org/dictionary/Bengali/kaikki.org-dictionary-Bengali.jsonl"
+  },
+  {
+   "code": "bew",
+   "name": "Betawi",
+   "senses": 691,
+   "bytes": 920594,
+   "url": "https://kaikki.org/dictionary/Betawi/kaikki.org-dictionary-Betawi.jsonl"
+  },
+  {
+   "code": "roa-brg",
+   "name": "Bourguignon",
+   "senses": 652,
+   "bytes": 1049921,
+   "url": "https://kaikki.org/dictionary/Bourguignon/kaikki.org-dictionary-Bourguignon.jsonl"
+  },
+  {
+   "code": "br",
+   "name": "Breton",
+   "senses": 2641,
+   "bytes": 3824751,
+   "url": "https://kaikki.org/dictionary/Breton/kaikki.org-dictionary-Breton.jsonl"
+  },
+  {
+   "code": "kxd",
+   "name": "Brunei Malay",
+   "senses": 526,
+   "bytes": 563206,
+   "url": "https://kaikki.org/dictionary/Brunei%20Malay/kaikki.org-dictionary-BruneiMalay.jsonl"
+  },
+  {
+   "code": "bg",
+   "name": "Bulgarian",
+   "senses": 76441,
+   "bytes": 191986394,
+   "url": "https://kaikki.org/dictionary/Bulgarian/kaikki.org-dictionary-Bulgarian.jsonl"
+  },
+  {
+   "code": "my",
+   "name": "Burmese",
+   "senses": 14777,
+   "bytes": 19003552,
+   "url": "https://kaikki.org/dictionary/Burmese/kaikki.org-dictionary-Burmese.jsonl"
+  },
+  {
+   "code": "bua",
+   "name": "Buryat",
+   "senses": 695,
+   "bytes": 922970,
+   "url": "https://kaikki.org/dictionary/Buryat/kaikki.org-dictionary-Buryat.jsonl"
+  },
+  {
+   "code": "chl",
+   "name": "Cahuilla",
+   "senses": 596,
+   "bytes": 603497,
+   "url": "https://kaikki.org/dictionary/Cahuilla/kaikki.org-dictionary-Cahuilla.jsonl"
+  },
+  {
+   "code": "yue",
+   "name": "Cantonese",
+   "senses": 15116,
+   "bytes": 9471371,
+   "url": "https://kaikki.org/dictionary/Cantonese/kaikki.org-dictionary-Cantonese.jsonl"
+  },
+  {
+   "code": "ca",
+   "name": "Catalan",
+   "senses": 228485,
+   "bytes": 247179824,
+   "url": "https://kaikki.org/dictionary/Catalan/kaikki.org-dictionary-Catalan.jsonl"
+  },
+  {
+   "code": "ceb",
+   "name": "Cebuano",
+   "senses": 25363,
+   "bytes": 25818720,
+   "url": "https://kaikki.org/dictionary/Cebuano/kaikki.org-dictionary-Cebuano.jsonl"
+  },
+  {
+   "code": "tzm",
+   "name": "Central Atlas Tamazight",
+   "senses": 722,
+   "bytes": 1131969,
+   "url": "https://kaikki.org/dictionary/Central%20Atlas%20Tamazight/kaikki.org-dictionary-CentralAtlasTamazight.jsonl"
+  },
+  {
+   "code": "bcl",
+   "name": "Central Bikol",
+   "senses": 9110,
+   "bytes": 9937753,
+   "url": "https://kaikki.org/dictionary/Central%20Bikol/kaikki.org-dictionary-CentralBikol.jsonl"
+  },
+  {
+   "code": "gmw-cfr",
+   "name": "Central Franconian",
+   "senses": 1299,
+   "bytes": 2410793,
+   "url": "https://kaikki.org/dictionary/Central%20Franconian/kaikki.org-dictionary-CentralFranconian.jsonl"
+  },
+  {
+   "code": "nch",
+   "name": "Central Huasteca Nahuatl",
+   "senses": 794,
+   "bytes": 676215,
+   "url": "https://kaikki.org/dictionary/Central%20Huasteca%20Nahuatl/kaikki.org-dictionary-CentralHuastecaNahuatl.jsonl"
+  },
+  {
+   "code": "ckb",
+   "name": "Central Kurdish",
+   "senses": 1730,
+   "bytes": 2675358,
+   "url": "https://kaikki.org/dictionary/Central%20Kurdish/kaikki.org-dictionary-CentralKurdish.jsonl"
+  },
+  {
+   "code": "nhn",
+   "name": "Central Nahuatl",
+   "senses": 1853,
+   "bytes": 1771066,
+   "url": "https://kaikki.org/dictionary/Central%20Nahuatl/kaikki.org-dictionary-CentralNahuatl.jsonl"
+  },
+  {
+   "code": "chg",
+   "name": "Chagatai",
+   "senses": 813,
+   "bytes": 3083106,
+   "url": "https://kaikki.org/dictionary/Chagatai/kaikki.org-dictionary-Chagatai.jsonl"
+  },
+  {
+   "code": "cbk",
+   "name": "Chavacano",
+   "senses": 1658,
+   "bytes": 2875185,
+   "url": "https://kaikki.org/dictionary/Chavacano/kaikki.org-dictionary-Chavacano.jsonl"
+  },
+  {
+   "code": "ce",
+   "name": "Chechen",
+   "senses": 1343,
+   "bytes": 2563607,
+   "url": "https://kaikki.org/dictionary/Chechen/kaikki.org-dictionary-Chechen.jsonl"
+  },
+  {
+   "code": "chr",
+   "name": "Cherokee",
+   "senses": 2324,
+   "bytes": 2028745,
+   "url": "https://kaikki.org/dictionary/Cherokee/kaikki.org-dictionary-Cherokee.jsonl"
+  },
+  {
+   "code": "ny",
+   "name": "Chichewa",
+   "senses": 3079,
+   "bytes": 2889321,
+   "url": "https://kaikki.org/dictionary/Chichewa/kaikki.org-dictionary-Chichewa.jsonl"
+  },
+  {
+   "code": "cic",
+   "name": "Chickasaw",
+   "senses": 1564,
+   "bytes": 2767697,
+   "url": "https://kaikki.org/dictionary/Chickasaw/kaikki.org-dictionary-Chickasaw.jsonl"
+  },
+  {
+   "code": "zh",
+   "name": "Chinese",
+   "senses": 392965,
+   "bytes": 1214691473,
+   "url": "https://kaikki.org/dictionary/Chinese/kaikki.org-dictionary-Chinese.jsonl"
+  },
+  {
+   "code": "cho",
+   "name": "Choctaw",
+   "senses": 1356,
+   "bytes": 1549248,
+   "url": "https://kaikki.org/dictionary/Choctaw/kaikki.org-dictionary-Choctaw.jsonl"
+  },
+  {
+   "code": "njo-jgl",
+   "name": "Chungli Ao",
+   "senses": 619,
+   "bytes": 963644,
+   "url": "https://kaikki.org/dictionary/Chungli%20Ao/kaikki.org-dictionary-ChungliAo.jsonl"
+  },
+  {
+   "code": "chk",
+   "name": "Chuukese",
+   "senses": 994,
+   "bytes": 739598,
+   "url": "https://kaikki.org/dictionary/Chuukese/kaikki.org-dictionary-Chuukese.jsonl"
+  },
+  {
+   "code": "cv",
+   "name": "Chuvash",
+   "senses": 2096,
+   "bytes": 2258144,
+   "url": "https://kaikki.org/dictionary/Chuvash/kaikki.org-dictionary-Chuvash.jsonl"
+  },
+  {
+   "code": "cim",
+   "name": "Cimbrian",
+   "senses": 5641,
+   "bytes": 8749536,
+   "url": "https://kaikki.org/dictionary/Cimbrian/kaikki.org-dictionary-Cimbrian.jsonl"
+  },
+  {
+   "code": "nci",
+   "name": "Classical Nahuatl",
+   "senses": 5211,
+   "bytes": 7107606,
+   "url": "https://kaikki.org/dictionary/Classical%20Nahuatl/kaikki.org-dictionary-ClassicalNahuatl.jsonl"
+  },
+  {
+   "code": "syc",
+   "name": "Classical Syriac",
+   "senses": 8412,
+   "bytes": 15429144,
+   "url": "https://kaikki.org/dictionary/Classical%20Syriac/kaikki.org-dictionary-ClassicalSyriac.jsonl"
+  },
+  {
+   "code": "cop",
+   "name": "Coptic",
+   "senses": 4016,
+   "bytes": 62844633,
+   "url": "https://kaikki.org/dictionary/Coptic/kaikki.org-dictionary-Coptic.jsonl"
+  },
+  {
+   "code": "kw",
+   "name": "Cornish",
+   "senses": 9646,
+   "bytes": 19179200,
+   "url": "https://kaikki.org/dictionary/Cornish/kaikki.org-dictionary-Cornish.jsonl"
+  },
+  {
+   "code": "co",
+   "name": "Corsican",
+   "senses": 1158,
+   "bytes": 1812441,
+   "url": "https://kaikki.org/dictionary/Corsican/kaikki.org-dictionary-Corsican.jsonl"
+  },
+  {
+   "code": "crh",
+   "name": "Crimean Tatar",
+   "senses": 5590,
+   "bytes": 10882856,
+   "url": "https://kaikki.org/dictionary/Crimean%20Tatar/kaikki.org-dictionary-CrimeanTatar.jsonl"
+  },
+  {
+   "code": "cub",
+   "name": "Cubeo",
+   "senses": 708,
+   "bytes": 598789,
+   "url": "https://kaikki.org/dictionary/Cubeo/kaikki.org-dictionary-Cubeo.jsonl"
+  },
+  {
+   "code": "acy",
+   "name": "Cypriot Arabic",
+   "senses": 503,
+   "bytes": 868173,
+   "url": "https://kaikki.org/dictionary/Cypriot%20Arabic/kaikki.org-dictionary-CypriotArabic.jsonl"
+  },
+  {
+   "code": "cs",
+   "name": "Czech",
+   "senses": 85607,
+   "bytes": 246074770,
+   "url": "https://kaikki.org/dictionary/Czech/kaikki.org-dictionary-Czech.jsonl"
+  },
+  {
+   "code": "dak",
+   "name": "Dakota",
+   "senses": 763,
+   "bytes": 480753,
+   "url": "https://kaikki.org/dictionary/Dakota/kaikki.org-dictionary-Dakota.jsonl"
+  },
+  {
+   "code": "dlm",
+   "name": "Dalmatian",
+   "senses": 1392,
+   "bytes": 1478837,
+   "url": "https://kaikki.org/dictionary/Dalmatian/kaikki.org-dictionary-Dalmatian.jsonl"
+  },
+  {
+   "code": "da",
+   "name": "Danish",
+   "senses": 68361,
+   "bytes": 98996783,
+   "url": "https://kaikki.org/dictionary/Danish/kaikki.org-dictionary-Danish.jsonl"
+  },
+  {
+   "code": "tfn",
+   "name": "Dena'ina",
+   "senses": 1484,
+   "bytes": 1504233,
+   "url": "https://kaikki.org/dictionary/Dena%27ina/kaikki.org-dictionary-Denaina.jsonl"
+  },
+  {
+   "code": "dv",
+   "name": "Dhivehi",
+   "senses": 2513,
+   "bytes": 3413330,
+   "url": "https://kaikki.org/dictionary/Dhivehi/kaikki.org-dictionary-Dhivehi.jsonl"
+  },
+  {
+   "code": "duo",
+   "name": "Dupaningan Agta",
+   "senses": 728,
+   "bytes": 520437,
+   "url": "https://kaikki.org/dictionary/Dupaningan%20Agta/kaikki.org-dictionary-DupaninganAgta.jsonl"
+  },
+  {
+   "code": "nl",
+   "name": "Dutch",
+   "senses": 190953,
+   "bytes": 257235436,
+   "url": "https://kaikki.org/dictionary/Dutch/kaikki.org-dictionary-Dutch.jsonl"
+  },
+  {
+   "code": "gmw-ecg",
+   "name": "East Central German",
+   "senses": 3126,
+   "bytes": 3104146,
+   "url": "https://kaikki.org/dictionary/East%20Central%20German/kaikki.org-dictionary-EastCentralGerman.jsonl"
+  },
+  {
+   "code": "kbd",
+   "name": "East Circassian",
+   "senses": 1731,
+   "bytes": 2778360,
+   "url": "https://kaikki.org/dictionary/East%20Circassian/kaikki.org-dictionary-EastCircassian.jsonl"
+  },
+  {
+   "code": "nhe",
+   "name": "Eastern Huasteca Nahuatl",
+   "senses": 682,
+   "bytes": 532937,
+   "url": "https://kaikki.org/dictionary/Eastern%20Huasteca%20Nahuatl/kaikki.org-dictionary-EasternHuastecaNahuatl.jsonl"
+  },
+  {
+   "code": "mhr",
+   "name": "Eastern Mari",
+   "senses": 2481,
+   "bytes": 5049975,
+   "url": "https://kaikki.org/dictionary/Eastern%20Mari/kaikki.org-dictionary-EasternMari.jsonl"
+  },
+  {
+   "code": "egy",
+   "name": "Egyptian",
+   "senses": 8555,
+   "bytes": 17601161,
+   "url": "https://kaikki.org/dictionary/Egyptian/kaikki.org-dictionary-Egyptian.jsonl"
+  },
+  {
+   "code": "arz",
+   "name": "Egyptian Arabic",
+   "senses": 2075,
+   "bytes": 6183587,
+   "url": "https://kaikki.org/dictionary/Egyptian%20Arabic/kaikki.org-dictionary-EgyptianArabic.jsonl"
+  },
+  {
+   "code": "ovd",
+   "name": "Elfdalian",
+   "senses": 517,
+   "bytes": 782579,
+   "url": "https://kaikki.org/dictionary/Elfdalian/kaikki.org-dictionary-Elfdalian.jsonl"
+  },
+  {
+   "code": "egl",
+   "name": "Emilian",
+   "senses": 3862,
+   "bytes": 5849442,
+   "url": "https://kaikki.org/dictionary/Emilian/kaikki.org-dictionary-Emilian.jsonl"
+  },
+  {
+   "code": "en",
+   "name": "English",
+   "senses": 1795048,
+   "bytes": 3430807113,
+   "url": "https://kaikki.org/dictionary/English/kaikki.org-dictionary-English.jsonl"
+  },
+  {
+   "code": "myv",
+   "name": "Erzya",
+   "senses": 1432,
+   "bytes": 2226989,
+   "url": "https://kaikki.org/dictionary/Erzya/kaikki.org-dictionary-Erzya.jsonl"
+  },
+  {
+   "code": "eo",
+   "name": "Esperanto",
+   "senses": 137530,
+   "bytes": 173562908,
+   "url": "https://kaikki.org/dictionary/Esperanto/kaikki.org-dictionary-Esperanto.jsonl"
+  },
+  {
+   "code": "et",
+   "name": "Estonian",
+   "senses": 17082,
+   "bytes": 56323247,
+   "url": "https://kaikki.org/dictionary/Estonian/kaikki.org-dictionary-Estonian.jsonl"
+  },
+  {
+   "code": "ett",
+   "name": "Etruscan",
+   "senses": 555,
+   "bytes": 658016,
+   "url": "https://kaikki.org/dictionary/Etruscan/kaikki.org-dictionary-Etruscan.jsonl"
+  },
+  {
+   "code": "eve",
+   "name": "Even",
+   "senses": 785,
+   "bytes": 785707,
+   "url": "https://kaikki.org/dictionary/Even/kaikki.org-dictionary-Even.jsonl"
+  },
+  {
+   "code": "evn",
+   "name": "Evenki",
+   "senses": 747,
+   "bytes": 806746,
+   "url": "https://kaikki.org/dictionary/Evenki/kaikki.org-dictionary-Evenki.jsonl"
+  },
+  {
+   "code": "ee",
+   "name": "Ewe",
+   "senses": 867,
+   "bytes": 814058,
+   "url": "https://kaikki.org/dictionary/Ewe/kaikki.org-dictionary-Ewe.jsonl"
+  },
+  {
+   "code": "fax",
+   "name": "Fala",
+   "senses": 1006,
+   "bytes": 3883660,
+   "url": "https://kaikki.org/dictionary/Fala/kaikki.org-dictionary-Fala.jsonl"
+  },
+  {
+   "code": "fo",
+   "name": "Faroese",
+   "senses": 12873,
+   "bytes": 24665823,
+   "url": "https://kaikki.org/dictionary/Faroese/kaikki.org-dictionary-Faroese.jsonl"
+  },
+  {
+   "code": "fj",
+   "name": "Fijian",
+   "senses": 1250,
+   "bytes": 1773386,
+   "url": "https://kaikki.org/dictionary/Fijian/kaikki.org-dictionary-Fijian.jsonl"
+  },
+  {
+   "code": "fi",
+   "name": "Finnish",
+   "senses": 312312,
+   "bytes": 4656985044,
+   "url": "https://kaikki.org/dictionary/Finnish/kaikki.org-dictionary-Finnish.jsonl"
+  },
+  {
+   "code": "frp",
+   "name": "Franco-Provençal",
+   "senses": 2877,
+   "bytes": 4074330,
+   "url": "https://kaikki.org/dictionary/Franco-Proven%C3%A7al/kaikki.org-dictionary-FrancoProven%C3%A7al.jsonl"
+  },
+  {
+   "code": "fr",
+   "name": "French",
+   "senses": 460826,
+   "bytes": 592859335,
+   "url": "https://kaikki.org/dictionary/French/kaikki.org-dictionary-French.jsonl"
+  },
+  {
+   "code": "fur",
+   "name": "Friulian",
+   "senses": 2591,
+   "bytes": 3934742,
+   "url": "https://kaikki.org/dictionary/Friulian/kaikki.org-dictionary-Friulian.jsonl"
+  },
+  {
+   "code": "ff",
+   "name": "Fula",
+   "senses": 2302,
+   "bytes": 2335512,
+   "url": "https://kaikki.org/dictionary/Fula/kaikki.org-dictionary-Fula.jsonl"
+  },
+  {
+   "code": "gag",
+   "name": "Gagauz",
+   "senses": 1712,
+   "bytes": 2621410,
+   "url": "https://kaikki.org/dictionary/Gagauz/kaikki.org-dictionary-Gagauz.jsonl"
+  },
+  {
+   "code": "gl",
+   "name": "Galician",
+   "senses": 248965,
+   "bytes": 265705724,
+   "url": "https://kaikki.org/dictionary/Galician/kaikki.org-dictionary-Galician.jsonl"
+  },
+  {
+   "code": "kld",
+   "name": "Gamilaraay",
+   "senses": 851,
+   "bytes": 525037,
+   "url": "https://kaikki.org/dictionary/Gamilaraay/kaikki.org-dictionary-Gamilaraay.jsonl"
+  },
+  {
+   "code": "grt",
+   "name": "Garo",
+   "senses": 1214,
+   "bytes": 1026798,
+   "url": "https://kaikki.org/dictionary/Garo/kaikki.org-dictionary-Garo.jsonl"
+  },
+  {
+   "code": "gwt",
+   "name": "Gawar-Bati",
+   "senses": 1083,
+   "bytes": 1112917,
+   "url": "https://kaikki.org/dictionary/Gawar-Bati/kaikki.org-dictionary-GawarBati.jsonl"
+  },
+  {
+   "code": "gez",
+   "name": "Ge'ez",
+   "senses": 894,
+   "bytes": 992587,
+   "url": "https://kaikki.org/dictionary/Ge%27ez/kaikki.org-dictionary-Geez.jsonl"
+  },
+  {
+   "code": "ka",
+   "name": "Georgian",
+   "senses": 31647,
+   "bytes": 142205906,
+   "url": "https://kaikki.org/dictionary/Georgian/kaikki.org-dictionary-Georgian.jsonl"
+  },
+  {
+   "code": "de",
+   "name": "German",
+   "senses": 634188,
+   "bytes": 1095258648,
+   "url": "https://kaikki.org/dictionary/German/kaikki.org-dictionary-German.jsonl"
+  },
+  {
+   "code": "bbj",
+   "name": "Ghomala'",
+   "senses": 820,
+   "bytes": 721375,
+   "url": "https://kaikki.org/dictionary/Ghomala%27/kaikki.org-dictionary-Ghomala.jsonl"
+  },
+  {
+   "code": "gho",
+   "name": "Ghomara",
+   "senses": 1699,
+   "bytes": 3729329,
+   "url": "https://kaikki.org/dictionary/Ghomara/kaikki.org-dictionary-Ghomara.jsonl"
+  },
+  {
+   "code": "got",
+   "name": "Gothic",
+   "senses": 25150,
+   "bytes": 47421601,
+   "url": "https://kaikki.org/dictionary/Gothic/kaikki.org-dictionary-Gothic.jsonl"
+  },
+  {
+   "code": "el",
+   "name": "Greek",
+   "senses": 112999,
+   "bytes": 221294549,
+   "url": "https://kaikki.org/dictionary/Greek/kaikki.org-dictionary-Greek.jsonl"
+  },
+  {
+   "code": "kl",
+   "name": "Greenlandic",
+   "senses": 3034,
+   "bytes": 4549810,
+   "url": "https://kaikki.org/dictionary/Greenlandic/kaikki.org-dictionary-Greenlandic.jsonl"
+  },
+  {
+   "code": "gu",
+   "name": "Gujarati",
+   "senses": 10030,
+   "bytes": 20496234,
+   "url": "https://kaikki.org/dictionary/Gujarati/kaikki.org-dictionary-Gujarati.jsonl"
+  },
+  {
+   "code": "afb",
+   "name": "Gulf Arabic",
+   "senses": 1039,
+   "bytes": 1857169,
+   "url": "https://kaikki.org/dictionary/Gulf%20Arabic/kaikki.org-dictionary-GulfArabic.jsonl"
+  },
+  {
+   "code": "guw",
+   "name": "Gun",
+   "senses": 869,
+   "bytes": 1298098,
+   "url": "https://kaikki.org/dictionary/Gun/kaikki.org-dictionary-Gun.jsonl"
+  },
+  {
+   "code": "ht",
+   "name": "Haitian Creole",
+   "senses": 2538,
+   "bytes": 2691629,
+   "url": "https://kaikki.org/dictionary/Haitian%20Creole/kaikki.org-dictionary-HaitianCreole.jsonl"
+  },
+  {
+   "code": "amf",
+   "name": "Hamer-Banna",
+   "senses": 768,
+   "bytes": 863275,
+   "url": "https://kaikki.org/dictionary/Hamer-Banna/kaikki.org-dictionary-HamerBanna.jsonl"
+  },
+  {
+   "code": "hnn",
+   "name": "Hanunoo",
+   "senses": 596,
+   "bytes": 785008,
+   "url": "https://kaikki.org/dictionary/Hanunoo/kaikki.org-dictionary-Hanunoo.jsonl"
+  },
+  {
+   "code": "ha",
+   "name": "Hausa",
+   "senses": 2717,
+   "bytes": 2885445,
+   "url": "https://kaikki.org/dictionary/Hausa/kaikki.org-dictionary-Hausa.jsonl"
+  },
+  {
+   "code": "haw",
+   "name": "Hawaiian",
+   "senses": 6492,
+   "bytes": 5922259,
+   "url": "https://kaikki.org/dictionary/Hawaiian/kaikki.org-dictionary-Hawaiian.jsonl"
+  },
+  {
+   "code": "he",
+   "name": "Hebrew",
+   "senses": 23978,
+   "bytes": 60179927,
+   "url": "https://kaikki.org/dictionary/Hebrew/kaikki.org-dictionary-Hebrew.jsonl"
+  },
+  {
+   "code": "acw",
+   "name": "Hijazi Arabic",
+   "senses": 3222,
+   "bytes": 8171028,
+   "url": "https://kaikki.org/dictionary/Hijazi%20Arabic/kaikki.org-dictionary-HijaziArabic.jsonl"
+  },
+  {
+   "code": "hil",
+   "name": "Hiligaynon",
+   "senses": 2573,
+   "bytes": 2322424,
+   "url": "https://kaikki.org/dictionary/Hiligaynon/kaikki.org-dictionary-Hiligaynon.jsonl"
+  },
+  {
+   "code": "hi",
+   "name": "Hindi",
+   "senses": 58698,
+   "bytes": 168373020,
+   "url": "https://kaikki.org/dictionary/Hindi/kaikki.org-dictionary-Hindi.jsonl"
+  },
+  {
+   "code": "hit",
+   "name": "Hittite",
+   "senses": 683,
+   "bytes": 5009623,
+   "url": "https://kaikki.org/dictionary/Hittite/kaikki.org-dictionary-Hittite.jsonl"
+  },
+  {
+   "code": "nan-hbl",
+   "name": "Hokkien",
+   "senses": 2988,
+   "bytes": 1510540,
+   "url": "https://kaikki.org/dictionary/Hokkien/kaikki.org-dictionary-Hokkien.jsonl"
+  },
+  {
+   "code": "hu",
+   "name": "Hungarian",
+   "senses": 90796,
+   "bytes": 590467907,
+   "url": "https://kaikki.org/dictionary/Hungarian/kaikki.org-dictionary-Hungarian.jsonl"
+  },
+  {
+   "code": "hrx",
+   "name": "Hunsrik",
+   "senses": 2749,
+   "bytes": 4637704,
+   "url": "https://kaikki.org/dictionary/Hunsrik/kaikki.org-dictionary-Hunsrik.jsonl"
+  },
+  {
+   "code": "iba",
+   "name": "Iban",
+   "senses": 1578,
+   "bytes": 1287738,
+   "url": "https://kaikki.org/dictionary/Iban/kaikki.org-dictionary-Iban.jsonl"
+  },
+  {
+   "code": "is",
+   "name": "Icelandic",
+   "senses": 32882,
+   "bytes": 72484459,
+   "url": "https://kaikki.org/dictionary/Icelandic/kaikki.org-dictionary-Icelandic.jsonl"
+  },
+  {
+   "code": "io",
+   "name": "Ido",
+   "senses": 22287,
+   "bytes": 27763587,
+   "url": "https://kaikki.org/dictionary/Ido/kaikki.org-dictionary-Ido.jsonl"
+  },
+  {
+   "code": "ilo",
+   "name": "Ilocano",
+   "senses": 2029,
+   "bytes": 2831603,
+   "url": "https://kaikki.org/dictionary/Ilocano/kaikki.org-dictionary-Ilocano.jsonl"
+  },
+  {
+   "code": "smn",
+   "name": "Inari Sami",
+   "senses": 648,
+   "bytes": 1779983,
+   "url": "https://kaikki.org/dictionary/Inari%20Sami/kaikki.org-dictionary-InariSami.jsonl"
+  },
+  {
+   "code": "id",
+   "name": "Indonesian",
+   "senses": 57372,
+   "bytes": 70005729,
+   "url": "https://kaikki.org/dictionary/Indonesian/kaikki.org-dictionary-Indonesian.jsonl"
+  },
+  {
+   "code": "izh",
+   "name": "Ingrian",
+   "senses": 10843,
+   "bytes": 60358916,
+   "url": "https://kaikki.org/dictionary/Ingrian/kaikki.org-dictionary-Ingrian.jsonl"
+  },
+  {
+   "code": "inh",
+   "name": "Ingush",
+   "senses": 732,
+   "bytes": 949469,
+   "url": "https://kaikki.org/dictionary/Ingush/kaikki.org-dictionary-Ingush.jsonl"
+  },
+  {
+   "code": "ia",
+   "name": "Interlingua",
+   "senses": 4380,
+   "bytes": 4818263,
+   "url": "https://kaikki.org/dictionary/Interlingua/kaikki.org-dictionary-Interlingua.jsonl"
+  },
+  {
+   "code": "iu",
+   "name": "Inuktitut",
+   "senses": 553,
+   "bytes": 518728,
+   "url": "https://kaikki.org/dictionary/Inuktitut/kaikki.org-dictionary-Inuktitut.jsonl"
+  },
+  {
+   "code": "ik",
+   "name": "Inupiaq",
+   "senses": 984,
+   "bytes": 964147,
+   "url": "https://kaikki.org/dictionary/Inupiaq/kaikki.org-dictionary-Inupiaq.jsonl"
+  },
+  {
+   "code": "ga",
+   "name": "Irish",
+   "senses": 52091,
+   "bytes": 112227977,
+   "url": "https://kaikki.org/dictionary/Irish/kaikki.org-dictionary-Irish.jsonl"
+  },
+  {
+   "code": "ist",
+   "name": "Istriot",
+   "senses": 1422,
+   "bytes": 1298243,
+   "url": "https://kaikki.org/dictionary/Istriot/kaikki.org-dictionary-Istriot.jsonl"
+  },
+  {
+   "code": "it",
+   "name": "Italian",
+   "senses": 720157,
+   "bytes": 779439733,
+   "url": "https://kaikki.org/dictionary/Italian/kaikki.org-dictionary-Italian.jsonl"
+  },
+  {
+   "code": "jam",
+   "name": "Jamaican Creole",
+   "senses": 1250,
+   "bytes": 3061551,
+   "url": "https://kaikki.org/dictionary/Jamaican%20Creole/kaikki.org-dictionary-JamaicanCreole.jsonl"
+  },
+  {
+   "code": "ja",
+   "name": "Japanese",
+   "senses": 237987,
+   "bytes": 387569356,
+   "url": "https://kaikki.org/dictionary/Japanese/kaikki.org-dictionary-Japanese.jsonl"
+  },
+  {
+   "code": "jv",
+   "name": "Javanese",
+   "senses": 7791,
+   "bytes": 8710862,
+   "url": "https://kaikki.org/dictionary/Javanese/kaikki.org-dictionary-Javanese.jsonl"
+  },
+  {
+   "code": "jje",
+   "name": "Jeju",
+   "senses": 1518,
+   "bytes": 1881295,
+   "url": "https://kaikki.org/dictionary/Jeju/kaikki.org-dictionary-Jeju.jsonl"
+  },
+  {
+   "code": "quc",
+   "name": "K'iche'",
+   "senses": 505,
+   "bytes": 359061,
+   "url": "https://kaikki.org/dictionary/K%27iche%27/kaikki.org-dictionary-Kiche.jsonl"
+  },
+  {
+   "code": "kea",
+   "name": "Kabuverdianu",
+   "senses": 1457,
+   "bytes": 3201510,
+   "url": "https://kaikki.org/dictionary/Kabuverdianu/kaikki.org-dictionary-Kabuverdianu.jsonl"
+  },
+  {
+   "code": "kls",
+   "name": "Kalasha",
+   "senses": 635,
+   "bytes": 590392,
+   "url": "https://kaikki.org/dictionary/Kalasha/kaikki.org-dictionary-Kalasha.jsonl"
+  },
+  {
+   "code": "xal",
+   "name": "Kalmyk",
+   "senses": 839,
+   "bytes": 943247,
+   "url": "https://kaikki.org/dictionary/Kalmyk/kaikki.org-dictionary-Kalmyk.jsonl"
+  },
+  {
+   "code": "kne",
+   "name": "Kankanaey",
+   "senses": 1138,
+   "bytes": 1328566,
+   "url": "https://kaikki.org/dictionary/Kankanaey/kaikki.org-dictionary-Kankanaey.jsonl"
+  },
+  {
+   "code": "kn",
+   "name": "Kannada",
+   "senses": 3964,
+   "bytes": 8974867,
+   "url": "https://kaikki.org/dictionary/Kannada/kaikki.org-dictionary-Kannada.jsonl"
+  },
+  {
+   "code": "pam",
+   "name": "Kapampangan",
+   "senses": 2240,
+   "bytes": 2560566,
+   "url": "https://kaikki.org/dictionary/Kapampangan/kaikki.org-dictionary-Kapampangan.jsonl"
+  },
+  {
+   "code": "kyj",
+   "name": "Karao",
+   "senses": 948,
+   "bytes": 657595,
+   "url": "https://kaikki.org/dictionary/Karao/kaikki.org-dictionary-Karao.jsonl"
+  },
+  {
+   "code": "krl",
+   "name": "Karelian",
+   "senses": 1410,
+   "bytes": 4887900,
+   "url": "https://kaikki.org/dictionary/Karelian/kaikki.org-dictionary-Karelian.jsonl"
+  },
+  {
+   "code": "ks",
+   "name": "Kashmiri",
+   "senses": 3368,
+   "bytes": 4694912,
+   "url": "https://kaikki.org/dictionary/Kashmiri/kaikki.org-dictionary-Kashmiri.jsonl"
+  },
+  {
+   "code": "csb",
+   "name": "Kashubian",
+   "senses": 4169,
+   "bytes": 11870286,
+   "url": "https://kaikki.org/dictionary/Kashubian/kaikki.org-dictionary-Kashubian.jsonl"
+  },
+  {
+   "code": "ckv",
+   "name": "Kavalan",
+   "senses": 916,
+   "bytes": 620517,
+   "url": "https://kaikki.org/dictionary/Kavalan/kaikki.org-dictionary-Kavalan.jsonl"
+  },
+  {
+   "code": "kk",
+   "name": "Kazakh",
+   "senses": 16201,
+   "bytes": 38520136,
+   "url": "https://kaikki.org/dictionary/Kazakh/kaikki.org-dictionary-Kazakh.jsonl"
+  },
+  {
+   "code": "ket",
+   "name": "Ket",
+   "senses": 1107,
+   "bytes": 2483238,
+   "url": "https://kaikki.org/dictionary/Ket/kaikki.org-dictionary-Ket.jsonl"
+  },
+  {
+   "code": "kjh",
+   "name": "Khakas",
+   "senses": 544,
+   "bytes": 861682,
+   "url": "https://kaikki.org/dictionary/Khakas/kaikki.org-dictionary-Khakas.jsonl"
+  },
+  {
+   "code": "klj",
+   "name": "Khalaj",
+   "senses": 2238,
+   "bytes": 9358131,
+   "url": "https://kaikki.org/dictionary/Khalaj/kaikki.org-dictionary-Khalaj.jsonl"
+  },
+  {
+   "code": "kix",
+   "name": "Khiamniungan Naga",
+   "senses": 5816,
+   "bytes": 5120361,
+   "url": "https://kaikki.org/dictionary/Khiamniungan%20Naga/kaikki.org-dictionary-KhiamniunganNaga.jsonl"
+  },
+  {
+   "code": "km",
+   "name": "Khmer",
+   "senses": 15360,
+   "bytes": 16683015,
+   "url": "https://kaikki.org/dictionary/Khmer/kaikki.org-dictionary-Khmer.jsonl"
+  },
+  {
+   "code": "ki",
+   "name": "Kikuyu",
+   "senses": 1982,
+   "bytes": 1834459,
+   "url": "https://kaikki.org/dictionary/Kikuyu/kaikki.org-dictionary-Kikuyu.jsonl"
+  },
+  {
+   "code": "sjd",
+   "name": "Kildin Sami",
+   "senses": 1998,
+   "bytes": 3282320,
+   "url": "https://kaikki.org/dictionary/Kildin%20Sami/kaikki.org-dictionary-KildinSami.jsonl"
+  },
+  {
+   "code": "kpv",
+   "name": "Komi-Zyrian",
+   "senses": 1647,
+   "bytes": 6671072,
+   "url": "https://kaikki.org/dictionary/Komi-Zyrian/kaikki.org-dictionary-KomiZyrian.jsonl"
+  },
+  {
+   "code": "kok",
+   "name": "Konkani",
+   "senses": 1475,
+   "bytes": 3026141,
+   "url": "https://kaikki.org/dictionary/Konkani/kaikki.org-dictionary-Konkani.jsonl"
+  },
+  {
+   "code": "ko",
+   "name": "Korean",
+   "senses": 82555,
+   "bytes": 207613877,
+   "url": "https://kaikki.org/dictionary/Korean/kaikki.org-dictionary-Korean.jsonl"
+  },
+  {
+   "code": "kum",
+   "name": "Kumyk",
+   "senses": 2117,
+   "bytes": 10660764,
+   "url": "https://kaikki.org/dictionary/Kumyk/kaikki.org-dictionary-Kumyk.jsonl"
+  },
+  {
+   "code": "xkz",
+   "name": "Kurtöp",
+   "senses": 539,
+   "bytes": 752179,
+   "url": "https://kaikki.org/dictionary/Kurt%C3%B6p/kaikki.org-dictionary-Kurt%C3%B6p.jsonl"
+  },
+  {
+   "code": "ky",
+   "name": "Kyrgyz",
+   "senses": 4614,
+   "bytes": 27491791,
+   "url": "https://kaikki.org/dictionary/Kyrgyz/kaikki.org-dictionary-Kyrgyz.jsonl"
+  },
+  {
+   "code": "lld",
+   "name": "Ladin",
+   "senses": 8461,
+   "bytes": 7384848,
+   "url": "https://kaikki.org/dictionary/Ladin/kaikki.org-dictionary-Ladin.jsonl"
+  },
+  {
+   "code": "lad",
+   "name": "Ladino",
+   "senses": 3190,
+   "bytes": 4884513,
+   "url": "https://kaikki.org/dictionary/Ladino/kaikki.org-dictionary-Ladino.jsonl"
+  },
+  {
+   "code": "lkt",
+   "name": "Lakota",
+   "senses": 1019,
+   "bytes": 775335,
+   "url": "https://kaikki.org/dictionary/Lakota/kaikki.org-dictionary-Lakota.jsonl"
+  },
+  {
+   "code": "lo",
+   "name": "Lao",
+   "senses": 3339,
+   "bytes": 5405795,
+   "url": "https://kaikki.org/dictionary/Lao/kaikki.org-dictionary-Lao.jsonl"
+  },
+  {
+   "code": "ltg",
+   "name": "Latgalian",
+   "senses": 676,
+   "bytes": 2031223,
+   "url": "https://kaikki.org/dictionary/Latgalian/kaikki.org-dictionary-Latgalian.jsonl"
+  },
+  {
+   "code": "la",
+   "name": "Latin",
+   "senses": 1010281,
+   "bytes": 1250206785,
+   "url": "https://kaikki.org/dictionary/Latin/kaikki.org-dictionary-Latin.jsonl"
+  },
+  {
+   "code": "lv",
+   "name": "Latvian",
+   "senses": 172708,
+   "bytes": 189349434,
+   "url": "https://kaikki.org/dictionary/Latvian/kaikki.org-dictionary-Latvian.jsonl"
+  },
+  {
+   "code": "lzz",
+   "name": "Laz",
+   "senses": 4083,
+   "bytes": 11767685,
+   "url": "https://kaikki.org/dictionary/Laz/kaikki.org-dictionary-Laz.jsonl"
+  },
+  {
+   "code": "lij",
+   "name": "Ligurian",
+   "senses": 2612,
+   "bytes": 2799228,
+   "url": "https://kaikki.org/dictionary/Ligurian/kaikki.org-dictionary-Ligurian.jsonl"
+  },
+  {
+   "code": "li",
+   "name": "Limburgish",
+   "senses": 2826,
+   "bytes": 4142918,
+   "url": "https://kaikki.org/dictionary/Limburgish/kaikki.org-dictionary-Limburgish.jsonl"
+  },
+  {
+   "code": "klw",
+   "name": "Lindu",
+   "senses": 677,
+   "bytes": 422345,
+   "url": "https://kaikki.org/dictionary/Lindu/kaikki.org-dictionary-Lindu.jsonl"
+  },
+  {
+   "code": "ln",
+   "name": "Lingala",
+   "senses": 1904,
+   "bytes": 1432144,
+   "url": "https://kaikki.org/dictionary/Lingala/kaikki.org-dictionary-Lingala.jsonl"
+  },
+  {
+   "code": "lt",
+   "name": "Lithuanian",
+   "senses": 35040,
+   "bytes": 83581783,
+   "url": "https://kaikki.org/dictionary/Lithuanian/kaikki.org-dictionary-Lithuanian.jsonl"
+  },
+  {
+   "code": "liv",
+   "name": "Livonian",
+   "senses": 6424,
+   "bytes": 15345025,
+   "url": "https://kaikki.org/dictionary/Livonian/kaikki.org-dictionary-Livonian.jsonl"
+  },
+  {
+   "code": "olo",
+   "name": "Livvi",
+   "senses": 789,
+   "bytes": 1374329,
+   "url": "https://kaikki.org/dictionary/Livvi/kaikki.org-dictionary-Livvi.jsonl"
+  },
+  {
+   "code": "lmo",
+   "name": "Lombard",
+   "senses": 1025,
+   "bytes": 1341684,
+   "url": "https://kaikki.org/dictionary/Lombard/kaikki.org-dictionary-Lombard.jsonl"
+  },
+  {
+   "code": "njh",
+   "name": "Lotha Naga",
+   "senses": 532,
+   "bytes": 620595,
+   "url": "https://kaikki.org/dictionary/Lotha%20Naga/kaikki.org-dictionary-LothaNaga.jsonl"
+  },
+  {
+   "code": "lou",
+   "name": "Louisiana Creole",
+   "senses": 830,
+   "bytes": 839848,
+   "url": "https://kaikki.org/dictionary/Louisiana%20Creole/kaikki.org-dictionary-LouisianaCreole.jsonl"
+  },
+  {
+   "code": "nds",
+   "name": "Low German",
+   "senses": 3022,
+   "bytes": 5128819,
+   "url": "https://kaikki.org/dictionary/Low%20German/kaikki.org-dictionary-LowGerman.jsonl"
+  },
+  {
+   "code": "dsb",
+   "name": "Lower Sorbian",
+   "senses": 4690,
+   "bytes": 8050696,
+   "url": "https://kaikki.org/dictionary/Lower%20Sorbian/kaikki.org-dictionary-LowerSorbian.jsonl"
+  },
+  {
+   "code": "taa",
+   "name": "Lower Tanana",
+   "senses": 4143,
+   "bytes": 4709632,
+   "url": "https://kaikki.org/dictionary/Lower%20Tanana/kaikki.org-dictionary-LowerTanana.jsonl"
+  },
+  {
+   "code": "khb",
+   "name": "Lü",
+   "senses": 821,
+   "bytes": 1256535,
+   "url": "https://kaikki.org/dictionary/L%C3%BC/kaikki.org-dictionary-L%C3%BC.jsonl"
+  },
+  {
+   "code": "lud",
+   "name": "Ludian",
+   "senses": 1013,
+   "bytes": 4243115,
+   "url": "https://kaikki.org/dictionary/Ludian/kaikki.org-dictionary-Ludian.jsonl"
+  },
+  {
+   "code": "smj",
+   "name": "Lule Sami",
+   "senses": 1160,
+   "bytes": 3673424,
+   "url": "https://kaikki.org/dictionary/Lule%20Sami/kaikki.org-dictionary-LuleSami.jsonl"
+  },
+  {
+   "code": "lut",
+   "name": "Lushootseed",
+   "senses": 934,
+   "bytes": 881866,
+   "url": "https://kaikki.org/dictionary/Lushootseed/kaikki.org-dictionary-Lushootseed.jsonl"
+  },
+  {
+   "code": "lb",
+   "name": "Luxembourgish",
+   "senses": 12283,
+   "bytes": 16410559,
+   "url": "https://kaikki.org/dictionary/Luxembourgish/kaikki.org-dictionary-Luxembourgish.jsonl"
+  },
+  {
+   "code": "mzs",
+   "name": "Macanese",
+   "senses": 1053,
+   "bytes": 1981174,
+   "url": "https://kaikki.org/dictionary/Macanese/kaikki.org-dictionary-Macanese.jsonl"
+  },
+  {
+   "code": "mk",
+   "name": "Macedonian",
+   "senses": 76803,
+   "bytes": 304620008,
+   "url": "https://kaikki.org/dictionary/Macedonian/kaikki.org-dictionary-Macedonian.jsonl"
+  },
+  {
+   "code": "mag",
+   "name": "Magahi",
+   "senses": 1148,
+   "bytes": 1159704,
+   "url": "https://kaikki.org/dictionary/Magahi/kaikki.org-dictionary-Magahi.jsonl"
+  },
+  {
+   "code": "mak",
+   "name": "Makasar",
+   "senses": 9576,
+   "bytes": 11677446,
+   "url": "https://kaikki.org/dictionary/Makasar/kaikki.org-dictionary-Makasar.jsonl"
+  },
+  {
+   "code": "mg",
+   "name": "Malagasy",
+   "senses": 4328,
+   "bytes": 2951422,
+   "url": "https://kaikki.org/dictionary/Malagasy/kaikki.org-dictionary-Malagasy.jsonl"
+  },
+  {
+   "code": "ms",
+   "name": "Malay",
+   "senses": 22460,
+   "bytes": 28867677,
+   "url": "https://kaikki.org/dictionary/Malay/kaikki.org-dictionary-Malay.jsonl"
+  },
+  {
+   "code": "ml",
+   "name": "Malayalam",
+   "senses": 17341,
+   "bytes": 23945372,
+   "url": "https://kaikki.org/dictionary/Malayalam/kaikki.org-dictionary-Malayalam.jsonl"
+  },
+  {
+   "code": "mt",
+   "name": "Maltese",
+   "senses": 83994,
+   "bytes": 99021210,
+   "url": "https://kaikki.org/dictionary/Maltese/kaikki.org-dictionary-Maltese.jsonl"
+  },
+  {
+   "code": "mnc",
+   "name": "Manchu",
+   "senses": 3301,
+   "bytes": 4401391,
+   "url": "https://kaikki.org/dictionary/Manchu/kaikki.org-dictionary-Manchu.jsonl"
+  },
+  {
+   "code": "cmn",
+   "name": "Mandarin",
+   "senses": 113730,
+   "bytes": 93008031,
+   "url": "https://kaikki.org/dictionary/Mandarin/kaikki.org-dictionary-Mandarin.jsonl"
+  },
+  {
+   "code": "mni",
+   "name": "Manipuri",
+   "senses": 1117,
+   "bytes": 983895,
+   "url": "https://kaikki.org/dictionary/Manipuri/kaikki.org-dictionary-Manipuri.jsonl"
+  },
+  {
+   "code": "gv",
+   "name": "Manx",
+   "senses": 5383,
+   "bytes": 6040959,
+   "url": "https://kaikki.org/dictionary/Manx/kaikki.org-dictionary-Manx.jsonl"
+  },
+  {
+   "code": "mi",
+   "name": "Māori",
+   "senses": 5367,
+   "bytes": 5304063,
+   "url": "https://kaikki.org/dictionary/M%C4%81ori/kaikki.org-dictionary-M%C4%81ori.jsonl"
+  },
+  {
+   "code": "arn",
+   "name": "Mapudungun",
+   "senses": 1293,
+   "bytes": 1491540,
+   "url": "https://kaikki.org/dictionary/Mapudungun/kaikki.org-dictionary-Mapudungun.jsonl"
+  },
+  {
+   "code": "mrw",
+   "name": "Maranao",
+   "senses": 1213,
+   "bytes": 1000851,
+   "url": "https://kaikki.org/dictionary/Maranao/kaikki.org-dictionary-Maranao.jsonl"
+  },
+  {
+   "code": "mr",
+   "name": "Marathi",
+   "senses": 8454,
+   "bytes": 28911881,
+   "url": "https://kaikki.org/dictionary/Marathi/kaikki.org-dictionary-Marathi.jsonl"
+  },
+  {
+   "code": "grk-mar",
+   "name": "Mariupol Greek",
+   "senses": 673,
+   "bytes": 1727407,
+   "url": "https://kaikki.org/dictionary/Mariupol%20Greek/kaikki.org-dictionary-MariupolGreek.jsonl"
+  },
+  {
+   "code": "mh",
+   "name": "Marshallese",
+   "senses": 2041,
+   "bytes": 2508374,
+   "url": "https://kaikki.org/dictionary/Marshallese/kaikki.org-dictionary-Marshallese.jsonl"
+  },
+  {
+   "code": "mfe",
+   "name": "Mauritian Creole",
+   "senses": 2072,
+   "bytes": 1801172,
+   "url": "https://kaikki.org/dictionary/Mauritian%20Creole/kaikki.org-dictionary-MauritianCreole.jsonl"
+  },
+  {
+   "code": "mzn",
+   "name": "Mazanderani",
+   "senses": 584,
+   "bytes": 1868875,
+   "url": "https://kaikki.org/dictionary/Mazanderani/kaikki.org-dictionary-Mazanderani.jsonl"
+  },
+  {
+   "code": "gun",
+   "name": "Mbya Guarani",
+   "senses": 513,
+   "bytes": 437612,
+   "url": "https://kaikki.org/dictionary/Mbya%20Guarani/kaikki.org-dictionary-MbyaGuarani.jsonl"
+  },
+  {
+   "code": "axm",
+   "name": "Middle Armenian",
+   "senses": 546,
+   "bytes": 1162406,
+   "url": "https://kaikki.org/dictionary/Middle%20Armenian/kaikki.org-dictionary-MiddleArmenian.jsonl"
+  },
+  {
+   "code": "dum",
+   "name": "Middle Dutch",
+   "senses": 4313,
+   "bytes": 5989862,
+   "url": "https://kaikki.org/dictionary/Middle%20Dutch/kaikki.org-dictionary-MiddleDutch.jsonl"
+  },
+  {
+   "code": "enm",
+   "name": "Middle English",
+   "senses": 71296,
+   "bytes": 72162589,
+   "url": "https://kaikki.org/dictionary/Middle%20English/kaikki.org-dictionary-MiddleEnglish.jsonl"
+  },
+  {
+   "code": "frm",
+   "name": "Middle French",
+   "senses": 5441,
+   "bytes": 13336591,
+   "url": "https://kaikki.org/dictionary/Middle%20French/kaikki.org-dictionary-MiddleFrench.jsonl"
+  },
+  {
+   "code": "gmh",
+   "name": "Middle High German",
+   "senses": 2650,
+   "bytes": 10197573,
+   "url": "https://kaikki.org/dictionary/Middle%20High%20German/kaikki.org-dictionary-MiddleHighGerman.jsonl"
+  },
+  {
+   "code": "mga",
+   "name": "Middle Irish",
+   "senses": 1040,
+   "bytes": 1395809,
+   "url": "https://kaikki.org/dictionary/Middle%20Irish/kaikki.org-dictionary-MiddleIrish.jsonl"
+  },
+  {
+   "code": "okm",
+   "name": "Middle Korean",
+   "senses": 1202,
+   "bytes": 2250185,
+   "url": "https://kaikki.org/dictionary/Middle%20Korean/kaikki.org-dictionary-MiddleKorean.jsonl"
+  },
+  {
+   "code": "wlm",
+   "name": "Middle Welsh",
+   "senses": 1327,
+   "bytes": 2099911,
+   "url": "https://kaikki.org/dictionary/Middle%20Welsh/kaikki.org-dictionary-MiddleWelsh.jsonl"
+  },
+  {
+   "code": "xmf",
+   "name": "Mingrelian",
+   "senses": 1071,
+   "bytes": 1256147,
+   "url": "https://kaikki.org/dictionary/Mingrelian/kaikki.org-dictionary-Mingrelian.jsonl"
+  },
+  {
+   "code": "mwl",
+   "name": "Mirandese",
+   "senses": 746,
+   "bytes": 1367223,
+   "url": "https://kaikki.org/dictionary/Mirandese/kaikki.org-dictionary-Mirandese.jsonl"
+  },
+  {
+   "code": "lus",
+   "name": "Mizo",
+   "senses": 997,
+   "bytes": 810866,
+   "url": "https://kaikki.org/dictionary/Mizo/kaikki.org-dictionary-Mizo.jsonl"
+  },
+  {
+   "code": "moh",
+   "name": "Mohawk",
+   "senses": 920,
+   "bytes": 1418948,
+   "url": "https://kaikki.org/dictionary/Mohawk/kaikki.org-dictionary-Mohawk.jsonl"
+  },
+  {
+   "code": "mkj",
+   "name": "Mokilese",
+   "senses": 2328,
+   "bytes": 1989368,
+   "url": "https://kaikki.org/dictionary/Mokilese/kaikki.org-dictionary-Mokilese.jsonl"
+  },
+  {
+   "code": "mdf",
+   "name": "Moksha",
+   "senses": 2831,
+   "bytes": 5260094,
+   "url": "https://kaikki.org/dictionary/Moksha/kaikki.org-dictionary-Moksha.jsonl"
+  },
+  {
+   "code": "mnw",
+   "name": "Mon",
+   "senses": 1720,
+   "bytes": 1947856,
+   "url": "https://kaikki.org/dictionary/Mon/kaikki.org-dictionary-Mon.jsonl"
+  },
+  {
+   "code": "mn",
+   "name": "Mongolian",
+   "senses": 8635,
+   "bytes": 12952503,
+   "url": "https://kaikki.org/dictionary/Mongolian/kaikki.org-dictionary-Mongolian.jsonl"
+  },
+  {
+   "code": "ary",
+   "name": "Moroccan Arabic",
+   "senses": 2874,
+   "bytes": 7154641,
+   "url": "https://kaikki.org/dictionary/Moroccan%20Arabic/kaikki.org-dictionary-MoroccanArabic.jsonl"
+  },
+  {
+   "code": "huu",
+   "name": "Murui Huitoto",
+   "senses": 747,
+   "bytes": 3022527,
+   "url": "https://kaikki.org/dictionary/Murui%20Huitoto/kaikki.org-dictionary-MuruiHuitoto.jsonl"
+  },
+  {
+   "code": "gmy",
+   "name": "Mycenaean Greek",
+   "senses": 696,
+   "bytes": 775240,
+   "url": "https://kaikki.org/dictionary/Mycenaean%20Greek/kaikki.org-dictionary-MycenaeanGreek.jsonl"
+  },
+  {
+   "code": "gld",
+   "name": "Nanai",
+   "senses": 672,
+   "bytes": 741670,
+   "url": "https://kaikki.org/dictionary/Nanai/kaikki.org-dictionary-Nanai.jsonl"
+  },
+  {
+   "code": "nv",
+   "name": "Navajo",
+   "senses": 28585,
+   "bytes": 33109239,
+   "url": "https://kaikki.org/dictionary/Navajo/kaikki.org-dictionary-Navajo.jsonl"
+  },
+  {
+   "code": "nap",
+   "name": "Neapolitan",
+   "senses": 1887,
+   "bytes": 2093856,
+   "url": "https://kaikki.org/dictionary/Neapolitan/kaikki.org-dictionary-Neapolitan.jsonl"
+  },
+  {
+   "code": "ne",
+   "name": "Nepali",
+   "senses": 3084,
+   "bytes": 18367971,
+   "url": "https://kaikki.org/dictionary/Nepali/kaikki.org-dictionary-Nepali.jsonl"
+  },
+  {
+   "code": "yrl",
+   "name": "Nheengatu",
+   "senses": 687,
+   "bytes": 1319566,
+   "url": "https://kaikki.org/dictionary/Nheengatu/kaikki.org-dictionary-Nheengatu.jsonl"
+  },
+  {
+   "code": "niv",
+   "name": "Nivkh",
+   "senses": 828,
+   "bytes": 799368,
+   "url": "https://kaikki.org/dictionary/Nivkh/kaikki.org-dictionary-Nivkh.jsonl"
+  },
+  {
+   "code": "nog",
+   "name": "Nogai",
+   "senses": 507,
+   "bytes": 546463,
+   "url": "https://kaikki.org/dictionary/Nogai/kaikki.org-dictionary-Nogai.jsonl"
+  },
+  {
+   "code": "nrf",
+   "name": "Norman",
+   "senses": 12365,
+   "bytes": 16010375,
+   "url": "https://kaikki.org/dictionary/Norman/kaikki.org-dictionary-Norman.jsonl"
+  },
+  {
+   "code": "frr",
+   "name": "North Frisian",
+   "senses": 1717,
+   "bytes": 3864833,
+   "url": "https://kaikki.org/dictionary/North%20Frisian/kaikki.org-dictionary-NorthFrisian.jsonl"
+  },
+  {
+   "code": "apc",
+   "name": "North Levantine Arabic",
+   "senses": 1264,
+   "bytes": 3054588,
+   "url": "https://kaikki.org/dictionary/North%20Levantine%20Arabic/kaikki.org-dictionary-NorthLevantineArabic.jsonl"
+  },
+  {
+   "code": "atv",
+   "name": "Northern Altai",
+   "senses": 1332,
+   "bytes": 1782097,
+   "url": "https://kaikki.org/dictionary/Northern%20Altai/kaikki.org-dictionary-NorthernAltai.jsonl"
+  },
+  {
+   "code": "kmr",
+   "name": "Northern Kurdish",
+   "senses": 8166,
+   "bytes": 10970376,
+   "url": "https://kaikki.org/dictionary/Northern%20Kurdish/kaikki.org-dictionary-NorthernKurdish.jsonl"
+  },
+  {
+   "code": "mns-nor",
+   "name": "Northern Mansi",
+   "senses": 1485,
+   "bytes": 12103244,
+   "url": "https://kaikki.org/dictionary/Northern%20Mansi/kaikki.org-dictionary-NorthernMansi.jsonl"
+  },
+  {
+   "code": "nd",
+   "name": "Northern Ndebele",
+   "senses": 541,
+   "bytes": 582853,
+   "url": "https://kaikki.org/dictionary/Northern%20Ndebele/kaikki.org-dictionary-NorthernNdebele.jsonl"
+  },
+  {
+   "code": "se",
+   "name": "Northern Sami",
+   "senses": 7353,
+   "bytes": 25232379,
+   "url": "https://kaikki.org/dictionary/Northern%20Sami/kaikki.org-dictionary-NorthernSami.jsonl"
+  },
+  {
+   "code": "ykg",
+   "name": "Northern Yukaghir",
+   "senses": 3598,
+   "bytes": 3049311,
+   "url": "https://kaikki.org/dictionary/Northern%20Yukaghir/kaikki.org-dictionary-NorthernYukaghir.jsonl"
+  },
+  {
+   "code": "no",
+   "name": "Norwegian",
+   "senses": 1525,
+   "bytes": 1463680,
+   "url": "https://kaikki.org/dictionary/Norwegian/kaikki.org-dictionary-Norwegian.jsonl"
+  },
+  {
+   "code": "nb",
+   "name": "Norwegian Bokmål",
+   "senses": 94218,
+   "bytes": 93359520,
+   "url": "https://kaikki.org/dictionary/Norwegian%20Bokm%C3%A5l/kaikki.org-dictionary-NorwegianBokm%C3%A5l.jsonl"
+  },
+  {
+   "code": "nn",
+   "name": "Norwegian Nynorsk",
+   "senses": 73434,
+   "bytes": 67427651,
+   "url": "https://kaikki.org/dictionary/Norwegian%20Nynorsk/kaikki.org-dictionary-NorwegianNynorsk.jsonl"
+  },
+  {
+   "code": "nup",
+   "name": "Nupe",
+   "senses": 610,
+   "bytes": 716084,
+   "url": "https://kaikki.org/dictionary/Nupe/kaikki.org-dictionary-Nupe.jsonl"
+  },
+  {
+   "code": "blc",
+   "name": "Nuxalk",
+   "senses": 911,
+   "bytes": 742871,
+   "url": "https://kaikki.org/dictionary/Nuxalk/kaikki.org-dictionary-Nuxalk.jsonl"
+  },
+  {
+   "code": "ngh",
+   "name": "Nǀuu",
+   "senses": 570,
+   "bytes": 442169,
+   "url": "https://kaikki.org/dictionary/N%C7%80uu/kaikki.org-dictionary-N%C7%80uu.jsonl"
+  },
+  {
+   "code": "oc",
+   "name": "Occitan",
+   "senses": 8181,
+   "bytes": 32023246,
+   "url": "https://kaikki.org/dictionary/Occitan/kaikki.org-dictionary-Occitan.jsonl"
+  },
+  {
+   "code": "or",
+   "name": "Odia",
+   "senses": 5111,
+   "bytes": 4610094,
+   "url": "https://kaikki.org/dictionary/Odia/kaikki.org-dictionary-Odia.jsonl"
+  },
+  {
+   "code": "oj",
+   "name": "Ojibwe",
+   "senses": 2071,
+   "bytes": 2809027,
+   "url": "https://kaikki.org/dictionary/Ojibwe/kaikki.org-dictionary-Ojibwe.jsonl"
+  },
+  {
+   "code": "ryu",
+   "name": "Okinawan",
+   "senses": 1396,
+   "bytes": 1860016,
+   "url": "https://kaikki.org/dictionary/Okinawan/kaikki.org-dictionary-Okinawan.jsonl"
+  },
+  {
+   "code": "trk-oat",
+   "name": "Old Anatolian Turkish",
+   "senses": 1013,
+   "bytes": 1670030,
+   "url": "https://kaikki.org/dictionary/Old%20Anatolian%20Turkish/kaikki.org-dictionary-OldAnatolianTurkish.jsonl"
+  },
+  {
+   "code": "xcl",
+   "name": "Old Armenian",
+   "senses": 12882,
+   "bytes": 48466464,
+   "url": "https://kaikki.org/dictionary/Old%20Armenian/kaikki.org-dictionary-OldArmenian.jsonl"
+  },
+  {
+   "code": "cu",
+   "name": "Old Church Slavonic",
+   "senses": 5906,
+   "bytes": 46731927,
+   "url": "https://kaikki.org/dictionary/Old%20Church%20Slavonic/kaikki.org-dictionary-OldChurchSlavonic.jsonl"
+  },
+  {
+   "code": "zlw-ocs",
+   "name": "Old Czech",
+   "senses": 5575,
+   "bytes": 21707687,
+   "url": "https://kaikki.org/dictionary/Old%20Czech/kaikki.org-dictionary-OldCzech.jsonl"
+  },
+  {
+   "code": "odt",
+   "name": "Old Dutch",
+   "senses": 2343,
+   "bytes": 7708252,
+   "url": "https://kaikki.org/dictionary/Old%20Dutch/kaikki.org-dictionary-OldDutch.jsonl"
+  },
+  {
+   "code": "orv",
+   "name": "Old East Slavic",
+   "senses": 1221,
+   "bytes": 5319192,
+   "url": "https://kaikki.org/dictionary/Old%20East%20Slavic/kaikki.org-dictionary-OldEastSlavic.jsonl"
+  },
+  {
+   "code": "ang",
+   "name": "Old English",
+   "senses": 94705,
+   "bytes": 140580442,
+   "url": "https://kaikki.org/dictionary/Old%20English/kaikki.org-dictionary-OldEnglish.jsonl"
+  },
+  {
+   "code": "fro",
+   "name": "Old French",
+   "senses": 11052,
+   "bytes": 37234970,
+   "url": "https://kaikki.org/dictionary/Old%20French/kaikki.org-dictionary-OldFrench.jsonl"
+  },
+  {
+   "code": "ofs",
+   "name": "Old Frisian",
+   "senses": 720,
+   "bytes": 1417023,
+   "url": "https://kaikki.org/dictionary/Old%20Frisian/kaikki.org-dictionary-OldFrisian.jsonl"
+  },
+  {
+   "code": "roa-opt",
+   "name": "Old Galician-Portuguese",
+   "senses": 2010,
+   "bytes": 8477182,
+   "url": "https://kaikki.org/dictionary/Old%20Galician-Portuguese/kaikki.org-dictionary-OldGalicianPortuguese.jsonl"
+  },
+  {
+   "code": "oge",
+   "name": "Old Georgian",
+   "senses": 932,
+   "bytes": 1466595,
+   "url": "https://kaikki.org/dictionary/Old%20Georgian/kaikki.org-dictionary-OldGeorgian.jsonl"
+  },
+  {
+   "code": "goh",
+   "name": "Old High German",
+   "senses": 4286,
+   "bytes": 9558287,
+   "url": "https://kaikki.org/dictionary/Old%20High%20German/kaikki.org-dictionary-OldHighGerman.jsonl"
+  },
+  {
+   "code": "sga",
+   "name": "Old Irish",
+   "senses": 8864,
+   "bytes": 20669629,
+   "url": "https://kaikki.org/dictionary/Old%20Irish/kaikki.org-dictionary-OldIrish.jsonl"
+  },
+  {
+   "code": "ojp",
+   "name": "Old Japanese",
+   "senses": 690,
+   "bytes": 1310384,
+   "url": "https://kaikki.org/dictionary/Old%20Japanese/kaikki.org-dictionary-OldJapanese.jsonl"
+  },
+  {
+   "code": "kaw",
+   "name": "Old Javanese",
+   "senses": 3803,
+   "bytes": 3607060,
+   "url": "https://kaikki.org/dictionary/Old%20Javanese/kaikki.org-dictionary-OldJavanese.jsonl"
+  },
+  {
+   "code": "okz",
+   "name": "Old Khmer",
+   "senses": 651,
+   "bytes": 665226,
+   "url": "https://kaikki.org/dictionary/Old%20Khmer/kaikki.org-dictionary-OldKhmer.jsonl"
+  },
+  {
+   "code": "non",
+   "name": "Old Norse",
+   "senses": 15791,
+   "bytes": 38965677,
+   "url": "https://kaikki.org/dictionary/Old%20Norse/kaikki.org-dictionary-OldNorse.jsonl"
+  },
+  {
+   "code": "pro",
+   "name": "Old Occitan",
+   "senses": 770,
+   "bytes": 1205239,
+   "url": "https://kaikki.org/dictionary/Old%20Occitan/kaikki.org-dictionary-OldOccitan.jsonl"
+  },
+  {
+   "code": "peo",
+   "name": "Old Persian",
+   "senses": 660,
+   "bytes": 1748310,
+   "url": "https://kaikki.org/dictionary/Old%20Persian/kaikki.org-dictionary-OldPersian.jsonl"
+  },
+  {
+   "code": "zlw-opl",
+   "name": "Old Polish",
+   "senses": 7410,
+   "bytes": 23454807,
+   "url": "https://kaikki.org/dictionary/Old%20Polish/kaikki.org-dictionary-OldPolish.jsonl"
+  },
+  {
+   "code": "zle-ort",
+   "name": "Old Ruthenian",
+   "senses": 899,
+   "bytes": 2633834,
+   "url": "https://kaikki.org/dictionary/Old%20Ruthenian/kaikki.org-dictionary-OldRuthenian.jsonl"
+  },
+  {
+   "code": "osx",
+   "name": "Old Saxon",
+   "senses": 2783,
+   "bytes": 8157056,
+   "url": "https://kaikki.org/dictionary/Old%20Saxon/kaikki.org-dictionary-OldSaxon.jsonl"
+  },
+  {
+   "code": "zlw-osk",
+   "name": "Old Slovak",
+   "senses": 995,
+   "bytes": 1857222,
+   "url": "https://kaikki.org/dictionary/Old%20Slovak/kaikki.org-dictionary-OldSlovak.jsonl"
+  },
+  {
+   "code": "osp",
+   "name": "Old Spanish",
+   "senses": 1653,
+   "bytes": 3611593,
+   "url": "https://kaikki.org/dictionary/Old%20Spanish/kaikki.org-dictionary-OldSpanish.jsonl"
+  },
+  {
+   "code": "gmq-osw",
+   "name": "Old Swedish",
+   "senses": 2017,
+   "bytes": 8596849,
+   "url": "https://kaikki.org/dictionary/Old%20Swedish/kaikki.org-dictionary-OldSwedish.jsonl"
+  },
+  {
+   "code": "tpw",
+   "name": "Old Tupi",
+   "senses": 2380,
+   "bytes": 5572284,
+   "url": "https://kaikki.org/dictionary/Old%20Tupi/kaikki.org-dictionary-OldTupi.jsonl"
+  },
+  {
+   "code": "otk",
+   "name": "Old Turkic",
+   "senses": 505,
+   "bytes": 1195887,
+   "url": "https://kaikki.org/dictionary/Old%20Turkic/kaikki.org-dictionary-OldTurkic.jsonl"
+  },
+  {
+   "code": "oui",
+   "name": "Old Uyghur",
+   "senses": 632,
+   "bytes": 1921475,
+   "url": "https://kaikki.org/dictionary/Old%20Uyghur/kaikki.org-dictionary-OldUyghur.jsonl"
+  },
+  {
+   "code": "om",
+   "name": "Oromo",
+   "senses": 1373,
+   "bytes": 1277268,
+   "url": "https://kaikki.org/dictionary/Oromo/kaikki.org-dictionary-Oromo.jsonl"
+  },
+  {
+   "code": "os",
+   "name": "Ossetian",
+   "senses": 1106,
+   "bytes": 1283157,
+   "url": "https://kaikki.org/dictionary/Ossetian/kaikki.org-dictionary-Ossetian.jsonl"
+  },
+  {
+   "code": "ota",
+   "name": "Ottoman Turkish",
+   "senses": 15251,
+   "bytes": 34356167,
+   "url": "https://kaikki.org/dictionary/Ottoman%20Turkish/kaikki.org-dictionary-OttomanTurkish.jsonl"
+  },
+  {
+   "code": "pi",
+   "name": "Pali",
+   "senses": 13037,
+   "bytes": 36758237,
+   "url": "https://kaikki.org/dictionary/Pali/kaikki.org-dictionary-Pali.jsonl"
+  },
+  {
+   "code": "phl",
+   "name": "Palula",
+   "senses": 3390,
+   "bytes": 6113799,
+   "url": "https://kaikki.org/dictionary/Palula/kaikki.org-dictionary-Palula.jsonl"
+  },
+  {
+   "code": "rsk",
+   "name": "Pannonian Rusyn",
+   "senses": 14837,
+   "bytes": 82930230,
+   "url": "https://kaikki.org/dictionary/Pannonian%20Rusyn/kaikki.org-dictionary-PannonianRusyn.jsonl"
+  },
+  {
+   "code": "pap",
+   "name": "Papiamentu",
+   "senses": 1417,
+   "bytes": 3318193,
+   "url": "https://kaikki.org/dictionary/Papiamentu/kaikki.org-dictionary-Papiamentu.jsonl"
+  },
+  {
+   "code": "gug",
+   "name": "Paraguayan Guarani",
+   "senses": 1147,
+   "bytes": 2586271,
+   "url": "https://kaikki.org/dictionary/Paraguayan%20Guarani/kaikki.org-dictionary-ParaguayanGuarani.jsonl"
+  },
+  {
+   "code": "ps",
+   "name": "Pashto",
+   "senses": 2157,
+   "bytes": 4352793,
+   "url": "https://kaikki.org/dictionary/Pashto/kaikki.org-dictionary-Pashto.jsonl"
+  },
+  {
+   "code": "pdc",
+   "name": "Pennsylvania German",
+   "senses": 3141,
+   "bytes": 3177752,
+   "url": "https://kaikki.org/dictionary/Pennsylvania%20German/kaikki.org-dictionary-PennsylvaniaGerman.jsonl"
+  },
+  {
+   "code": "fa",
+   "name": "Persian",
+   "senses": 28272,
+   "bytes": 95770880,
+   "url": "https://kaikki.org/dictionary/Persian/kaikki.org-dictionary-Persian.jsonl"
+  },
+  {
+   "code": "bnt-phu",
+   "name": "Phuthi",
+   "senses": 1396,
+   "bytes": 1440217,
+   "url": "https://kaikki.org/dictionary/Phuthi/kaikki.org-dictionary-Phuthi.jsonl"
+  },
+  {
+   "code": "pms",
+   "name": "Piedmontese",
+   "senses": 1115,
+   "bytes": 905094,
+   "url": "https://kaikki.org/dictionary/Piedmontese/kaikki.org-dictionary-Piedmontese.jsonl"
+  },
+  {
+   "code": "sje",
+   "name": "Pite Sami",
+   "senses": 548,
+   "bytes": 794404,
+   "url": "https://kaikki.org/dictionary/Pite%20Sami/kaikki.org-dictionary-PiteSami.jsonl"
+  },
+  {
+   "code": "pdt",
+   "name": "Plautdietsch",
+   "senses": 5537,
+   "bytes": 5564587,
+   "url": "https://kaikki.org/dictionary/Plautdietsch/kaikki.org-dictionary-Plautdietsch.jsonl"
+  },
+  {
+   "code": "pon",
+   "name": "Pohnpeian",
+   "senses": 839,
+   "bytes": 1020771,
+   "url": "https://kaikki.org/dictionary/Pohnpeian/kaikki.org-dictionary-Pohnpeian.jsonl"
+  },
+  {
+   "code": "pox",
+   "name": "Polabian",
+   "senses": 663,
+   "bytes": 1523505,
+   "url": "https://kaikki.org/dictionary/Polabian/kaikki.org-dictionary-Polabian.jsonl"
+  },
+  {
+   "code": "pl",
+   "name": "Polish",
+   "senses": 267966,
+   "bytes": 897521880,
+   "url": "https://kaikki.org/dictionary/Polish/kaikki.org-dictionary-Polish.jsonl"
+  },
+  {
+   "code": "pt",
+   "name": "Portuguese",
+   "senses": 527775,
+   "bytes": 610118460,
+   "url": "https://kaikki.org/dictionary/Portuguese/kaikki.org-dictionary-Portuguese.jsonl"
+  },
+  {
+   "code": "pot",
+   "name": "Potawatomi",
+   "senses": 1019,
+   "bytes": 1670398,
+   "url": "https://kaikki.org/dictionary/Potawatomi/kaikki.org-dictionary-Potawatomi.jsonl"
+  },
+  {
+   "code": "pra",
+   "name": "Prakrit",
+   "senses": 2986,
+   "bytes": 16593872,
+   "url": "https://kaikki.org/dictionary/Prakrit/kaikki.org-dictionary-Prakrit.jsonl"
+  },
+  {
+   "code": "ine-bsl-pro",
+   "name": "Proto-Balto-Slavic",
+   "senses": 548,
+   "bytes": 1847807,
+   "url": "https://kaikki.org/dictionary/Proto-Balto-Slavic/kaikki.org-dictionary-ProtoBaltoSlavic.jsonl"
+  },
+  {
+   "code": "bnt-pro",
+   "name": "Proto-Bantu",
+   "senses": 869,
+   "bytes": 1167963,
+   "url": "https://kaikki.org/dictionary/Proto-Bantu/kaikki.org-dictionary-ProtoBantu.jsonl"
+  },
+  {
+   "code": "cel-bry-pro",
+   "name": "Proto-Brythonic",
+   "senses": 798,
+   "bytes": 1566475,
+   "url": "https://kaikki.org/dictionary/Proto-Brythonic/kaikki.org-dictionary-ProtoBrythonic.jsonl"
+  },
+  {
+   "code": "cel-pro",
+   "name": "Proto-Celtic",
+   "senses": 1936,
+   "bytes": 12096153,
+   "url": "https://kaikki.org/dictionary/Proto-Celtic/kaikki.org-dictionary-ProtoCeltic.jsonl"
+  },
+  {
+   "code": "urj-fin-pro",
+   "name": "Proto-Finnic",
+   "senses": 4281,
+   "bytes": 19425627,
+   "url": "https://kaikki.org/dictionary/Proto-Finnic/kaikki.org-dictionary-ProtoFinnic.jsonl"
+  },
+  {
+   "code": "gem-pro",
+   "name": "Proto-Germanic",
+   "senses": 7791,
+   "bytes": 67828586,
+   "url": "https://kaikki.org/dictionary/Proto-Germanic/kaikki.org-dictionary-ProtoGermanic.jsonl"
+  },
+  {
+   "code": "ine-pro",
+   "name": "Proto-Indo-European",
+   "senses": 2552,
+   "bytes": 12622360,
+   "url": "https://kaikki.org/dictionary/Proto-Indo-European/kaikki.org-dictionary-ProtoIndoEuropean.jsonl"
+  },
+  {
+   "code": "iir-pro",
+   "name": "Proto-Indo-Iranian",
+   "senses": 974,
+   "bytes": 3539972,
+   "url": "https://kaikki.org/dictionary/Proto-Indo-Iranian/kaikki.org-dictionary-ProtoIndoIranian.jsonl"
+  },
+  {
+   "code": "ira-pro",
+   "name": "Proto-Iranian",
+   "senses": 532,
+   "bytes": 2746452,
+   "url": "https://kaikki.org/dictionary/Proto-Iranian/kaikki.org-dictionary-ProtoIranian.jsonl"
+  },
+  {
+   "code": "itc-pro",
+   "name": "Proto-Italic",
+   "senses": 855,
+   "bytes": 5631162,
+   "url": "https://kaikki.org/dictionary/Proto-Italic/kaikki.org-dictionary-ProtoItalic.jsonl"
+  },
+  {
+   "code": "jpx-pro",
+   "name": "Proto-Japonic",
+   "senses": 557,
+   "bytes": 1241168,
+   "url": "https://kaikki.org/dictionary/Proto-Japonic/kaikki.org-dictionary-ProtoJaponic.jsonl"
+  },
+  {
+   "code": "poz-pro",
+   "name": "Proto-Malayo-Polynesian",
+   "senses": 871,
+   "bytes": 2441624,
+   "url": "https://kaikki.org/dictionary/Proto-Malayo-Polynesian/kaikki.org-dictionary-ProtoMalayoPolynesian.jsonl"
+  },
+  {
+   "code": "urj-prm-pro",
+   "name": "Proto-Permic",
+   "senses": 546,
+   "bytes": 2066723,
+   "url": "https://kaikki.org/dictionary/Proto-Permic/kaikki.org-dictionary-ProtoPermic.jsonl"
+  },
+  {
+   "code": "jpx-ryu-pro",
+   "name": "Proto-Ryukyuan",
+   "senses": 571,
+   "bytes": 1169521,
+   "url": "https://kaikki.org/dictionary/Proto-Ryukyuan/kaikki.org-dictionary-ProtoRyukyuan.jsonl"
+  },
+  {
+   "code": "smi-pro",
+   "name": "Proto-Sami",
+   "senses": 2022,
+   "bytes": 4661659,
+   "url": "https://kaikki.org/dictionary/Proto-Sami/kaikki.org-dictionary-ProtoSami.jsonl"
+  },
+  {
+   "code": "syd-pro",
+   "name": "Proto-Samoyedic",
+   "senses": 807,
+   "bytes": 1317179,
+   "url": "https://kaikki.org/dictionary/Proto-Samoyedic/kaikki.org-dictionary-ProtoSamoyedic.jsonl"
+  },
+  {
+   "code": "sit-pro",
+   "name": "Proto-Sino-Tibetan",
+   "senses": 527,
+   "bytes": 1230642,
+   "url": "https://kaikki.org/dictionary/Proto-Sino-Tibetan/kaikki.org-dictionary-ProtoSinoTibetan.jsonl"
+  },
+  {
+   "code": "sla-pro",
+   "name": "Proto-Slavic",
+   "senses": 7216,
+   "bytes": 51696473,
+   "url": "https://kaikki.org/dictionary/Proto-Slavic/kaikki.org-dictionary-ProtoSlavic.jsonl"
+  },
+  {
+   "code": "trk-pro",
+   "name": "Proto-Turkic",
+   "senses": 1459,
+   "bytes": 7734485,
+   "url": "https://kaikki.org/dictionary/Proto-Turkic/kaikki.org-dictionary-ProtoTurkic.jsonl"
+  },
+  {
+   "code": "urj-pro",
+   "name": "Proto-Uralic",
+   "senses": 752,
+   "bytes": 1086009,
+   "url": "https://kaikki.org/dictionary/Proto-Uralic/kaikki.org-dictionary-ProtoUralic.jsonl"
+  },
+  {
+   "code": "gmw-pro",
+   "name": "Proto-West Germanic",
+   "senses": 7359,
+   "bytes": 51489469,
+   "url": "https://kaikki.org/dictionary/Proto-West%20Germanic/kaikki.org-dictionary-ProtoWestGermanic.jsonl"
+  },
+  {
+   "code": "pa",
+   "name": "Punjabi",
+   "senses": 17797,
+   "bytes": 38069877,
+   "url": "https://kaikki.org/dictionary/Punjabi/kaikki.org-dictionary-Punjabi.jsonl"
+  },
+  {
+   "code": "qu",
+   "name": "Quechua",
+   "senses": 3929,
+   "bytes": 31990312,
+   "url": "https://kaikki.org/dictionary/Quechua/kaikki.org-dictionary-Quechua.jsonl"
+  },
+  {
+   "code": "rgn",
+   "name": "Romagnol",
+   "senses": 1818,
+   "bytes": 1999501,
+   "url": "https://kaikki.org/dictionary/Romagnol/kaikki.org-dictionary-Romagnol.jsonl"
+  },
+  {
+   "code": "rom",
+   "name": "Romani",
+   "senses": 1288,
+   "bytes": 1531421,
+   "url": "https://kaikki.org/dictionary/Romani/kaikki.org-dictionary-Romani.jsonl"
+  },
+  {
+   "code": "ro",
+   "name": "Romanian",
+   "senses": 148191,
+   "bytes": 434336969,
+   "url": "https://kaikki.org/dictionary/Romanian/kaikki.org-dictionary-Romanian.jsonl"
+  },
+  {
+   "code": "rm",
+   "name": "Romansh",
+   "senses": 2607,
+   "bytes": 3892891,
+   "url": "https://kaikki.org/dictionary/Romansh/kaikki.org-dictionary-Romansh.jsonl"
+  },
+  {
+   "code": "ru",
+   "name": "Russian",
+   "senses": 493243,
+   "bytes": 948499810,
+   "url": "https://kaikki.org/dictionary/Russian/kaikki.org-dictionary-Russian.jsonl"
+  },
+  {
+   "code": "rw",
+   "name": "Rwanda-Rundi",
+   "senses": 792,
+   "bytes": 807084,
+   "url": "https://kaikki.org/dictionary/Rwanda-Rundi/kaikki.org-dictionary-RwandaRundi.jsonl"
+  },
+  {
+   "code": "ksw",
+   "name": "S'gaw Karen",
+   "senses": 1361,
+   "bytes": 1366371,
+   "url": "https://kaikki.org/dictionary/S%27gaw%20Karen/kaikki.org-dictionary-SgawKaren.jsonl"
+  },
+  {
+   "code": "str",
+   "name": "Saanich",
+   "senses": 572,
+   "bytes": 615814,
+   "url": "https://kaikki.org/dictionary/Saanich/kaikki.org-dictionary-Saanich.jsonl"
+  },
+  {
+   "code": "xsa",
+   "name": "Sabaean",
+   "senses": 564,
+   "bytes": 1309036,
+   "url": "https://kaikki.org/dictionary/Sabaean/kaikki.org-dictionary-Sabaean.jsonl"
+  },
+  {
+   "code": "szy",
+   "name": "Sakizaya",
+   "senses": 733,
+   "bytes": 578355,
+   "url": "https://kaikki.org/dictionary/Sakizaya/kaikki.org-dictionary-Sakizaya.jsonl"
+  },
+  {
+   "code": "slr",
+   "name": "Salar",
+   "senses": 1784,
+   "bytes": 9593611,
+   "url": "https://kaikki.org/dictionary/Salar/kaikki.org-dictionary-Salar.jsonl"
+  },
+  {
+   "code": "xsb",
+   "name": "Sambali",
+   "senses": 537,
+   "bytes": 425839,
+   "url": "https://kaikki.org/dictionary/Sambali/kaikki.org-dictionary-Sambali.jsonl"
+  },
+  {
+   "code": "sm",
+   "name": "Samoan",
+   "senses": 816,
+   "bytes": 782955,
+   "url": "https://kaikki.org/dictionary/Samoan/kaikki.org-dictionary-Samoan.jsonl"
+  },
+  {
+   "code": "omq-sjq",
+   "name": "San Juan Quiahije Chatino",
+   "senses": 1255,
+   "bytes": 1333328,
+   "url": "https://kaikki.org/dictionary/San%20Juan%20Quiahije%20Chatino/kaikki.org-dictionary-SanJuanQuiahijeChatino.jsonl"
+  },
+  {
+   "code": "sa",
+   "name": "Sanskrit",
+   "senses": 31278,
+   "bytes": 147853708,
+   "url": "https://kaikki.org/dictionary/Sanskrit/kaikki.org-dictionary-Sanskrit.jsonl"
+  },
+  {
+   "code": "sat",
+   "name": "Santali",
+   "senses": 1101,
+   "bytes": 1688787,
+   "url": "https://kaikki.org/dictionary/Santali/kaikki.org-dictionary-Santali.jsonl"
+  },
+  {
+   "code": "poz-sml",
+   "name": "Sarawak Malay",
+   "senses": 539,
+   "bytes": 641629,
+   "url": "https://kaikki.org/dictionary/Sarawak%20Malay/kaikki.org-dictionary-SarawakMalay.jsonl"
+  },
+  {
+   "code": "sc",
+   "name": "Sardinian",
+   "senses": 1731,
+   "bytes": 2560642,
+   "url": "https://kaikki.org/dictionary/Sardinian/kaikki.org-dictionary-Sardinian.jsonl"
+  },
+  {
+   "code": "sdc",
+   "name": "Sassarese",
+   "senses": 743,
+   "bytes": 1206288,
+   "url": "https://kaikki.org/dictionary/Sassarese/kaikki.org-dictionary-Sassarese.jsonl"
+  },
+  {
+   "code": "stq",
+   "name": "Saterland Frisian",
+   "senses": 2524,
+   "bytes": 3149895,
+   "url": "https://kaikki.org/dictionary/Saterland%20Frisian/kaikki.org-dictionary-SaterlandFrisian.jsonl"
+  },
+  {
+   "code": "sco",
+   "name": "Scots",
+   "senses": 7245,
+   "bytes": 8130861,
+   "url": "https://kaikki.org/dictionary/Scots/kaikki.org-dictionary-Scots.jsonl"
+  },
+  {
+   "code": "gd",
+   "name": "Scottish Gaelic",
+   "senses": 24602,
+   "bytes": 30921470,
+   "url": "https://kaikki.org/dictionary/Scottish%20Gaelic/kaikki.org-dictionary-ScottishGaelic.jsonl"
+  },
+  {
+   "code": "sjs",
+   "name": "Senhaja de Srair",
+   "senses": 1781,
+   "bytes": 2340691,
+   "url": "https://kaikki.org/dictionary/Senhaja%20de%20Srair/kaikki.org-dictionary-SenhajadeSrair.jsonl"
+  },
+  {
+   "code": "sh",
+   "name": "Serbo-Croatian",
+   "senses": 92304,
+   "bytes": 384952867,
+   "url": "https://kaikki.org/dictionary/Serbo-Croatian/kaikki.org-dictionary-SerboCroatian.jsonl"
+  },
+  {
+   "code": "shn",
+   "name": "Shan",
+   "senses": 3156,
+   "bytes": 3420025,
+   "url": "https://kaikki.org/dictionary/Shan/kaikki.org-dictionary-Shan.jsonl"
+  },
+  {
+   "code": "sn",
+   "name": "Shona",
+   "senses": 640,
+   "bytes": 720188,
+   "url": "https://kaikki.org/dictionary/Shona/kaikki.org-dictionary-Shona.jsonl"
+  },
+  {
+   "code": "scn",
+   "name": "Sicilian",
+   "senses": 4600,
+   "bytes": 6588110,
+   "url": "https://kaikki.org/dictionary/Sicilian/kaikki.org-dictionary-Sicilian.jsonl"
+  },
+  {
+   "code": "sip",
+   "name": "Sikkimese",
+   "senses": 1309,
+   "bytes": 1014453,
+   "url": "https://kaikki.org/dictionary/Sikkimese/kaikki.org-dictionary-Sikkimese.jsonl"
+  },
+  {
+   "code": "szl",
+   "name": "Silesian",
+   "senses": 3730,
+   "bytes": 14982820,
+   "url": "https://kaikki.org/dictionary/Silesian/kaikki.org-dictionary-Silesian.jsonl"
+  },
+  {
+   "code": "sd",
+   "name": "Sindhi",
+   "senses": 2182,
+   "bytes": 4483007,
+   "url": "https://kaikki.org/dictionary/Sindhi/kaikki.org-dictionary-Sindhi.jsonl"
+  },
+  {
+   "code": "si",
+   "name": "Sinhalese",
+   "senses": 1519,
+   "bytes": 1916140,
+   "url": "https://kaikki.org/dictionary/Sinhalese/kaikki.org-dictionary-Sinhalese.jsonl"
+  },
+  {
+   "code": "ysr",
+   "name": "Sirenik",
+   "senses": 2080,
+   "bytes": 1901721,
+   "url": "https://kaikki.org/dictionary/Sirenik/kaikki.org-dictionary-Sirenik.jsonl"
+  },
+  {
+   "code": "sms",
+   "name": "Skolt Sami",
+   "senses": 680,
+   "bytes": 1863069,
+   "url": "https://kaikki.org/dictionary/Skolt%20Sami/kaikki.org-dictionary-SkoltSami.jsonl"
+  },
+  {
+   "code": "sk",
+   "name": "Slovak",
+   "senses": 21613,
+   "bytes": 57679634,
+   "url": "https://kaikki.org/dictionary/Slovak/kaikki.org-dictionary-Slovak.jsonl"
+  },
+  {
+   "code": "sl",
+   "name": "Slovene",
+   "senses": 9553,
+   "bytes": 28739799,
+   "url": "https://kaikki.org/dictionary/Slovene/kaikki.org-dictionary-Slovene.jsonl"
+  },
+  {
+   "code": "zlw-slv",
+   "name": "Slovincian",
+   "senses": 1327,
+   "bytes": 5498051,
+   "url": "https://kaikki.org/dictionary/Slovincian/kaikki.org-dictionary-Slovincian.jsonl"
+  },
+  {
+   "code": "so",
+   "name": "Somali",
+   "senses": 1284,
+   "bytes": 1699953,
+   "url": "https://kaikki.org/dictionary/Somali/kaikki.org-dictionary-Somali.jsonl"
+  },
+  {
+   "code": "st",
+   "name": "Sotho",
+   "senses": 699,
+   "bytes": 598909,
+   "url": "https://kaikki.org/dictionary/Sotho/kaikki.org-dictionary-Sotho.jsonl"
+  },
+  {
+   "code": "ajp",
+   "name": "South Levantine Arabic",
+   "senses": 4383,
+   "bytes": 19043952,
+   "url": "https://kaikki.org/dictionary/South%20Levantine%20Arabic/kaikki.org-dictionary-SouthLevantineArabic.jsonl"
+  },
+  {
+   "code": "alt",
+   "name": "Southern Altai",
+   "senses": 2310,
+   "bytes": 11934695,
+   "url": "https://kaikki.org/dictionary/Southern%20Altai/kaikki.org-dictionary-SouthernAltai.jsonl"
+  },
+  {
+   "code": "nr",
+   "name": "Southern Ndebele",
+   "senses": 704,
+   "bytes": 719588,
+   "url": "https://kaikki.org/dictionary/Southern%20Ndebele/kaikki.org-dictionary-SouthernNdebele.jsonl"
+  },
+  {
+   "code": "es",
+   "name": "Spanish",
+   "senses": 879175,
+   "bytes": 1119672956,
+   "url": "https://kaikki.org/dictionary/Spanish/kaikki.org-dictionary-Spanish.jsonl"
+  },
+  {
+   "code": "srn",
+   "name": "Sranan Tongo",
+   "senses": 2360,
+   "bytes": 2516246,
+   "url": "https://kaikki.org/dictionary/Sranan%20Tongo/kaikki.org-dictionary-SrananTongo.jsonl"
+  },
+  {
+   "code": "sux",
+   "name": "Sumerian",
+   "senses": 3170,
+   "bytes": 2313965,
+   "url": "https://kaikki.org/dictionary/Sumerian/kaikki.org-dictionary-Sumerian.jsonl"
+  },
+  {
+   "code": "su",
+   "name": "Sundanese",
+   "senses": 4280,
+   "bytes": 3943660,
+   "url": "https://kaikki.org/dictionary/Sundanese/kaikki.org-dictionary-Sundanese.jsonl"
+  },
+  {
+   "code": "sva",
+   "name": "Svan",
+   "senses": 533,
+   "bytes": 596487,
+   "url": "https://kaikki.org/dictionary/Svan/kaikki.org-dictionary-Svan.jsonl"
+  },
+  {
+   "code": "sw",
+   "name": "Swahili",
+   "senses": 24496,
+   "bytes": 86485272,
+   "url": "https://kaikki.org/dictionary/Swahili/kaikki.org-dictionary-Swahili.jsonl"
+  },
+  {
+   "code": "ss",
+   "name": "Swazi",
+   "senses": 1853,
+   "bytes": 1772838,
+   "url": "https://kaikki.org/dictionary/Swazi/kaikki.org-dictionary-Swazi.jsonl"
+  },
+  {
+   "code": "sv",
+   "name": "Swedish",
+   "senses": 347823,
+   "bytes": 359966907,
+   "url": "https://kaikki.org/dictionary/Swedish/kaikki.org-dictionary-Swedish.jsonl"
+  },
+  {
+   "code": "syl",
+   "name": "Sylheti",
+   "senses": 1271,
+   "bytes": 1806414,
+   "url": "https://kaikki.org/dictionary/Sylheti/kaikki.org-dictionary-Sylheti.jsonl"
+  },
+  {
+   "code": "tl",
+   "name": "Tagalog",
+   "senses": 57063,
+   "bytes": 153382185,
+   "url": "https://kaikki.org/dictionary/Tagalog/kaikki.org-dictionary-Tagalog.jsonl"
+  },
+  {
+   "code": "tdd",
+   "name": "Tai Nüa",
+   "senses": 543,
+   "bytes": 685964,
+   "url": "https://kaikki.org/dictionary/Tai%20N%C3%BCa/kaikki.org-dictionary-TaiN%C3%BCa.jsonl"
+  },
+  {
+   "code": "tg",
+   "name": "Tajik",
+   "senses": 5926,
+   "bytes": 13521296,
+   "url": "https://kaikki.org/dictionary/Tajik/kaikki.org-dictionary-Tajik.jsonl"
+  },
+  {
+   "code": "tly",
+   "name": "Talysh",
+   "senses": 2257,
+   "bytes": 1868369,
+   "url": "https://kaikki.org/dictionary/Talysh/kaikki.org-dictionary-Talysh.jsonl"
+  },
+  {
+   "code": "ta",
+   "name": "Tamil",
+   "senses": 28744,
+   "bytes": 89384238,
+   "url": "https://kaikki.org/dictionary/Tamil/kaikki.org-dictionary-Tamil.jsonl"
+  },
+  {
+   "code": "txg",
+   "name": "Tangut",
+   "senses": 2039,
+   "bytes": 1538335,
+   "url": "https://kaikki.org/dictionary/Tangut/kaikki.org-dictionary-Tangut.jsonl"
+  },
+  {
+   "code": "twf",
+   "name": "Taos",
+   "senses": 581,
+   "bytes": 711113,
+   "url": "https://kaikki.org/dictionary/Taos/kaikki.org-dictionary-Taos.jsonl"
+  },
+  {
+   "code": "roa-tar",
+   "name": "Tarantino",
+   "senses": 672,
+   "bytes": 668593,
+   "url": "https://kaikki.org/dictionary/Tarantino/kaikki.org-dictionary-Tarantino.jsonl"
+  },
+  {
+   "code": "rif",
+   "name": "Tarifit",
+   "senses": 19615,
+   "bytes": 24096429,
+   "url": "https://kaikki.org/dictionary/Tarifit/kaikki.org-dictionary-Tarifit.jsonl"
+  },
+  {
+   "code": "shi",
+   "name": "Tashelhit",
+   "senses": 3050,
+   "bytes": 5001775,
+   "url": "https://kaikki.org/dictionary/Tashelhit/kaikki.org-dictionary-Tashelhit.jsonl"
+  },
+  {
+   "code": "tt",
+   "name": "Tatar",
+   "senses": 2247,
+   "bytes": 5330346,
+   "url": "https://kaikki.org/dictionary/Tatar/kaikki.org-dictionary-Tatar.jsonl"
+  },
+  {
+   "code": "tsg",
+   "name": "Tausug",
+   "senses": 1573,
+   "bytes": 2171041,
+   "url": "https://kaikki.org/dictionary/Tausug/kaikki.org-dictionary-Tausug.jsonl"
+  },
+  {
+   "code": "tyz",
+   "name": "Tày",
+   "senses": 1793,
+   "bytes": 2024890,
+   "url": "https://kaikki.org/dictionary/T%C3%A0y/kaikki.org-dictionary-T%C3%A0y.jsonl"
+  },
+  {
+   "code": "te",
+   "name": "Telugu",
+   "senses": 28688,
+   "bytes": 32823503,
+   "url": "https://kaikki.org/dictionary/Telugu/kaikki.org-dictionary-Telugu.jsonl"
+  },
+  {
+   "code": "tft",
+   "name": "Ternate",
+   "senses": 1781,
+   "bytes": 2460397,
+   "url": "https://kaikki.org/dictionary/Ternate/kaikki.org-dictionary-Ternate.jsonl"
+  },
+  {
+   "code": "nhg",
+   "name": "Tetelcingo Nahuatl",
+   "senses": 617,
+   "bytes": 615971,
+   "url": "https://kaikki.org/dictionary/Tetelcingo%20Nahuatl/kaikki.org-dictionary-TetelcingoNahuatl.jsonl"
+  },
+  {
+   "code": "tet",
+   "name": "Tetum",
+   "senses": 779,
+   "bytes": 647077,
+   "url": "https://kaikki.org/dictionary/Tetum/kaikki.org-dictionary-Tetum.jsonl"
+  },
+  {
+   "code": "th",
+   "name": "Thai",
+   "senses": 27854,
+   "bytes": 51094749,
+   "url": "https://kaikki.org/dictionary/Thai/kaikki.org-dictionary-Thai.jsonl"
+  },
+  {
+   "code": "bo",
+   "name": "Tibetan",
+   "senses": 4794,
+   "bytes": 4907314,
+   "url": "https://kaikki.org/dictionary/Tibetan/kaikki.org-dictionary-Tibetan.jsonl"
+  },
+  {
+   "code": "ti",
+   "name": "Tigrinya",
+   "senses": 1111,
+   "bytes": 1378694,
+   "url": "https://kaikki.org/dictionary/Tigrinya/kaikki.org-dictionary-Tigrinya.jsonl"
+  },
+  {
+   "code": "tli",
+   "name": "Tlingit",
+   "senses": 708,
+   "bytes": 1506892,
+   "url": "https://kaikki.org/dictionary/Tlingit/kaikki.org-dictionary-Tlingit.jsonl"
+  },
+  {
+   "code": "xto",
+   "name": "Tocharian A",
+   "senses": 582,
+   "bytes": 726768,
+   "url": "https://kaikki.org/dictionary/Tocharian%20A/kaikki.org-dictionary-TocharianA.jsonl"
+  },
+  {
+   "code": "txb",
+   "name": "Tocharian B",
+   "senses": 2856,
+   "bytes": 2673298,
+   "url": "https://kaikki.org/dictionary/Tocharian%20B/kaikki.org-dictionary-TocharianB.jsonl"
+  },
+  {
+   "code": "tpi",
+   "name": "Tok Pisin",
+   "senses": 2348,
+   "bytes": 2709517,
+   "url": "https://kaikki.org/dictionary/Tok%20Pisin/kaikki.org-dictionary-TokPisin.jsonl"
+  },
+  {
+   "code": "tkl",
+   "name": "Tokelauan",
+   "senses": 1235,
+   "bytes": 1206591,
+   "url": "https://kaikki.org/dictionary/Tokelauan/kaikki.org-dictionary-Tokelauan.jsonl"
+  },
+  {
+   "code": "to",
+   "name": "Tongan",
+   "senses": 553,
+   "bytes": 507012,
+   "url": "https://kaikki.org/dictionary/Tongan/kaikki.org-dictionary-Tongan.jsonl"
+  },
+  {
+   "code": "ttj",
+   "name": "Tooro",
+   "senses": 959,
+   "bytes": 10458470,
+   "url": "https://kaikki.org/dictionary/Tooro/kaikki.org-dictionary-Tooro.jsonl"
+  },
+  {
+   "code": "mul",
+   "name": "Translingual",
+   "senses": 107566,
+   "bytes": 145276168,
+   "url": "https://kaikki.org/dictionary/Translingual/kaikki.org-dictionary-Translingual.jsonl"
+  },
+  {
+   "code": "tum",
+   "name": "Tumbuka",
+   "senses": 1069,
+   "bytes": 1160100,
+   "url": "https://kaikki.org/dictionary/Tumbuka/kaikki.org-dictionary-Tumbuka.jsonl"
+  },
+  {
+   "code": "yrk-tun",
+   "name": "Tundra Nenets",
+   "senses": 664,
+   "bytes": 1633495,
+   "url": "https://kaikki.org/dictionary/Tundra%20Nenets/kaikki.org-dictionary-TundraNenets.jsonl"
+  },
+  {
+   "code": "aeb",
+   "name": "Tunisian Arabic",
+   "senses": 1160,
+   "bytes": 3219775,
+   "url": "https://kaikki.org/dictionary/Tunisian%20Arabic/kaikki.org-dictionary-TunisianArabic.jsonl"
+  },
+  {
+   "code": "tr",
+   "name": "Turkish",
+   "senses": 60762,
+   "bytes": 462890080,
+   "url": "https://kaikki.org/dictionary/Turkish/kaikki.org-dictionary-Turkish.jsonl"
+  },
+  {
+   "code": "tk",
+   "name": "Turkmen",
+   "senses": 2484,
+   "bytes": 5506298,
+   "url": "https://kaikki.org/dictionary/Turkmen/kaikki.org-dictionary-Turkmen.jsonl"
+  },
+  {
+   "code": "tyv",
+   "name": "Tuvan",
+   "senses": 1066,
+   "bytes": 2387239,
+   "url": "https://kaikki.org/dictionary/Tuvan/kaikki.org-dictionary-Tuvan.jsonl"
+  },
+  {
+   "code": "uby",
+   "name": "Ubykh",
+   "senses": 1480,
+   "bytes": 1241678,
+   "url": "https://kaikki.org/dictionary/Ubykh/kaikki.org-dictionary-Ubykh.jsonl"
+  },
+  {
+   "code": "udm",
+   "name": "Udmurt",
+   "senses": 2047,
+   "bytes": 6421493,
+   "url": "https://kaikki.org/dictionary/Udmurt/kaikki.org-dictionary-Udmurt.jsonl"
+  },
+  {
+   "code": "uga",
+   "name": "Ugaritic",
+   "senses": 1271,
+   "bytes": 1489010,
+   "url": "https://kaikki.org/dictionary/Ugaritic/kaikki.org-dictionary-Ugaritic.jsonl"
+  },
+  {
+   "code": "uk",
+   "name": "Ukrainian",
+   "senses": 82051,
+   "bytes": 322794961,
+   "url": "https://kaikki.org/dictionary/Ukrainian/kaikki.org-dictionary-Ukrainian.jsonl"
+  },
+  {
+   "code": "xum",
+   "name": "Umbrian",
+   "senses": 637,
+   "bytes": 1317313,
+   "url": "https://kaikki.org/dictionary/Umbrian/kaikki.org-dictionary-Umbrian.jsonl"
+  },
+  {
+   "code": "unm",
+   "name": "Unami",
+   "senses": 2480,
+   "bytes": 3592889,
+   "url": "https://kaikki.org/dictionary/Unami/kaikki.org-dictionary-Unami.jsonl"
+  },
+  {
+   "code": "hsb",
+   "name": "Upper Sorbian",
+   "senses": 1961,
+   "bytes": 5895034,
+   "url": "https://kaikki.org/dictionary/Upper%20Sorbian/kaikki.org-dictionary-UpperSorbian.jsonl"
+  },
+  {
+   "code": "urk",
+   "name": "Urak Lawoi'",
+   "senses": 836,
+   "bytes": 1033293,
+   "url": "https://kaikki.org/dictionary/Urak%20Lawoi%27/kaikki.org-dictionary-UrakLawoi.jsonl"
+  },
+  {
+   "code": "ur",
+   "name": "Urdu",
+   "senses": 18106,
+   "bytes": 39033485,
+   "url": "https://kaikki.org/dictionary/Urdu/kaikki.org-dictionary-Urdu.jsonl"
+  },
+  {
+   "code": "ush",
+   "name": "Ushojo",
+   "senses": 3789,
+   "bytes": 2641753,
+   "url": "https://kaikki.org/dictionary/Ushojo/kaikki.org-dictionary-Ushojo.jsonl"
+  },
+  {
+   "code": "ug",
+   "name": "Uyghur",
+   "senses": 5299,
+   "bytes": 37707906,
+   "url": "https://kaikki.org/dictionary/Uyghur/kaikki.org-dictionary-Uyghur.jsonl"
+  },
+  {
+   "code": "uz",
+   "name": "Uzbek",
+   "senses": 5267,
+   "bytes": 26877348,
+   "url": "https://kaikki.org/dictionary/Uzbek/kaikki.org-dictionary-Uzbek.jsonl"
+  },
+  {
+   "code": "vec",
+   "name": "Venetan",
+   "senses": 5593,
+   "bytes": 8060201,
+   "url": "https://kaikki.org/dictionary/Venetan/kaikki.org-dictionary-Venetan.jsonl"
+  },
+  {
+   "code": "vep",
+   "name": "Veps",
+   "senses": 3224,
+   "bytes": 11659053,
+   "url": "https://kaikki.org/dictionary/Veps/kaikki.org-dictionary-Veps.jsonl"
+  },
+  {
+   "code": "vi",
+   "name": "Vietnamese",
+   "senses": 62555,
+   "bytes": 83304305,
+   "url": "https://kaikki.org/dictionary/Vietnamese/kaikki.org-dictionary-Vietnamese.jsonl"
+  },
+  {
+   "code": "wym",
+   "name": "Vilamovian",
+   "senses": 1824,
+   "bytes": 2137719,
+   "url": "https://kaikki.org/dictionary/Vilamovian/kaikki.org-dictionary-Vilamovian.jsonl"
+  },
+  {
+   "code": "vo",
+   "name": "Volapük",
+   "senses": 4479,
+   "bytes": 33766605,
+   "url": "https://kaikki.org/dictionary/Volap%C3%BCk/kaikki.org-dictionary-Volap%C3%BCk.jsonl"
+  },
+  {
+   "code": "vro",
+   "name": "Võro",
+   "senses": 762,
+   "bytes": 1580920,
+   "url": "https://kaikki.org/dictionary/V%C3%B5ro/kaikki.org-dictionary-V%C3%B5ro.jsonl"
+  },
+  {
+   "code": "vot",
+   "name": "Votic",
+   "senses": 4743,
+   "bytes": 21310752,
+   "url": "https://kaikki.org/dictionary/Votic/kaikki.org-dictionary-Votic.jsonl"
+  },
+  {
+   "code": "wa",
+   "name": "Walloon",
+   "senses": 3010,
+   "bytes": 3682013,
+   "url": "https://kaikki.org/dictionary/Walloon/kaikki.org-dictionary-Walloon.jsonl"
+  },
+  {
+   "code": "war",
+   "name": "Waray-Waray",
+   "senses": 821,
+   "bytes": 783175,
+   "url": "https://kaikki.org/dictionary/Waray-Waray/kaikki.org-dictionary-WarayWaray.jsonl"
+  },
+  {
+   "code": "cy",
+   "name": "Welsh",
+   "senses": 36255,
+   "bytes": 62903229,
+   "url": "https://kaikki.org/dictionary/Welsh/kaikki.org-dictionary-Welsh.jsonl"
+  },
+  {
+   "code": "ady",
+   "name": "West Circassian",
+   "senses": 7793,
+   "bytes": 14126532,
+   "url": "https://kaikki.org/dictionary/West%20Circassian/kaikki.org-dictionary-WestCircassian.jsonl"
+  },
+  {
+   "code": "fy",
+   "name": "West Frisian",
+   "senses": 4833,
+   "bytes": 5757627,
+   "url": "https://kaikki.org/dictionary/West%20Frisian/kaikki.org-dictionary-WestFrisian.jsonl"
+  },
+  {
+   "code": "mqs",
+   "name": "West Makian",
+   "senses": 1031,
+   "bytes": 1234813,
+   "url": "https://kaikki.org/dictionary/West%20Makian/kaikki.org-dictionary-WestMakian.jsonl"
+  },
+  {
+   "code": "apw",
+   "name": "Western Apache",
+   "senses": 522,
+   "bytes": 397049,
+   "url": "https://kaikki.org/dictionary/Western%20Apache/kaikki.org-dictionary-WesternApache.jsonl"
+  },
+  {
+   "code": "mww",
+   "name": "White Hmong",
+   "senses": 1399,
+   "bytes": 1172589,
+   "url": "https://kaikki.org/dictionary/White%20Hmong/kaikki.org-dictionary-WhiteHmong.jsonl"
+  },
+  {
+   "code": "wyi",
+   "name": "Woiwurrung",
+   "senses": 2039,
+   "bytes": 1476382,
+   "url": "https://kaikki.org/dictionary/Woiwurrung/kaikki.org-dictionary-Woiwurrung.jsonl"
+  },
+  {
+   "code": "wal",
+   "name": "Wolaytta",
+   "senses": 781,
+   "bytes": 618632,
+   "url": "https://kaikki.org/dictionary/Wolaytta/kaikki.org-dictionary-Wolaytta.jsonl"
+  },
+  {
+   "code": "wo",
+   "name": "Wolof",
+   "senses": 804,
+   "bytes": 726923,
+   "url": "https://kaikki.org/dictionary/Wolof/kaikki.org-dictionary-Wolof.jsonl"
+  },
+  {
+   "code": "xh",
+   "name": "Xhosa",
+   "senses": 3700,
+   "bytes": 4521449,
+   "url": "https://kaikki.org/dictionary/Xhosa/kaikki.org-dictionary-Xhosa.jsonl"
+  },
+  {
+   "code": "sah",
+   "name": "Yakut",
+   "senses": 4912,
+   "bytes": 6367773,
+   "url": "https://kaikki.org/dictionary/Yakut/kaikki.org-dictionary-Yakut.jsonl"
+  },
+  {
+   "code": "yao",
+   "name": "Yao (Africa)",
+   "senses": 573,
+   "bytes": 688039,
+   "url": "https://kaikki.org/dictionary/Yao%20%28Africa%29/kaikki.org-dictionary-YaoAfrica.jsonl"
+  },
+  {
+   "code": "mch",
+   "name": "Ye'kwana",
+   "senses": 2585,
+   "bytes": 2517653,
+   "url": "https://kaikki.org/dictionary/Ye%27kwana/kaikki.org-dictionary-Yekwana.jsonl"
+  },
+  {
+   "code": "yi",
+   "name": "Yiddish",
+   "senses": 15947,
+   "bytes": 30403385,
+   "url": "https://kaikki.org/dictionary/Yiddish/kaikki.org-dictionary-Yiddish.jsonl"
+  },
+  {
+   "code": "yog",
+   "name": "Yogad",
+   "senses": 654,
+   "bytes": 506854,
+   "url": "https://kaikki.org/dictionary/Yogad/kaikki.org-dictionary-Yogad.jsonl"
+  },
+  {
+   "code": "yol",
+   "name": "Yola",
+   "senses": 3330,
+   "bytes": 4353773,
+   "url": "https://kaikki.org/dictionary/Yola/kaikki.org-dictionary-Yola.jsonl"
+  },
+  {
+   "code": "yo",
+   "name": "Yoruba",
+   "senses": 8106,
+   "bytes": 11225113,
+   "url": "https://kaikki.org/dictionary/Yoruba/kaikki.org-dictionary-Yoruba.jsonl"
+  },
+  {
+   "code": "yua",
+   "name": "Yucatec Maya",
+   "senses": 768,
+   "bytes": 800238,
+   "url": "https://kaikki.org/dictionary/Yucatec%20Maya/kaikki.org-dictionary-YucatecMaya.jsonl"
+  },
+  {
+   "code": "yur",
+   "name": "Yurok",
+   "senses": 652,
+   "bytes": 601497,
+   "url": "https://kaikki.org/dictionary/Yurok/kaikki.org-dictionary-Yurok.jsonl"
+  },
+  {
+   "code": "zza",
+   "name": "Zazaki",
+   "senses": 1351,
+   "bytes": 1239606,
+   "url": "https://kaikki.org/dictionary/Zazaki/kaikki.org-dictionary-Zazaki.jsonl"
+  },
+  {
+   "code": "za",
+   "name": "Zhuang",
+   "senses": 4216,
+   "bytes": 7486225,
+   "url": "https://kaikki.org/dictionary/Zhuang/kaikki.org-dictionary-Zhuang.jsonl"
+  },
+  {
+   "code": "zu",
+   "name": "Zulu",
+   "senses": 4864,
+   "bytes": 60687111,
+   "url": "https://kaikki.org/dictionary/Zulu/kaikki.org-dictionary-Zulu.jsonl"
+  }
+ ]
+}

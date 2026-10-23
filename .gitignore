@@ -1,0 +1,5 @@
+.claude/
+.env
+node_modules/
+*.idx
+kaikki.org-dictionary-*.jsonl

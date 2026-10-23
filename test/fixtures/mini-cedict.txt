@@ -1,0 +1,55 @@
+# CC-CEDICT excerpt used as a test fixture (same line format as the full export).
+#! version=1
+110 110 [yao1 yao1 ling2] /the emergency number for law enforcement in Mainland China and Taiwan/
+119 119 [yao1 yao1 jiu3] /the emergency number for firefighting services in Mainland China/
+11區 11区 [11 Qu1] /(ACG) Japan (from the anime "Code Geass", in which Japan was renamed Area 11)/
+中 中 [Zhong1] /(bound form) China; Chinese/surname Zhong/
+中 中 [zhong1] /within; among; in/middle; center/while (doing sth); during/(dialect) OK; all right/
+中 中 [zhong4] /to hit (a target)/to be struck by (a bullet, illness etc)/to win (a prize or lottery)/
+中亞 中亚 [Zhong1 Ya4] /Central Asia/
+中國 中国 [Zhong1 guo2] /China/
+中國人 中国人 [Zhong1 guo2 ren2] /Chinese person/
+中央 中央 [zhong1 yang1] /central/middle/center/central authorities (of a state)/
+中學 中学 [zhong1 xue2] /middle school/
+中心 中心 [zhong1 xin1] /center; heart; core/
+中文 中文 [Zhong1 wen2] /Chinese language/
+中華 中华 [Zhong1 hua2] /Zhonghua, historical and cultural term for China, often used to denote Chinese civilization and identity (as in 中華文化|中华文化[Zhong1 hua2 wen2 hua4] "Chinese culture")/used in the official name of the Republic of China, 中華民國|中华民国[Zhong1 hua2 Min2 guo2]/
+中間 中间 [zhong1 jian1] /the middle; the inside/in the middle; within; between; among/during; in the meantime/
+你 你 [ni3] /you (informal, as opposed to courteous 您[nin2])/
+你好 你好 [ni3 hao3] /hello; hi/
+午安 午安 [wu3 an1] /Good afternoon!/Hello (daytime greeting)/
+呂 吕 [Lu:3] /surname Lü/
+呂 吕 [lu:3] /pitchpipe, pitch standard, one of the twelve semitones in the traditional tone system/
+哈嘍 哈喽 [ha1 lou2] /hello (loanword)/
+哈囉 哈啰 [ha1 luo1] /hello (loanword)/
+喂 喂 [wei2] /hello (when answering the phone)/
+喂 喂 [wei4] /hey/to feed (an animal, baby, invalid etc)/
+女 女 [nu:3] /female/woman/daughter/
+女 女 [ru3] /old variant of 汝[ru3]/
+好 好 [hao3] /good/appropriate; proper/all right!/(before a verb) easy to/(before a verb) good to/(before an adjective for exclamatory effect) so/(verb complement indicating completion)/(of two people) close; on intimate terms/(after a form of address) hello/
+好 好 [hao4] /to be fond of; to have a tendency to; to be prone to/
+寧 宁 [Ning2] /abbr. for Ningxia Hui Autonomous Region 寧夏回族自治區|宁夏回族自治区[Ning2 xia4 Hui2 zu2 Zi4 zhi4 qu1]/abbr. for Nanjing 南京[Nan2 jing1]/surname Ning/
+寧 宁 [ning2] /peaceful/to pacify/to visit (one's parents etc)/
+寧 宁 [ning4] /would rather/to prefer/how (emphatic)/Taiwan pr. [ning2]/
+尼 尼 [ni2] /Buddhist nun/(often used in phonetic spellings)/
+年 年 [Nian2] /surname Nian/
+年 年 [nian2] /year/CL:個|个[ge4]/
+忠 忠 [zhong1] /loyal; devoted; faithful/
+念 念 [nian4] /to read/to study (a subject)/to attend (a school)/to read aloud/to give (sb) a tongue-lashing (CL:頓|顿[dun4])/to miss (sb)/idea/remembrance/twenty (banker's anti-fraud numeral corresponding to 廿[nian4])/
+拿 拿 [na2] /to hold/to seize/to catch/to apprehend/to take/(used in the same way as 把[ba3]: to mark the following noun as a direct object)/
+擬合 拟合 [ni3 he2] /to fit (data to a model)/a (close) fit/
+泥 泥 [ni2] /mud/clay/paste/pulp/
+泥 泥 [ni4] /restrained/
+泥孩 泥孩 [ni2 hai2] /clay doll/
+牛 牛 [Niu2] /surname Niu/
+牛 牛 [niu2] /ox/cow/bull/CL:條|条[tiao2],頭|头[tou2]/newton (abbr. for 牛頓|牛顿[niu2 dun4])/(slang) awesome/
+眾 众 [Zhong4] /abbr. for 眾議院|众议院[Zhong4 yi4 yuan4], House of Representatives/
+眾 众 [zhong4] /(bound form) crowd; multitude/(bound form) many; numerous/
+種 种 [zhong3] /seed/species/kind/type/classifier for types, kinds, sorts/
+種 种 [zhong4] /to plant/to grow/to cultivate/
+綠 绿 [lu4] /used in names/
+綠 绿 [lu:4] /green/(slang) (derived from 綠帽子|绿帽子[lu:4 mao4 zi5]) to cheat on (one's spouse or boyfriend or girlfriend)/
+綠色 绿色 [lu:4 se4] /green/
+重 重 [chong2] /to repeat/repetition/again/re-/classifier: layer/
+重 重 [zhong4] /heavy/serious/to attach importance to/
+𰻞𰻞麵 𰻝𰻝面 [biang2 biang2 mian4] /broad, belt-shaped noodles, popular in Shaanxi/

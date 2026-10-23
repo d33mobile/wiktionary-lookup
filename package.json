@@ -1,0 +1,20 @@
+{
+  "name": "wiktionary-lookup",
+  "version": "0.7.0",
+  "description": "Offline dictionary for every language of English Wiktionary: incremental prefix lookup engine, index builder, web app and Android app",
+  "type": "module",
+  "main": "lookup.js",
+  "exports": {
+    ".": "./lookup.js"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "test:web": "python3 test/web/smoke.py",
+    "apk": "android/build-apk.sh"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "(MIT AND GPL-3.0-or-later)",
+  "private": true
+}

@@ -1,0 +1,75 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Sentry DSN for crash reporting, looked up in this order: the Gradle
+// property SENTRY_DSN (gradle.properties, ~/.gradle/gradle.properties or
+// -PSENTRY_DSN=...), the SENTRY_DSN environment variable, then
+// local.properties. Empty (the default) builds the app with Sentry disabled.
+def sentryDsn() {
+    def fromProperty = project.findProperty('SENTRY_DSN')
+    if (fromProperty) return fromProperty.toString()
+    def fromEnv = System.getenv('SENTRY_DSN')
+    if (fromEnv) return fromEnv
+    def local = rootProject.file('local.properties')
+    if (local.exists()) {
+        def props = new Properties()
+        local.withInputStream { props.load(it) }
+        if (props.getProperty('SENTRY_DSN')) return props.getProperty('SENTRY_DSN')
+    }
+    return ''
+}
+
+android {
+    namespace 'pl.d33.wiktionary'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'pl.d33.wiktionary'
+        minSdk 26
+        targetSdk 36
+        versionCode 7
+        versionName '0.7'
+        buildConfigField 'String', 'SENTRY_DSN', '"' + sentryDsn().replace('\\', '\\\\').replace('"', '\\"') + '"'
+    }
+
+    buildTypes {
+        // Installs next to the release app (same package otherwise).
+        debug {
+            applicationIdSuffix '.debug'
+        }
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.14.0'
+    // The core module of sentry-android: Java crashes, ANRs and breadcrumbs. The
+    // full artifact adds native (NDK) crash handling with 3 MB of .so files and
+    // session replay, neither of which this app (no native code) needs.
+    implementation 'io.sentry:sentry-android-core:8.60.0'
+    testImplementation 'junit:junit:4.13.2'
+}
+
+// The web app and the index are copied into src/main/assets by build-apk.sh
+// (node ../stage-web.js); the directory is not committed.
+tasks.named('preBuild') {
+    doFirst {
+        if (!file('src/main/assets/web/index.idx').exists()) {
+            throw new GradleException('src/main/assets/web/index.idx missing: run android/build-apk.sh INDEX')
+        }
+    }
+}
