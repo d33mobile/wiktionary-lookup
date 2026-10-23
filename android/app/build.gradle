@@ -20,6 +20,24 @@ def sentryDsn() {
     return ''
 }
 
+// Release signing, optional: RELEASE_STORE_FILE, RELEASE_STORE_PASSWORD,
+// RELEASE_KEY_ALIAS and RELEASE_KEY_PASSWORD as Gradle properties, environment
+// variables or local.properties entries. Without them assembleRelease
+// writes an unsigned APK (app-release-unsigned.apk) to sign separately.
+def releaseSetting(String name) {
+    def fromProperty = project.findProperty(name)
+    if (fromProperty) return fromProperty.toString()
+    def fromEnv = System.getenv(name)
+    if (fromEnv) return fromEnv
+    def local = rootProject.file('local.properties')
+    if (local.exists()) {
+        def props = new Properties()
+        local.withInputStream { props.load(it) }
+        return props.getProperty(name)
+    }
+    return null
+}
+
 android {
     namespace 'pl.d33.wiktionary'
     compileSdk 36
@@ -28,15 +46,29 @@ android {
         applicationId 'pl.d33.wiktionary'
         minSdk 26
         targetSdk 36
-        versionCode 7
-        versionName '0.7'
+        versionCode 8
+        versionName '0.8'
         buildConfigField 'String', 'SENTRY_DSN', '"' + sentryDsn().replace('\\', '\\\\').replace('"', '\\"') + '"'
+    }
+
+    signingConfigs {
+        release {
+            if (releaseSetting('RELEASE_STORE_FILE')) {
+                storeFile file(releaseSetting('RELEASE_STORE_FILE'))
+                storePassword releaseSetting('RELEASE_STORE_PASSWORD')
+                keyAlias releaseSetting('RELEASE_KEY_ALIAS')
+                keyPassword releaseSetting('RELEASE_KEY_PASSWORD')
+            }
+        }
     }
 
     buildTypes {
         // Installs next to the release app (same package otherwise).
         debug {
             applicationIdSuffix '.debug'
+        }
+        release {
+            if (releaseSetting('RELEASE_STORE_FILE')) signingConfig signingConfigs.release
         }
     }
 

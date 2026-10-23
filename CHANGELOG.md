@@ -2,6 +2,11 @@
 
 Wiktionary Lookup, an offline dictionary built from English Wiktionary.
 
+## 0.8 (versionCode 8)
+
+- The release APK is built straight from the published source (README: "Release build"), with the same name, package and version.
+- Long web addresses in "What's new" and "About" wrap on narrow screens.
+
 ## 0.7 (versionCode 7)
 
 - Source code published: https://github.com/d33mobile/wiktionary-lookup (linked from About and licenses).

@@ -235,6 +235,11 @@ button.speak-audio.cached::after {
 }
 #changelog[hidden] { display: none; }
 #changelog .dialog {
+  width: 100%;
+  /* Long URLs wrap instead of widening the dialog past a narrow screen
+     (overflow-wrap: anywhere is Chromium 80; word-break: break-word works in 66). */
+  overflow-wrap: break-word;
+  word-break: break-word;
   background: var(--bg);
   color: var(--fg);
   border-radius: 10px;
@@ -284,7 +289,7 @@ button.speak-audio.cached::after {
 }
 .pad-actions > * + * { margin-left: 6px; }
 #pad-status { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
-.about-para { white-space: pre-wrap; font-size: 13px; }
+.about-para { white-space: pre-wrap; font-size: 13px; overflow-wrap: break-word; word-break: break-word; }
 /* Drawing must not select text or open the copy/share toolbar. */
 #pad, #pad-canvas, #pad-candidates, .pad-candidate {
   -webkit-user-select: none;

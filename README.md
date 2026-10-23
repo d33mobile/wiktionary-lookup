@@ -51,6 +51,31 @@ Android: `android/build-apk.sh zh.idx [OUT_DIR [MANIFEST]]` builds a debug
 APK (Android SDK, JDK 17). Crash reporting is off unless the build gets a
 `SENTRY_DSN` (Gradle property, environment or `android/local.properties`).
 
+## Release build
+
+The APKs in the F-Droid repository are built from this source as follows,
+then signed with the maintainer's key; the label, package id (`pl.d33.wiktionary`),
+versionCode and versionName come from the source (`android/app/build.gradle`,
+`strings.xml`).
+
+```sh
+# The built-in language (Chinese) and the language list, from the data release:
+D=https://github.com/d33mobile/wiktionary-lookup-data/releases/latest/download
+curl -L $D/manifest.json -o manifest.json
+# zh.idx.gz and zh.details.gz: the "url" and details.url of "zh" in manifest.json
+curl -L "$(node -e 'const m=require("./manifest.json");const z=m.languages.find(l=>l.code==="zh");console.log(new URL(z.url,process.argv[1]).href)' $D/manifest.json)" | gunzip > zh.idx
+curl -L "$(node -e 'const m=require("./manifest.json");const z=m.languages.find(l=>l.code==="zh");console.log(new URL(z.details.url,process.argv[1]).href)' $D/manifest.json)" | gunzip > zh.details
+
+node stage-web.js android/app/src/main/assets zh.idx manifest.json
+cd android && ./gradlew assembleRelease     # app/build/outputs/apk/release/app-release-unsigned.apk
+```
+
+To sign during the build, set `RELEASE_STORE_FILE`, `RELEASE_STORE_PASSWORD`,
+`RELEASE_KEY_ALIAS` and `RELEASE_KEY_PASSWORD` (Gradle properties, environment
+or `android/local.properties`); otherwise sign the unsigned APK with
+`zipalign -p 4` and `apksigner sign`. Crash reporting stays off unless
+`SENTRY_DSN` is set (the published builds have none).
+
 ## Tests
 
 ```sh
