@@ -8,8 +8,6 @@
 import { AUDIO_URL_PREFIX } from '../lib/engine.js';
 
 const ANDROID_HOST = 'appassets.androidplatform.net';
-const MODE_KEY = 'wiktionary-lookup.pronunciation';
-export const MODES = { auto: 'auto', speech: 'speech' };
 // Speech voices for index languages whose bare code picks the wrong one;
 // the Android app has the same table in Pronunciation.java.
 const SPEECH_TAGS = { zh: 'zh-CN', cmn: 'zh-CN', yue: 'zh-HK', ja: 'ja-JP', ko: 'ko-KR', nb: 'nb-NO', no: 'nb-NO' };
@@ -23,14 +21,6 @@ export function commonsUrl(name) {
 export function audioUrl(name, location) {
   if (location.hostname === ANDROID_HOST) return new URL(`/audio/${encodeURIComponent(name)}`, location.href).href;
   return commonsUrl(name);
-}
-
-export function getMode() {
-  try {
-    return localStorage.getItem(MODE_KEY) === MODES.speech ? MODES.speech : MODES.auto;
-  } catch (err) {
-    return MODES.auto;
-  }
 }
 
 const PREFETCH_KEY = 'wiktionary-lookup.prefetch';
@@ -51,14 +41,6 @@ export function setPrefetchMode(mode) {
     localStorage.setItem(PREFETCH_KEY, mode);
   } catch (err) {
     // Not remembered; applies until the page reloads.
-  }
-}
-
-export function setMode(mode) {
-  try {
-    localStorage.setItem(MODE_KEY, mode);
-  } catch (err) {
-    // Not remembered; the choice still applies until the page reloads.
   }
 }
 

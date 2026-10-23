@@ -2,6 +2,20 @@
 
 Wiktionary Lookup, an offline dictionary built from English Wiktionary.
 
+## 0.9 (versionCode 9)
+
+- Wikipedia: download the article titles of the English, German or Polish Wikipedia (with short descriptions) from the language screen; an article opens inside the app.
+- "Open on Wiktionary" shows the Wiktionary page inside the app, loaded in the background while you read the entry.
+- Large dictionaries (English: 261 MB) open in about 2 seconds without loading everything into memory, and you can type while a dictionary is still loading.
+- Dictionary updates: when the data on the server is newer (for example with recordings), the language screen offers "Update" and "Update all", and a dot on the gear says so.
+- History of the entries you opened, and favourites (the star on entries), with export and import.
+- "What's new" shows the whole changelog; it is also in the options.
+- Downloads are stored as files and read in parts, using less memory.
+- Options behind the gear next to the search box: the language in use and "More languages...", updates, the handwriting pen, prefetching of recordings and pages, history, favourites, "What's new" and About.
+- Chinese is no longer built into the app (a few MB instead of 54 MB): on first start choose a language (Chinese is the suggestion) and it is downloaded. If you used the built-in Chinese of an earlier version, download it once more from the same list.
+- The speaker plays the Wiktionary recording when there is one; text-to-speech has its own button on the entry page. The "Always text-to-speech" option is gone.
+- The handwriting pad closes when you open a result or an entry; the pen opens it again.
+
 ## 0.8 (versionCode 8)
 
 - The release APK is built straight from the published source (README: "Release build"), with the same name, package and version.

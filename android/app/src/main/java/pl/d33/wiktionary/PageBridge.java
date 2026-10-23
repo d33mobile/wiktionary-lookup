@@ -5,13 +5,21 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.provider.Settings;
+import android.util.Base64;
 import android.webkit.JavascriptInterface;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -25,14 +33,142 @@ final class PageBridge {
     private final Context context;
     private final Speech speech;
     private final AudioProxy audio;
-    private final Consumer<String> onCached;
+    private final IndexStore indexes;
+    private final ReleaseFetcher releases;
+    private final Consumer<String> runJs;
+    private final Runnable pickFile;
+    private final PagePanel pages;
+    private final ExecutorService downloads = Executors.newSingleThreadExecutor();
+    private final Map<String, AtomicBoolean> running = new ConcurrentHashMap<>();
 
-    /** onCached(name) runs (on a background thread) when a prefetched file is stored. */
-    PageBridge(Context context, Speech speech, AudioProxy audio, Consumer<String> onCached) {
+    /** runJs(script) evaluates a script in the page (from any thread). */
+    /** pickFile opens the system file picker; MainActivity hands the text to window.onPickedText. */
+    PageBridge(Context context, Speech speech, AudioProxy audio, IndexStore indexes, ReleaseFetcher releases,
+               Consumer<String> runJs, Runnable pickFile, PagePanel pages) {
+        this.pickFile = pickFile;
+        this.pages = pages;
         this.context = context;
         this.speech = speech;
         this.audio = audio;
-        this.onCached = onCached;
+        this.indexes = indexes;
+        this.releases = releases;
+        this.runJs = runJs;
+    }
+
+    // The entry's Wiktionary or Wikipedia page in the in-app panel (PagePanel).
+    private static boolean wikiUrl(String url) {
+        Uri u = Uri.parse(url);
+        String host = u.getHost();
+        return "https".equals(u.getScheme()) && host != null
+                && (host.endsWith(".wiktionary.org") || host.endsWith(".wikipedia.org"));
+    }
+
+    /** Loads the page in the hidden panel (one at a time). */
+    @JavascriptInterface
+    public void prefetchPage(String url) {
+        if (wikiUrl(url)) pages.prefetchLater(url);
+    }
+
+    @JavascriptInterface
+    public void showPage(String url) {
+        if (wikiUrl(url)) pages.showLater(url);
+    }
+
+    @JavascriptInterface
+    public String pageState() {
+        return pages.state();
+    }
+
+    /** Shares text (a favourites export) through the system share sheet. */
+    @JavascriptInterface
+    public void shareText(String title, String text) {
+        Intent send = new Intent(Intent.ACTION_SEND);
+        send.setType("text/plain");
+        send.putExtra(Intent.EXTRA_SUBJECT, title);
+        send.putExtra(Intent.EXTRA_TITLE, title);
+        send.putExtra(Intent.EXTRA_TEXT, text);
+        Intent chooser = Intent.createChooser(send, title);
+        chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(chooser);
+    }
+
+    /** Lets the user pick a text file (a favourites export); see window.onPickedText. */
+    @JavascriptInterface
+    public void pickTextFile() {
+        pickFile.run();
+    }
+
+    // Index files in app storage (IndexStore), served at /local/<name>.
+
+    /** Size of a stored index file, -1 when missing. */
+    @JavascriptInterface
+    public double indexFileSize(String name) {
+        return IndexStore.validName(name) ? indexes.size(name) : -1;
+    }
+
+    @JavascriptInterface
+    public boolean deleteIndexFile(String name) {
+        return IndexStore.validName(name) && indexes.delete(name);
+    }
+
+    /** Bytes [offset, offset + length) of a stored index file, base64; "" on error. */
+    @JavascriptInterface
+    public String readIndexRange(String name, double offset, int length) {
+        try {
+            return Base64.encodeToString(indexes.read(name, (long) offset, length), Base64.NO_WRAP);
+        } catch (IOException | IllegalArgumentException e) {
+            return "";
+        }
+    }
+
+    /**
+     * Downloads a release asset into app storage: json {id, name, path (the part
+     * after /remote/), bytes, sha256, gzip}. Reports through
+     * window.onNativeDownload(id, state, done, total, error), state one of
+     * progress, done, error.
+     */
+    @JavascriptInterface
+    public void startIndexDownload(String json) {
+        final JSONObject req;
+        try {
+            req = new JSONObject(json);
+        } catch (JSONException e) {
+            return;
+        }
+        final String id = req.optString("id");
+        final AtomicBoolean cancelled = new AtomicBoolean();
+        running.put(id, cancelled);
+        downloads.execute(() -> {
+            final long[] lastReport = {0};
+            try {
+                ReleaseFetcher.Result r = releases.fetch(req.getString("path"));
+                if (!r.ok()) throw new IOException("HTTP " + r.status + " (" + r.error + ")");
+                indexes.store(req.getString("name"), r.body, req.optBoolean("gzip"), req.optLong("bytes"),
+                        req.optString("sha256", null), (done, total) -> {
+                            long now = System.currentTimeMillis();
+                            if (now - lastReport[0] >= 150) {
+                                lastReport[0] = now;
+                                report(id, "progress", done, total, null);
+                            }
+                        }, cancelled);
+                report(id, "done", req.optLong("bytes"), req.optLong("bytes"), null);
+            } catch (IOException | JSONException | RuntimeException e) {
+                report(id, "error", 0, 0, cancelled.get() ? "cancelled" : e.getMessage());
+            } finally {
+                running.remove(id);
+            }
+        });
+    }
+
+    @JavascriptInterface
+    public void cancelIndexDownload(String id) {
+        AtomicBoolean c = running.get(id);
+        if (c != null) c.set(true);
+    }
+
+    private void report(String id, String state, long done, long total, String error) {
+        runJs.accept("window.onNativeDownload && window.onNativeDownload(" + JSONObject.quote(id) + ","
+                + JSONObject.quote(state) + "," + done + "," + total + "," + (error == null ? "null" : JSONObject.quote(error)) + ")");
     }
 
     /** The installed version, so the page can show what is new since the last start. */
@@ -51,7 +187,8 @@ final class PageBridge {
     /** Starts downloading the recordings in `namesJson` (a JSON array) that are not cached. */
     @JavascriptInterface
     public void prefetchAudio(String namesJson) {
-        audio.prefetch(names(namesJson), onCached);
+        audio.prefetch(names(namesJson),
+                name -> runJs.accept("window.onAudioCached && window.onAudioCached(" + JSONObject.quote(name) + ")"));
     }
 
     /** The subset of `namesJson` already in the cache, as a JSON array. */

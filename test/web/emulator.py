@@ -5,8 +5,8 @@ Usage: python3 test/web/emulator.py --serial emulator-5560 --apk APK --shots DIR
        [--package pl.d33.wiktionary.debug] [--download smj --query guolle --expect fish]
 
 Installs the APK, starts it, forwards the WebView's DevTools socket (debug
-builds enable it) and checks, in the real system WebView: the built-in
-Chinese index opens; "shit" lists English matches first; the picker lists
+builds enable it) and checks, in the real system WebView: a fresh install
+starts with the language list and Chinese downloads from it; "shit" lists English matches first; the picker lists
 the release manifest; downloading --download through the app's release
 proxy works and --query finds --expect; switching back to Chinese works.
 With --sentry-log (an APK built with a DSN pointing at a fake Sentry server
@@ -81,7 +81,8 @@ class Page:
         needs a user gesture, which element.click() from script is not."""
         box = self.eval(f"(() => {{ const e = document.querySelector({json.dumps(selector)});"
                         " e.scrollIntoView({ block: 'center' }); const r = e.getBoundingClientRect();"
-                        " return [r.left + r.width / 2, r.top + r.height / 2]; })()")
+                        " const v = window.visualViewport || { offsetLeft: 0, offsetTop: 0 };"
+                        " return [r.left + r.width / 2 - v.offsetLeft, r.top + r.height / 2 - v.offsetTop]; })()")
         for kind in ("mousePressed", "mouseReleased"):
             self.call("Input.dispatchMouseEvent", type=kind, x=box[0], y=box[1], button="left", clickCount=1)
 
@@ -111,10 +112,35 @@ def connect(dev, package, restart=True):
     dev.adb("forward", f"tcp:{DEVTOOLS_PORT}", f"localabstract:webview_devtools_remote_{pid}")
     while True:
         targets = json.load(urllib.request.urlopen(f"http://127.0.0.1:{DEVTOOLS_PORT}/json", timeout=60))
-        pages = [t for t in targets if t.get("type") == "page" and "webSocketDebuggerUrl" in t]
+        # The app's own page (the Wiktionary panel is a second WebView).
+        pages = [t for t in targets if t.get("type") == "page" and "webSocketDebuggerUrl" in t
+                 and t.get("url", "").startswith("https://appassets.androidplatform.net/")]
         if pages:
             return Page(pages[0]["webSocketDebuggerUrl"])
         time.sleep(3)
+
+
+def past_welcome(page):
+    """A fresh install starts with the language list: take the built-in Chinese."""
+    # The list is redrawn when the catalogue refresh arrives; wait for it, retry the tap.
+    for _ in range(3):
+        if page.eval("document.body.dataset.screen") != "welcome":
+            return
+        page.wait("!/checking for updates/.test(document.getElementById('picker-status').textContent)", 60, "catalogue")
+        # "Use" with a built-in Chinese, "Download dictionary" without one.
+        page.tap('#lang-list li[data-code="zh"] .lang-actions button')
+        time.sleep(1)
+    page.wait("document.body.dataset.screen === 'search' && document.body.dataset.lang === 'zh'"
+              " && document.body.dataset.ready === 'true'", 600, "Chinese")
+
+
+def open_entry_pages(page, word):
+    """Waits for the entry page of `word`; when the language's entry pages are
+    not installed yet (a separate download), takes them from its offer."""
+    page.wait(f"document.body.dataset.detail === {json.dumps(word)} && document.body.dataset.details !== 'loading'", 60, "entry page")
+    if page.eval("document.body.dataset.details") == "none" and page.eval("!!document.getElementById('detail-get-pages')"):
+        page.tap("#detail-get-pages")
+    page.wait(f"document.body.dataset.detail === {json.dumps(word)} && document.body.dataset.details === 'loaded'", 600, "entry pages")
 
 
 def set_query(page, text):
@@ -124,10 +150,17 @@ def set_query(page, text):
         q.value = {json.dumps(text)};
         const t0 = performance.now();
         q.dispatchEvent(new Event('input'));
-        const ms = performance.now() - t0;
-        const groups = Array.from(document.querySelectorAll('#results li.group'), (g) => g.textContent);
+        return new Promise((resolve) => {{
+          // A lazily opened language searches asynchronously: wait for this query's results.
+          const done = () => {{
+            if (document.body.dataset.searched !== q.value && performance.now() - t0 < 30000) return setTimeout(done, 20);
+            const ms = performance.now() - t0;
+            const groups = Array.from(document.querySelectorAll('#results li.group'), (g) => g.textContent);
         const rows = Array.from(document.querySelectorAll('#results li[data-index]'), (r) => r.innerText.replace(/\\n/g, ' | '));
-        return {{ ms, groups, first: rows.slice(0, 3), status: document.getElementById('status').textContent }};
+            resolve({{ ms, groups, first: rows.slice(0, 3), status: document.getElementById('status').textContent }});
+          }};
+          done();
+        }});
     }})()""")
 
 
@@ -150,12 +183,12 @@ def main():
     print("install:", dev.adb("install", args.apk, text=True).strip())
     page = connect(dev, args.package)
     print("user agent:", page.eval("navigator.userAgent"))
-    took = page.wait("!!document.body && (document.body.dataset.ready === 'true' || document.body.dataset.ready === 'error')",
-                     START_TIMEOUT_S, "start")
-    print(f"start ({took:.0f} s):", page.eval("document.getElementById('status').textContent"))
-    if page.eval("document.body.dataset.screen") == "welcome":
-        page.tap('#lang-list li[data-code="zh"] button')
-        page.wait("document.body.dataset.screen === 'search'", 30, "search screen")
+    # A fresh install has no language: the first screen is the language list.
+    took = page.wait("!!document.body && !!document.body.dataset.screen", START_TIMEOUT_S, "start")
+    print(f"start ({took:.0f} s):", page.eval("document.body.dataset.screen"), "|",
+          page.eval("document.getElementById('status').textContent"))
+    assert page.eval("document.body.dataset.screen") == "welcome"
+    past_welcome(page)
     assert page.eval("document.body.dataset.ready") == "true"
     dev.screenshot(args.shots / "01-start.png")
 
@@ -184,7 +217,7 @@ def main():
                 time.sleep(2)
             print(f"sentry: envelope with {marker!r} arrived after {time.monotonic() - t0:.0f} s")
 
-    page.eval("(() => { const s = document.getElementById('lang'); s.value = '__more'; s.dispatchEvent(new Event('change')); })()")
+    page.eval("(() => { document.getElementById('gear').click(); document.getElementById('opt-more').click(); })()")
     page.wait("/languages available|could not check/.test(document.getElementById('picker-status').textContent)", 120, "manifest refresh")
     print("picker:", page.eval("document.getElementById('picker-status').textContent"),
           "| rows:", page.eval("document.querySelectorAll('#lang-list li[data-code]').length"))
@@ -217,7 +250,7 @@ def main():
     dev.adb("shell", "input", "keyevent", "KEYCODE_BACK")
     page.wait("document.getElementById('detail').hidden", 30, "back")
 
-    page.eval("(() => { const s = document.getElementById('lang'); s.value = 'zh'; s.dispatchEvent(new Event('change')); })()")
+    page.eval("(() => { document.getElementById('gear').click(); document.querySelector('#opt-languages button[data-code=zh]').click(); })()")
     page.wait("document.body.dataset.lang === 'zh' && document.body.dataset.ready === 'true'", START_TIMEOUT_S, "switch")
     r = set_query(page, "nihao")
     print("switch back, nihao ->", r)

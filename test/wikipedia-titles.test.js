@@ -83,9 +83,11 @@ test('prepare: articles with redirects, descriptions and views', async () => {
   assert.equal(stats.redirectsDropped, 1, 'Dangling points to no article');
   assert.equal(stats.redirectsToSection, 1);
   const lines = readFileSync(join(dir, 'enwiki-titles.tsv'), 'utf8').trim().split('\n');
-  assert.equal(lines[0], 'New York City\t8000\tMost populous city in the United States\tNYC\x1fNew york city\x1fBig Apple');
+  assert.deepEqual(lines.map((l) => l.split('\t')[0]),
+    ['New York', 'New York City', 'Newark, New Jersey', "O'Hare International Airport", 'Tokyo'], 'sorted by headword key');
+  assert.equal(lines[1], 'New York City\t8000\tMost populous city in the United States\tNYC\x1fNew york city\x1fBig Apple');
   assert.equal(lines[3], "O'Hare International Airport\t0\t\t");
-  const nyc = entryOf(lines[0]);
+  const nyc = entryOf(lines[1]);
   assert.deepEqual(nyc.forms, ['NYC', 'Big Apple'], 'a case variant of the title is dropped');
   assert.equal(nyc.freq, Math.round(Math.log2(8000) * 16));
   assert.equal(entryOf(lines[3]).freq, undefined);

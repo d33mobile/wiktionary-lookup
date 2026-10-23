@@ -47,6 +47,11 @@ final class ReleaseProxy implements WebViewAssetLoader.PathHandler {
                 }
             });
 
+    /** The fetcher, also used for native downloads into app storage. */
+    ReleaseFetcher fetcher() {
+        return fetcher;
+    }
+
     @Override
     public WebResourceResponse handle(String path) {
         ReleaseFetcher.Result result = fetcher.fetch(path);

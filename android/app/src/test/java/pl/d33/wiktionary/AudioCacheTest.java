@@ -11,6 +11,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.junit.Test;
@@ -59,5 +63,37 @@ public class AudioCacheTest {
         assertThrows(IOException.class, () -> c.store("big.ogg", bytes(5_000), 4_096));
         assertFalse(c.contains("big.ogg"));
         assertEquals(0, dir.listFiles().length);
+    }
+
+    /**
+     * Prefetch threads store at the same time on a first start, when the
+     * cache directory does not exist yet: losing the race to create it must
+     * not fail the store (seen on Android 9: "cannot create .../cache/audio").
+     */
+    @Test
+    public void concurrentFirstStoresAllSucceed() throws Exception {
+        int threads = 8;
+        AtomicInteger failures = new AtomicInteger();
+        for (int round = 0; round < 300; round++) {
+            File dir = new File(Files.createTempDirectory("audio-race").toFile(), "cache/audio");
+            AudioCache c = cache(dir, 1_000_000);
+            CyclicBarrier start = new CyclicBarrier(threads);
+            List<Thread> all = new ArrayList<>();
+            for (int t = 0; t < threads; t++) {
+                String name = "f" + t + ".ogg";
+                Thread th = new Thread(() -> {
+                    try {
+                        start.await();
+                        c.store(name, bytes(FILE_BYTES), 10_000);
+                    } catch (Exception e) {
+                        failures.incrementAndGet();
+                    }
+                });
+                th.start();
+                all.add(th);
+            }
+            for (Thread th : all) th.join();
+        }
+        assertEquals(0, failures.get());
     }
 }

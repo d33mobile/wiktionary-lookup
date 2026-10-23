@@ -2,8 +2,9 @@
 
 An offline dictionary for every language of English Wiktionary, with search
 as you type, Wiktionary-style entry pages, pronunciation (Wiktionary
-recordings or text-to-speech) and handwriting input for Chinese and
-Japanese. It runs as a static web page and as an Android app (a WebView
+recordings or text-to-speech), handwriting input for Chinese and Japanese,
+history and favourites, and Wikipedia article titles (English, German,
+Polish) with their short descriptions. It runs as a static web page and as an Android app (a WebView
 around the same page), published in an F-Droid repository:
 https://d33mobile.github.io/wiktionary-lookup-fdroid/
 
@@ -44,10 +45,10 @@ node tui.js zh.idx                          # interactive
 node scripts/build-all.js                   # every language, see the script header
 ```
 
-Web app: `node stage-web.js DEST zh.idx [manifest.json]`, then serve `DEST`
+Web app: `node stage-web.js DEST zh.idx|- [manifest.json]` (`-`: no built-in language), then serve `DEST`
 and open `/web/index.html`.
 
-Android: `android/build-apk.sh zh.idx [OUT_DIR [MANIFEST]]` builds a debug
+Android: `android/build-apk.sh zh.idx|- [OUT_DIR [MANIFEST]]` builds a debug
 APK (Android SDK, JDK 17). Crash reporting is off unless the build gets a
 `SENTRY_DSN` (Gradle property, environment or `android/local.properties`).
 
@@ -59,14 +60,10 @@ versionCode and versionName come from the source (`android/app/build.gradle`,
 `strings.xml`).
 
 ```sh
-# The built-in language (Chinese) and the language list, from the data release:
-D=https://github.com/d33mobile/wiktionary-lookup-data/releases/latest/download
-curl -L $D/manifest.json -o manifest.json
-# zh.idx.gz and zh.details.gz: the "url" and details.url of "zh" in manifest.json
-curl -L "$(node -e 'const m=require("./manifest.json");const z=m.languages.find(l=>l.code==="zh");console.log(new URL(z.url,process.argv[1]).href)' $D/manifest.json)" | gunzip > zh.idx
-curl -L "$(node -e 'const m=require("./manifest.json");const z=m.languages.find(l=>l.code==="zh");console.log(new URL(z.details.url,process.argv[1]).href)' $D/manifest.json)" | gunzip > zh.details
-
-node stage-web.js android/app/src/main/assets zh.idx manifest.json
+# The language list shipped with the app (no built-in language since 0.9),
+# from the data release current at the time of the app release:
+curl -L https://github.com/d33mobile/wiktionary-lookup-data/releases/download/data-2026-10-23b/manifest.json -o manifest.json
+node stage-web.js android/app/src/main/assets - manifest.json
 cd android && ./gradlew assembleRelease     # app/build/outputs/apk/release/app-release-unsigned.apk
 ```
 

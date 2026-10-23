@@ -12,6 +12,8 @@ import { ENGINE_FILES } from '../stage-web.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const ENTRY = resolve(ROOT, 'lib', 'engine.js');
+// Loaded by pages that open big indexes asynchronously; imports the engine.
+const LAZY_ENTRY = resolve(ROOT, 'lib', 'lazy-index.js');
 // Static and dynamic import specifiers, and the Node globals a browser lacks.
 const IMPORT_RE = /\b(?:import|export)\b[^'"`;]*?\bfrom\s*['"]([^'"]+)['"]|\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)|^\s*import\s*['"]([^'"]+)['"]/gm;
 const NODE_GLOBAL_RE = /\b(?:Buffer|process|require|__dirname|__filename)\b|import\.meta\.(?:dirname|filename)/;
@@ -33,7 +35,7 @@ function importGraph(entry) {
 }
 
 test('the engine module graph has only relative imports and no Node globals', () => {
-  const graph = importGraph(ENTRY);
+  const graph = new Map([...importGraph(ENTRY), ...importGraph(LAZY_ENTRY)]);
   // stage-web.js copies exactly these files next to the page.
   assert.deepEqual([...graph.keys()].map((f) => f.slice(ROOT.length + 1)).sort(),
     ENGINE_FILES.map((f) => `lib/${f}`).sort());

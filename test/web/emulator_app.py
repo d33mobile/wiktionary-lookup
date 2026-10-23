@@ -40,9 +40,8 @@ def main():
     print("marks:", page.eval("['zh', 'de', 'ja', 'la', 'eo', 'fr'].map((c) => { const m = document.querySelector("
                               "`#lang-list li[data-code=${c}] .lang-mark`); return c + ' ' + (m ? m.textContent : '-'); })"))
     dev.screenshot(shots / "05-1-welcome.png")
-    page.tap('#lang-list li[data-code="zh"] button')
-    page.wait("document.body.dataset.screen === 'search'", 30, "search screen")
-    print("chose Chinese -> search screen; header:", page.eval("document.querySelector('#lang option:checked').textContent"))
+    emulator.past_welcome(page)
+    print("chose Chinese -> search screen:", page.eval("document.getElementById('status').textContent"))
 
     emulator.set_query(page, "nihao")
     t0 = time.monotonic()
@@ -64,7 +63,7 @@ def main():
     print("tap speaker:", [l.split("AudioProxy: ")[-1] for l in logcat(dev, "AudioProxy") if "AudioProxy:" in l])
 
     page.tap("#results li[data-index] .words")
-    page.wait("document.body.dataset.detail === '你好' && document.body.dataset.details === 'loaded'", 60, "detail")
+    emulator.open_entry_pages(page, "你好")
     print("detail of 你好:", page.eval("Array.from(document.querySelectorAll('#detail .detail-h, #detail .detail-h4'), (h) => h.textContent)"),
           "| example:", page.eval("(document.querySelector('.ex-text') || {}).textContent"))
     dev.screenshot(shots / "05-3a-nihao.png")

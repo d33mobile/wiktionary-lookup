@@ -8,7 +8,8 @@
 //
 // Downloaded indexes are kept decompressed in the Cache API; which languages
 // are installed and which one is active is kept in localStorage. The index
-// bundled with the page (index.idx) is always installed under BUNDLED_CODE.
+// bundled with the page (index.idx), if any (bundle.json says), is always
+// installed under BUNDLED_CODE.
 
 import { gunzip } from './inflate.js';
 
@@ -65,6 +66,49 @@ async function httpError(res) {
   return detail ? `HTTP ${res.status} (${detail})` : `HTTP ${res.status}`;
 }
 
+function hexDigest(buffer) {
+  return Array.from(new Uint8Array(buffer), (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+// The Android app's file storage for indexes (IndexStore), when present.
+function nativeFiles() {
+  const n = window.WiktionaryNative;
+  return n && n.startIndexDownload ? n : null;
+}
+
+function fileName(code, kind) {
+  return `${code}.${kind || 'idx'}`;
+}
+
+function localUrl(code, kind) {
+  return new URL(`/local/${fileName(code, kind)}`, location.href).href;
+}
+
+// Downloads through the app (PageBridge.startIndexDownload); it reports
+// back through window.onNativeDownload(id, state, done, total, error).
+const nativeJobs = new Map();
+let nativeJobId = 0;
+window.onNativeDownload = (id, state, done, total, error) => {
+  const job = nativeJobs.get(id);
+  if (!job) return;
+  if (state === 'progress') {
+    job.onProgress(done, total, 'download');
+  } else {
+    nativeJobs.delete(id);
+    if (state === 'done') job.resolve();
+    else job.reject(error === 'cancelled' ? Object.assign(new Error('cancelled'), { name: 'AbortError' }) : new Error(error || 'download failed'));
+  }
+};
+
+function nativeDownload(native, request, onProgress, signal) {
+  const id = `d${++nativeJobId}`;
+  return new Promise((resolve, reject) => {
+    nativeJobs.set(id, { resolve, reject, onProgress });
+    if (signal) signal.addEventListener('abort', () => native.cancelIndexDownload(id));
+    native.startIndexDownload(JSON.stringify({ id, ...request }));
+  });
+}
+
 function cacheKey(code, kind) {
   return new URL(`/__indexes/${encodeURIComponent(code)}.${kind || 'idx'}`, location.href).href;
 }
@@ -82,6 +126,26 @@ export function inflateText(bytes) {
   return new TextDecoder().decode(gunzip(bytes));
 }
 
+// The catalogue: Wiktionary languages and Wikipedia title indexes (kind
+// 'wikipedia', listed in `languages` or in a separate `wikipedia` array).
+// A Wikipedia index is keyed 'wikipedia-<code>' (its file name too), so it
+// does not collide with the Wiktionary language of the same code; `lang`
+// keeps the language code (flags, voices).
+export const WIKIPEDIA_PREFIX = 'wikipedia-';
+
+function catalogueOf(manifest) {
+  const all = manifest.languages.concat(Array.isArray(manifest.wikipedia) ? manifest.wikipedia : []);
+  return all.map((l) => {
+    if (l.kind !== 'wikipedia') return l;
+    const lang = l.lang || (l.code.indexOf(WIKIPEDIA_PREFIX) === 0 ? l.code.slice(WIKIPEDIA_PREFIX.length) : l.code);
+    return { ...l, code: WIKIPEDIA_PREFIX + lang, lang };
+  });
+}
+
+export function isWikipedia(code) {
+  return code.indexOf(WIKIPEDIA_PREFIX) === 0;
+}
+
 export class Languages {
   constructor({ base, bundledIndexUrl, bundledDetailsUrl, bundledManifestUrl }) {
     this.manifestUrl = manifestUrl(base);
@@ -94,9 +158,30 @@ export class Languages {
     // No saved state: the first start, when the app asks for a language.
     this.fresh = !state.installed;
     this.installed = state.installed || {};
-    this.active = state.active || BUNDLED_CODE;
-    this.installed[BUNDLED_CODE] = { code: BUNDLED_CODE, name: BUNDLED_NAME, ...this.installed[BUNDLED_CODE], bundled: true };
-    if (!this.installed[this.active]) this.active = BUNDLED_CODE;
+    this.active = state.active || null;
+    this.lostBundled = false;
+  }
+
+  // Whether the page comes with a built-in index (bundle.json). Without one,
+  // a built-in Chinese of an earlier version is gone: it has to be
+  // downloaded (lostBundled says so once).
+  setBundled(hasIndex) {
+    const zh = this.installed[BUNDLED_CODE];
+    if (hasIndex) {
+      this.installed[BUNDLED_CODE] = { code: BUNDLED_CODE, name: BUNDLED_NAME, ...zh, bundled: true };
+    } else if (zh && zh.bundled) {
+      delete this.installed[BUNDLED_CODE];
+      this.lostBundled = true;
+      this.save();
+    }
+    if (!this.installed[this.active]) this.active = this.fallback();
+  }
+
+  // The language to use when the active one is gone: the built-in one, else any.
+  fallback() {
+    if (this.installed[BUNDLED_CODE]) return BUNDLED_CODE;
+    const codes = Object.keys(this.installed);
+    return codes.length ? codes[0] : null;
   }
 
   isBundled(code) {
@@ -108,10 +193,10 @@ export class Languages {
   }
 
   setCatalogue(manifest, source) {
-    this.catalogue = manifest.languages;
+    this.catalogue = catalogueOf(manifest);
     this.catalogueSource = source;
     const zh = this.catalogue.find((l) => l.code === BUNDLED_CODE);
-    if (zh) this.installed[BUNDLED_CODE].name = zh.name;
+    if (zh && this.installed[BUNDLED_CODE]) this.installed[BUNDLED_CODE].name = zh.name;
   }
 
   // The last fetched remote manifest, else the bundled one.
@@ -155,7 +240,45 @@ export class Languages {
     this.save();
   }
 
-  // ArrayBuffer of an installed index. A cached index that went missing
+  // A {size, read(offset, length)} reader over a file the app stored, for
+  // lib/lazy-index.js (/local/<file>?offset=&length=).
+  fileReader(code, kind) {
+    const native = nativeFiles();
+    const size = native ? native.indexFileSize(fileName(code, kind)) : -1;
+    if (size < 0) return Promise.reject(new Error(`the ${code} index is no longer stored, download it again`));
+    const url = localUrl(code, kind);
+    return Promise.resolve({
+      size,
+      async read(offset, length) {
+        const res = await fetch(`${url}?offset=${offset}&length=${length}`);
+        if (!res.ok) throw new Error(`${fileName(code, kind)}: HTTP ${res.status}`);
+        return new Uint8Array(await res.arrayBuffer());
+      },
+    });
+  }
+
+  // Bytes of a downloaded file, or null when it is gone (storage cleared).
+  // record.storage 'file': the Android app's storage, served at /local/;
+  // otherwise the Cache API (browsers, and installs before 0.9).
+  async readStored(code, kind, record) {
+    if (record.storage === 'file') {
+      const res = await fetch(localUrl(code, kind));
+      return res.ok ? res.arrayBuffer() : null;
+    }
+    const res = await (await caches.open(CACHE_NAME)).match(cacheKey(code, kind));
+    return res ? res.arrayBuffer() : null;
+  }
+
+  async deleteStored(code, kind, record) {
+    if (record && record.storage === 'file') {
+      const native = nativeFiles();
+      if (native) native.deleteIndexFile(fileName(code, kind));
+      return;
+    }
+    await (await caches.open(CACHE_NAME)).delete(cacheKey(code, kind));
+  }
+
+  // ArrayBuffer of an installed index. An index that went missing
   // (storage cleared by the user or the browser) is marked uninstalled.
   async read(code) {
     if (this.isBundled(code)) {
@@ -163,15 +286,14 @@ export class Languages {
       if (!res.ok) throw new Error(`${this.bundledIndexUrl}: HTTP ${res.status}`);
       return res.arrayBuffer();
     }
-    const cache = await caches.open(CACHE_NAME);
-    const res = await cache.match(cacheKey(code));
-    if (!res) {
+    const bytes = await this.readStored(code, 'idx', this.installed[code]);
+    if (!bytes) {
       delete this.installed[code];
-      if (this.active === code) this.active = BUNDLED_CODE;
+      if (this.active === code) this.active = this.fallback();
       this.save();
       throw new Error(`the ${code} index is no longer stored, download it again`);
     }
-    return res.arrayBuffer();
+    return bytes;
   }
 
   // The entry pages (.details sidecar) of an installed language as an
@@ -189,13 +311,12 @@ export class Languages {
       }
     }
     if (!lang.details) return null;
-    const res = await (await caches.open(CACHE_NAME)).match(cacheKey(code, 'details'));
-    if (!res) {
+    const bytes = await this.readStored(code, 'details', lang.details);
+    if (!bytes) {
       delete lang.details;
       this.save();
-      return null;
     }
-    return res.arrayBuffer();
+    return bytes;
   }
 
   hasDetails(code) {
@@ -204,44 +325,101 @@ export class Languages {
     return lang.bundled ? Boolean(this.bundledDetailsUrl) : Boolean(lang.details);
   }
 
+  // What a newer data release changed for an installed language: the
+  // dictionary and/or the installed entry pages differ (by SHA-256) from
+  // the catalogue. {index, details, bytes (download size)} or null.
+  updateFor(code) {
+    const lang = this.installed[code];
+    const cat = this.catalogue.find((l) => l.code === code);
+    if (!lang || lang.bundled || !cat || !cat.url) return null;
+    const index = Boolean(cat.sha256 && lang.sha256 && cat.sha256 !== lang.sha256);
+    // A new index invalidates installed pages too (they are per build).
+    const details = Boolean(lang.details && cat.details
+      && (index || (cat.details.sha256 && lang.details.sha256 && cat.details.sha256 !== lang.details.sha256)));
+    if (!index && !details) return null;
+    const bytes = (index ? cat.gzBytes || cat.bytes || 0 : 0)
+      + (details ? cat.details.gzBytes || cat.details.bytes || 0 : 0);
+    return { index, details, bytes };
+  }
+
+  // Installs from before 0.4 kept no checksum: compute it once from the
+  // stored file so updates can be detected. Returns the codes it filled in.
+  async fillMissingChecksums() {
+    const done = [];
+    if (!crypto.subtle) return done;
+    for (const code of Object.keys(this.installed)) {
+      const lang = this.installed[code];
+      if (lang.bundled || lang.sha256) continue;
+      const bytes = await this.readStored(code, 'idx', lang);
+      if (!bytes) continue;
+      lang.sha256 = hexDigest(await crypto.subtle.digest('SHA-256', bytes));
+      done.push(code);
+    }
+    if (done.length) this.save();
+    return done;
+  }
+
   // Downloads the entry pages of an installed language (manifest
-  // entry.details); returns them as an ArrayBuffer.
+  // entry.details); returns them as an ArrayBuffer, or null when the app
+  // stored them as a file (read them with readDetails).
   async installDetails(entry, onProgress, signal) {
     const d = entry.details;
     const file = { code: entry.code, name: `${entry.name} entry pages`, url: d.url, bytes: d.bytes, sha256: d.sha256, gzBytes: d.gzBytes };
-    const bytes = await this.fetchFile(file, cacheKey(entry.code, 'details'), onProgress, signal);
-    this.installed[entry.code].details = { bytes: bytes.byteLength, sha256: d.sha256 || null };
+    const previous = this.installed[entry.code].details;
+    const got = await this.fetchFile(file, 'details', onProgress, signal);
+    if (previous && (previous.storage || 'cache') !== got.storage) await this.deleteStored(entry.code, 'details', previous);
+    this.installed[entry.code].details = { bytes: d.bytes || (got.bytes && got.bytes.byteLength), sha256: d.sha256 || null, storage: got.storage };
     this.save();
-    return bytes;
+    return got.bytes;
   }
 
   async removeDetails(code) {
     const lang = this.installed[code];
-    if (!lang || lang.bundled) return;
-    await (await caches.open(CACHE_NAME)).delete(cacheKey(code, 'details'));
+    if (!lang || lang.bundled || !lang.details) return;
+    await this.deleteStored(code, 'details', lang.details);
     delete lang.details;
     this.save();
   }
 
-  // Downloads, decompresses (for .gz URLs), verifies and stores one
-  // catalogue entry's index; returns it as an ArrayBuffer.
+  // Downloads, decompresses, verifies and stores one catalogue entry's
+  // index (replacing an older one only once the new one is complete);
+  // returns it as an ArrayBuffer, or null when the app stored it as a file.
   // onProgress(done, total, phase) reports 'download' bytes and, when the
   // WebView has no DecompressionStream, the 'unpack' step that follows.
   async install(entry, onProgress, signal) {
-    const bytes = await this.fetchFile(entry, cacheKey(entry.code), onProgress, signal);
     const previous = this.installed[entry.code];
+    const got = await this.fetchFile(entry, 'idx', onProgress, signal);
+    if (previous && !previous.bundled && (previous.storage || 'cache') !== got.storage) await this.deleteStored(entry.code, 'idx', previous);
     this.installed[entry.code] = {
-      code: entry.code, name: entry.name, entries: entry.entries, bytes: bytes.byteLength, sha256: entry.sha256 || null,
+      code: entry.code, name: entry.name, entries: entry.entries, bytes: entry.bytes || (got.bytes && got.bytes.byteLength),
+      sha256: entry.sha256 || null, storage: got.storage, kind: entry.kind || 'wiktionary', lang: entry.lang || entry.code,
     };
     // Entry pages belong to one build of the index: a new index drops them.
-    if (previous && previous.details) await this.removeDetails(entry.code);
+    if (previous && previous.details) {
+      this.installed[entry.code].details = previous.details;
+      await this.removeDetails(entry.code);
+    }
     this.save();
-    return bytes;
+    return got.bytes;
   }
 
-  // file: {code, name, url, bytes, sha256, gzBytes} -> stored under key.
-  async fetchFile(entry, key, onProgress, signal) {
+  // file: {code, name, url, bytes, sha256, gzBytes} -> {storage, bytes}.
+  // In the Android app (when the URL goes through its release proxy) the
+  // app downloads into its storage; elsewhere the page does, into the Cache API.
+  async fetchFile(entry, kind, onProgress, signal) {
     const url = new URL(entry.url, this.manifestUrl);
+    const native = nativeFiles();
+    if (native && url.host === location.host && url.pathname.indexOf(ANDROID_PROXY) === 0) {
+      await nativeDownload(native, {
+        name: fileName(entry.code, kind),
+        path: decodeURIComponent(url.pathname.slice(ANDROID_PROXY.length)),
+        bytes: entry.bytes || 0,
+        sha256: entry.sha256 || '',
+        gzip: url.pathname.endsWith('.gz'),
+      }, onProgress, signal);
+      return { storage: 'file', bytes: null };
+    }
+    const key = cacheKey(entry.code, kind);
     const res = await fetch(url, { signal });
     if (!res.ok || !res.body) throw new Error(`${entry.name}: ${await httpError(res)}`);
     const gzipped = url.pathname.endsWith('.gz');
@@ -258,15 +436,13 @@ export class Languages {
         throw new Error(`${entry.name}: got ${bytes.byteLength} bytes, expected ${entry.bytes}`);
       }
       if (entry.sha256 && crypto.subtle) {
-        const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
-        const hex = Array.from(digest, (b) => b.toString(16).padStart(2, '0')).join('');
-        if (hex !== entry.sha256) throw new Error(`${entry.name}: checksum mismatch`);
+        if (hexDigest(await crypto.subtle.digest('SHA-256', bytes)) !== entry.sha256) throw new Error(`${entry.name}: checksum mismatch`);
       }
     } catch (err) {
       await cache.delete(key);
       throw err;
     }
-    return bytes;
+    return { storage: 'cache', bytes };
   }
 
   // Chromium 80+: decompress while downloading and stream into the cache;
@@ -319,11 +495,11 @@ export class Languages {
 
   async remove(code) {
     if (this.isBundled(code)) return;
-    const cache = await caches.open(CACHE_NAME);
-    await cache.delete(cacheKey(code));
-    await cache.delete(cacheKey(code, 'details'));
+    const lang = this.installed[code];
+    await this.deleteStored(code, 'idx', lang);
+    if (lang && lang.details) await this.deleteStored(code, 'details', lang.details);
     delete this.installed[code];
-    if (this.active === code) this.active = BUNDLED_CODE;
+    if (this.active === code) this.active = this.fallback();
     this.save();
   }
 }

@@ -38,16 +38,6 @@ header {
 header .bar { display: flex; }
 /* Flexbox gap is Chromium 84; margins work in older WebViews too. */
 header .bar > * + * { margin-left: 8px; }
-#lang {
-  flex: 0 1 auto;
-  max-width: 40%;
-  padding: 0 8px;
-  font-size: 15px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--bg);
-  color: var(--fg);
-}
 #q {
   flex: 1 1 auto;
   min-width: 0;
@@ -149,7 +139,8 @@ button.speak-audio { color: var(--accent); }
 .speak-row button.speak-audio { color: var(--accent); }
 .speak-row button.speak svg { margin: 0 6px 0 0; }
 .speak-label { font-size: 14px; }
-.speak-row { display: flex; align-items: center; margin: 8px 0 0; }
+.speak-row { display: flex; flex-wrap: wrap; align-items: center; margin: 8px 0 0; }
+.speak-row > * { margin-bottom: 6px; }
 .speak-row button.speak { margin-left: 0; }
 .speak-row > * + * { margin-left: 8px; }
 #speech-hint { margin-top: 4px; font-size: 13px; color: var(--accent); }
@@ -246,13 +237,16 @@ button.speak-audio.cached::after {
   padding: 16px 18px;
   max-width: 480px;
   max-height: 80vh;
-  overflow-y: auto;
+  /* The notes scroll; the title and OK stay in view. */
+  display: flex;
+  flex-direction: column;
 }
+#changelog-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 #changelog h2 { margin: 0 0 8px; font-size: 20px; font-weight: 500; }
 #changelog h3 { margin: 12px 0 4px; font-size: 15px; }
 #changelog ul { margin: 0; padding-left: 20px; font-size: 14px; }
 #changelog li { margin-bottom: 4px; }
-#changelog-close { margin-top: 12px; padding: 6px 16px; }
+#changelog-close { flex: none; align-self: flex-start; margin-top: 12px; padding: 6px 16px; }
 #pen {
   flex: none;
   width: 44px;
@@ -296,3 +290,77 @@ button.speak-audio.cached::after {
   user-select: none;
   -webkit-touch-callout: none;
 }
+#notice { margin-top: 4px; font-size: 13px; }
+#notice button { margin-left: 4px; font-size: 13px; }
+.changelog-version.new h3::after { content: ' (new)'; color: var(--accent); font-weight: 400; }
+#gear {
+  flex: none;
+  width: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--fg);
+  padding: 0;
+}
+#gear svg { width: 22px; height: 22px; fill: currentColor; display: block; margin: auto; }
+button.star {
+  flex: none;
+  width: 36px;
+  height: 32px;
+  padding: 4px 6px;
+  margin-left: 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--muted);
+}
+button.star svg { width: 20px; height: 20px; display: block; margin: auto; fill: none; stroke: currentColor; stroke-width: 1.6; }
+button.star.on { color: #c98a00; }
+button.star.on svg { fill: currentColor; }
+.speak-row button.star { width: auto; display: inline-flex; align-items: center; }
+.speak-row button.star svg { margin: 0 6px 0 0; }
+.tabs > * + * { margin-left: 6px; }
+.tab { padding: 6px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); font-size: 15px; }
+.tab.active { border-color: var(--accent); color: var(--accent); }
+.library-tools { margin-top: 10px; font-size: 14px; }
+.library-tools > * + * { margin-left: 8px; }
+#favourites-text textarea { width: 100%; font-size: 12px; }
+#library-list { list-style: none; margin: 0; padding: 0; }
+.library-day { padding: 12px 4px 4px; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; }
+.library-item { display: flex; align-items: center; padding: 8px 4px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.library-info { flex: 1 1 auto; min-width: 0; }
+.library-item .head { font-size: 18px; }
+.library-delete { flex: none; width: 36px; height: 32px; margin-left: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--muted); font-size: 18px; }
+#load-progress { width: 100%; height: 4px; display: block; margin-top: 4px; accent-color: var(--accent); }
+.lang-section { padding: 14px 4px 4px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); display: block !important; }
+#gear { position: relative; }
+#lang-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 9px;
+  height: 9px;
+  border-radius: 5px;
+  background: var(--accent);
+}
+.opt-h { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin: 16px 0 6px; }
+#opt-languages { list-style: none; margin: 0; padding: 0; }
+.opt-language {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 8px;
+  margin: 0 0 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 16px;
+  text-align: left;
+}
+.opt-language.active { border-color: var(--accent); }
+.opt-language.active::after { content: 'active'; margin-left: auto; color: var(--accent); font-size: 13px; }
+.opt-update { margin-left: 8px; font-size: 12px; color: var(--accent); }
+.opt-empty { color: var(--muted); }
+.opt-buttons { display: flex; flex-wrap: wrap; }
+.opt-buttons > * { margin: 0 8px 8px 0; padding: 6px 12px; }

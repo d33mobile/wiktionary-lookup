@@ -24,7 +24,9 @@
 // failures
 // are recorded in <out>/meta/<code>.failed.json and retried only with
 // --retry-failed. Progress goes to stdout and <out>/build-all.log. The
-// manifest is rewritten from the meta files after every language, sorted by
+// manifest is rewritten from the meta files after every language (kind
+// 'wiktionary') plus the entries of <out>/manifest-wikipedia.json when it
+// exists (kind 'wikipedia', scripts/wikipedia-release.js), sorted by
 // name, with url = "<code>.idx.gz" (relative to the manifest, as the data
 // release serves both from the same directory).
 import { readFile, writeFile, mkdir, rm, stat, readdir, rename, appendFile } from 'node:fs/promises';
@@ -48,14 +50,16 @@ const DEFAULTS = {
   wordfreqLangs: new Set(['zh']),
 };
 const KEEP_JSONL_BYTES = 100e6;
+const WIKIPEDIA_FRAGMENT = 'manifest-wikipedia.json';
 const KEEP_JSONL_CODES = new Set(['zh']);
 const CHILD_HEAP_MB = 12000;
 // Bumped whenever the index contents change (sources, builder, format); a
 // language whose meta file has another revision or another extract size is
 // rebuilt. 2: frequencies (zh) and pronunciation audio. 3: details
 // embedded. 4: details in a sidecar file; a revision 3 index of the same
-// extract is split into index and sidecar instead of rebuilt.
-const BUILD_REV = 4;
+// extract is split into index and sidecar instead of rebuilt. 5: entries
+// sorted by headword key, byte text offsets (lazy opening).
+const BUILD_REV = 5;
 const SPLITTABLE_REV = 3;
 
 function parseArgs(argv) {
@@ -210,7 +214,16 @@ async function writeManifest(opts, list) {
     const m = JSON.parse(await readFile(join(metaDir, f), 'utf8'));
     if (m.skipped) continue;
     const { code, name, entries, audioEntries, bytes, sha256: sum, gzBytes, url, details, script, hasRomanization } = m;
-    languages.push({ code, name, entries, audioEntries, bytes, sha256: sum, gzBytes, url, ...(details ? { details } : {}), script, hasRomanization });
+    languages.push({
+      kind: 'wiktionary', code, name, entries, audioEntries, bytes, sha256: sum, gzBytes, url, ...(details ? { details } : {}), script, hasRomanization,
+    });
+  }
+  // Wikipedia title indexes (scripts/wikipedia-release.js) published next
+  // to the Wiktionary ones: kind 'wikipedia'.
+  try {
+    languages.push(...JSON.parse(await readFile(join(opts.out, WIKIPEDIA_FRAGMENT), 'utf8')).wikipedia);
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
   }
   languages.sort((a, b) => a.name.localeCompare(b.name));
   const manifest = {

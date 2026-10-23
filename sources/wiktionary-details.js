@@ -14,6 +14,8 @@
 //
 // title is the Wiktionary page title (https://en.wiktionary.org/wiki/<title>).
 // Caps keep the size bounded: see the constants. Empty fields are left out.
+import { keyFunctions } from '../lib/normalize.js';
+
 export const MAX_EXAMPLES = 3;
 export const EXAMPLE_MAX = 300;
 export const ETYMOLOGY_MAX = 600;
@@ -136,6 +138,19 @@ export function recordDetails(record, { chinese = false, examples = true } = {})
     if (list.length) out[rel] = list;
   }
   return out;
+}
+
+// Entries in the order of their headword key (lib/normalize.js keyFunctions
+// of the index's key scheme), ties in source order: entry ids then follow
+// orderSimp, so an index read lazily by byte range (lib/lazy-index.js) finds
+// the keys a bisect compares, and the fields of neighbouring results, in
+// neighbouring blocks. Ranking does not depend on ids except as the last
+// tie-break.
+export function sortByHeadword(list, keys) {
+  const key = keyFunctions(keys).headword;
+  const keyed = list.map((e, i) => ({ k: key(e.simp), i, e }));
+  keyed.sort((a, b) => (a.k < b.k ? -1 : a.k > b.k ? 1 : a.i - b.i));
+  return keyed.map((x) => x.e);
 }
 
 // Sources keep an entry's details as {title, parts: [JSON of recordDetails]}

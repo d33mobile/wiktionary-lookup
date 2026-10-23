@@ -3,7 +3,7 @@
 //
 //   const d = await loadIndex('cedict.idx');
 //   d.search('nihao', { limit: 20 })  // -> [{simp, trad, pinyin, definition, matchedOn}]
-import { readFile } from 'node:fs/promises';
+import { readFile, open } from 'node:fs/promises';
 import { gunzipSync } from 'node:zlib';
 import { openSync, readSync, closeSync, existsSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
@@ -11,6 +11,27 @@ import { openIndex, Dictionary, DEFAULT_LIMIT } from './lib/engine.js';
 import { openIndexReader } from './lib/index-format.js';
 
 export { Dictionary, Session, openIndex, AUDIO_URL_PREFIX } from './lib/engine.js';
+export { openIndexLazy, openIndexProgressive, fetchRangeReader } from './lib/lazy-index.js';
+
+// Asynchronous reader over a file for lib/lazy-index.js:
+// {size, read(offset, length) -> Promise<Uint8Array>, close()}.
+export async function nodeFileReader(path) {
+  const handle = await open(path, 'r');
+  const { size } = await handle.stat();
+  return {
+    size,
+    async read(offset, length) {
+      const buf = new Uint8Array(length);
+      for (let done = 0; done < length;) {
+        const { bytesRead } = await handle.read(buf, done, length - done, offset + done);
+        if (bytesRead === 0) throw new Error(`${path}: short read at ${offset + done}`);
+        done += bytesRead;
+      }
+      return buf;
+    },
+    close: () => handle.close(),
+  };
+}
 
 // Details blocks (Dictionary.getDetails) are inflated with zlib in Node.
 const nodeInflate = async (bytes) => gunzipSync(bytes).toString('utf8');

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Usage: android/build-apk.sh INDEX [OUT_DIR [MANIFEST]]
+# Usage: android/build-apk.sh INDEX|- [OUT_DIR [MANIFEST]]   (- : no built-in language)
 # Stages the web app, the engine, INDEX (the built-in language) and MANIFEST
 # (the language list shown before the app reaches the data releases) into
 # app/src/main/assets, builds the debug APK (no lint) and copies it to

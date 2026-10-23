@@ -75,6 +75,35 @@ def two_step_language(dest, download):
     return {"code": "zhd", "name": "Chinese test pages", "entries": 6, "script": "Hani", **base, "details": details}
 
 
+def stale_language_manifest(dest, download, current):
+    """The manifest as it was before an audio rebuild: 'zhd' built from the
+    same records without recordings (another sha256). Written next to the
+    current one as manifest-old.json."""
+    old_jsonl = dest / "zh-details-no-audio.jsonl"
+    with open(HERE / "fixtures" / "zh-details.jsonl", encoding="utf-8") as src, open(old_jsonl, "w", encoding="utf-8") as out:
+        for line in src:
+            record = json.loads(line)
+            for sound in record.get("sounds", []):
+                for key in ("audio", "ogg_url", "mp3_url"):
+                    sound.pop(key, None)
+            out.write(json.dumps(record, ensure_ascii=False) + "\n")
+    idx = download / "zhd-old.idx"
+    build_fixture("wiktionary-zh", old_jsonl, idx)
+    base = gz_entry(idx, f"../../download/{RELEASE_TAG}/zhd-old.idx.gz")
+    details = gz_entry(download / "zhd-old.details", f"../../download/{RELEASE_TAG}/zhd-old.details.gz")
+    details["entries"] = 6
+    languages = [dict(l, **base, details=details) if l["code"] == "zhd" else l for l in current]
+    (dest / "manifest-old.json").write_text(json.dumps({"languages": languages}))
+
+
+def wikipedia_entry(download):
+    idx = download / "wikipedia-pl.idx"
+    build_fixture(REPO / "sources" / "wikipedia-titles.js", HERE / "fixtures" / "plwiki-titles.tsv", idx, "none")
+    base = gz_entry(idx, f"../../download/{RELEASE_TAG}/wikipedia-pl.idx.gz")
+    return {"kind": "wikipedia", "code": "pl", "name": "Polish Wikipedia", "entries": 4, "script": "Latn",
+            "articleUrl": "https://pl.wikipedia.org/wiki/{title}", **base}
+
+
 def build_release(dest):
     """Writes the mimicked GitHub release tree under dest/releases."""
     download = dest / "releases" / "download" / RELEASE_TAG
@@ -86,20 +115,27 @@ def build_release(dest):
     raw = idx.read_bytes()
     gz = gzip.compress(raw, mtime=0)
     (download / "de.idx.gz").write_bytes(gz)
+    zhd = two_step_language(dest, download)
     languages = [
-        {"code": "zh", "name": "Chinese", "entries": 0, "bytes": 0, "sha256": None},
+        # Downloadable for an app without a built-in language: the zh-details fixture.
+        {"code": "zh", "name": "Chinese", "entries": zhd["entries"], "script": "Hani",
+         **{k: zhd[k] for k in ("bytes", "sha256", "gzBytes", "url", "details")}},
         {"code": "de", "name": "German", "entries": 10, "bytes": len(raw),
          "sha256": hashlib.sha256(raw).hexdigest(), "gzBytes": len(gz),
          "url": f"../../download/{RELEASE_TAG}/de.idx.gz"},
         # Listed only for its script sign (no flag): no url, never downloaded.
         {"code": "la", "name": "Latin", "entries": 1, "bytes": 1, "script": "Latn"},
         # A language whose entry pages are a separate download (sidecar).
-        two_step_language(dest, download),
+        zhd,
+        # Wikipedia titles (a separate catalogue section, articles open as pages).
+        wikipedia_entry(download),
         # Never downloaded: checks the size warning only.
         {"code": "xl", "name": "Extra Large", "entries": 1, "bytes": 300 * 1048576, "sha256": None,
          "gzBytes": 100 * 1048576, "url": f"../../download/{RELEASE_TAG}/xl.idx.gz"},
     ]
     (latest / "manifest.json").write_text(json.dumps({"languages": languages}))
+    (dest / "manifest-new.json").write_text(json.dumps({"languages": languages}))
+    stale_language_manifest(dest, download, languages)
     bundled = dest / "bundled-manifest.json"
     bundled.write_text(json.dumps({"languages": languages[:1]}))
     return bundled
@@ -207,8 +243,8 @@ def chinese(page, shots):
 
 
 def languages(page, base, shots, requests):
-    assert page.locator("#lang option:checked").inner_text().endswith(" Chinese")
-    page.select_option("#lang", "__more")
+    assert ("Chinese", True) in installed_languages(page)
+    open_languages(page)
     page.wait_for_selector("#picker:not([hidden])")
     page.fill("#lang-filter", "germ")
     german = page.locator('#lang-list li[data-code="de"]')
@@ -236,7 +272,7 @@ def languages(page, base, shots, requests):
     page.screenshot(path=str(shots / "downloading.png"))
     wait_language(page, "de")
     assert page.locator("#picker").is_hidden()
-    assert page.locator("#lang option:checked").inner_text() == "\U0001F1E9\U0001F1EA German"
+    assert ("German", True) in installed_languages(page)
     print("installed ->", page.inner_text("#status"))
     query(page, "Haus", "Haus")
     page.screenshot(path=str(shots / "haus.png"))
@@ -248,19 +284,19 @@ def languages(page, base, shots, requests):
     assert sum(r.endswith(".idx.gz") for r in requests) == downloads, "reload must not download again"
     print("reload -> German still active, no second download")
 
-    page.select_option("#lang", "zh")
+    switch_language(page, "zh")
     wait_language(page, "zh")
     query(page, "nihao", "你好")
     print("switch -> Chinese")
 
-    page.select_option("#lang", "__more")
+    open_languages(page)
     german = page.locator('#lang-list li[data-code="de"]')
     german.get_by_role("button", name="Remove").click()
     german.get_by_role("button", name="Download").wait_for()
-    options = page.locator("#lang option").all_inner_texts()
-    assert [o.split(" ", 1)[-1] for o in options] == ["Chinese", "languages..."] or options[-1] == "More languages...", options
-    assert len(options) == 2 and options[0].endswith(" Chinese"), options
-    print("remove -> German removed, languages:", options[:-1])
+    page.click("#picker-close")
+    options = [name for name, _ in installed_languages(page)]
+    assert options == ["Chinese"], options
+    print("remove -> German removed, languages:", options)
 
 
 # Removes what Chromium 66 (stock Android 9 WebView) lacks, so the download
@@ -299,9 +335,30 @@ window.WiktionaryNative = {
 """
 
 
-def set_mode(page, mode):
-    page.evaluate(f"(() => {{ const s = document.getElementById('pron-mode'); s.value = '{mode}';"
-                  " s.dispatchEvent(new Event('change')); })()")
+def open_options(page):
+    page.click("#gear")
+    page.wait_for_selector("#options:not([hidden])")
+
+
+def open_languages(page):
+    """Options (the gear) > More languages..."""
+    open_options(page)
+    page.click("#opt-more")
+    page.wait_for_selector("#picker:not([hidden])")
+
+
+def switch_language(page, code):
+    open_options(page)
+    page.click(f'#opt-languages button[data-code="{code}"]')
+
+
+def installed_languages(page):
+    """[(name, active)] from the options screen (opened and closed again)."""
+    open_options(page)
+    rows = page.evaluate("Array.from(document.querySelectorAll('#opt-languages button.opt-language'),"
+                         " (b) => [b.querySelector('.lang-name').textContent, b.classList.contains('active')])")
+    page.click("#options-close")
+    return [tuple(r) for r in rows]
 
 
 def speech(browser, base, shots):
@@ -348,6 +405,9 @@ def speech(browser, base, shots):
     row = page.inner_text("#detail-speak-row").replace("\n", " ")
     assert page.locator("#detail-speak").is_visible() and page.locator("#detail-tts").is_visible(), row
     print("detail of 你好:", row)
+    # The buttons wrap instead of widening the page (a wider page zooms out on phones).
+    width = page.evaluate("[document.documentElement.scrollWidth, document.documentElement.clientWidth]")
+    assert width[0] <= width[1], width
     page.screenshot(path=str(shots / "audio-detail.png"))
     page.evaluate("window.__spoken = []; document.body.dataset.spoke = ''")
     page.click("#detail-tts")
@@ -369,12 +429,6 @@ def speech(browser, base, shots):
     page.click("#back")
     page.wait_for_selector("#detail", state="hidden")
 
-    # "Always text-to-speech": every row gets the text-to-speech button.
-    set_mode(page, "speech")
-    query(page, "zhongguo", "中国")
-    assert result_rows(page).first.locator("button.speak-tts").count() == 1
-    print("setting 'Always text-to-speech' -> text-to-speech button on every row")
-    set_mode(page, "auto")
     context.close()
 
 
@@ -513,6 +567,25 @@ def handwriting(browser, base, shots):
     page.click("#pad-undo")
     page.wait_for_function("/^\\d+ candidates/.test(document.getElementById('pad-status').textContent)")
     print("undo ->", page.locator("#pad-candidates .pad-candidate").all_text_contents()[:4])
+    # Picking a result closes the pad (the pen reopens it), opening an entry too.
+    page.click("#pad-clear")
+    page.evaluate("window.__strokes = 0")
+    draw(page, [[(40, 130), (240, 130)], [(140, 30), (140, 250)]])
+    candidates(page, 2)
+    page.fill("#q", "")
+    page.locator("#pad-candidates .pad-candidate", has_text="十").first.click()
+    page.wait_for_function("document.getElementById('q').value === '十'")
+    wait_results(page)
+    assert page.locator("#pad").is_visible(), "a candidate alone keeps the pad open"
+    result_rows(page).first.click()
+    page.wait_for_selector("#detail:not([hidden])")
+    print("pad open -> pick 十 -> tap first result -> pad hidden:", page.locator("#pad").is_hidden())
+    assert page.locator("#pad").is_hidden(), "picking a result closes the pad"
+    page.go_back()
+    page.wait_for_selector("#detail", state="hidden")
+    assert page.locator("#pad").is_hidden(), "only the pen reopens it"
+    page.click("#pen")
+    assert page.locator("#pad").is_visible()
     context.close()
 
 
@@ -524,7 +597,7 @@ def two_step(browser, base, shots):
     page = context.new_page()
     page.goto(base)
     wait_language(page, "zh")
-    page.select_option("#lang", "__more")
+    open_languages(page)
     page.fill("#lang-filter", "test pages")
     row = page.locator('#lang-list li[data-code="zhd"]')
     print("picker ->", row.inner_text().replace("\n", " | "))
@@ -542,7 +615,7 @@ def two_step(browser, base, shots):
     print("after download ->", page.locator(".ex-text").first.inner_text(), "|", page.locator(".detail-h").all_text_contents())
     page.click("#back")
     page.wait_for_selector("#detail", state="hidden")
-    page.select_option("#lang", "__more")
+    open_languages(page)
     page.fill("#lang-filter", "test pages")
     row.get_by_role("button", name="Remove entry pages").click()
     row.get_by_role("button", name="Download entry pages").wait_for()
@@ -554,6 +627,204 @@ def two_step(browser, base, shots):
     page.wait_for_function("document.body.dataset.details === 'none'")
     assert page.locator("#detail-get-pages").is_visible()
     print("reload -> plain definition, offer shown again")
+    context.close()
+
+
+def updates(browser, base, shots, release_root):
+    """A language installed from an older data release (no recordings) is
+    offered as an update once the catalogue changes: Update in its row,
+    "Update all", a dot on the header switch and a one-time note; after
+    the update the recording's speaker appears."""
+    manifest = release_root / "releases" / "latest" / "download" / "manifest.json"
+    shutil.copyfile(release_root / "manifest-old.json", manifest)
+    context = new_context(browser)
+    page = context.new_page()
+    page.goto(base)
+    wait_language(page, "zh")
+    open_languages(page)
+    page.fill("#lang-filter", "test pages")
+    row = page.locator('#lang-list li[data-code="zhd"]')
+    row.get_by_role("button", name="Download dictionary").click()
+    wait_language(page, "zhd")
+    query(page, "nihao", "你好")
+    assert result_rows(page).first.locator("button.speak-audio").count() == 0
+    print("installed from the old release -> no recording on 你好")
+
+    shutil.copyfile(release_root / "manifest-new.json", manifest)
+    page.reload()
+    wait_language(page, "zhd")
+    page.wait_for_function("document.body.dataset.updates === '1'")
+    assert page.locator("#lang-badge").is_visible()
+    note = page.locator("#notice")
+    note.wait_for()
+    print("new release -> dot on the gear | note:", note.inner_text().replace("\n", " "))
+    page.screenshot(path=str(shots / "update-badge.png"))
+    note.get_by_role("button", name="Show").click()
+    page.wait_for_selector("#options:not([hidden])")
+    print("note -> options:", page.inner_text("#opt-languages").replace("\n", " "), "|", page.inner_text("#update-all"))
+    page.click("#opt-more")
+    page.fill("#lang-filter", "test pages")
+    print("row ->", row.inner_text().replace("\n", " | "))
+    page.click("#picker-close")
+    open_options(page)
+    page.click("#update-all")
+    page.wait_for_function("document.body.dataset.updates === '0'")
+    assert page.locator("#lang-badge").is_hidden() and page.locator("#update-all").is_hidden()
+    assert page.locator("#notice").is_hidden(), "the note goes once nothing is left to update"
+    page.click("#options-close")
+    query(page, "nihao", "你好")
+    assert result_rows(page).first.locator("button.speak-audio").count() == 1
+    print("after Update -> speaker on 你好, badge gone")
+    page.reload()
+    wait_language(page, "zhd")
+    page.wait_for_timeout(1000)
+    assert page.locator("#notice").is_hidden(), "the note appears once per app version"
+    context.close()
+
+
+def library(browser, base, shots):
+    """History records opened entries (grouped by day, reopen, delete, clear
+    with confirmation, pause); favourites from the star on rows and on the
+    entry page (sort, export as text, import)."""
+    context = new_context(browser)
+    page = context.new_page()
+    page.goto(base)
+    wait_language(page, "zh")
+    for q, head in (("nihao", "你好"), ("zhongguo", "中国")):
+        query(page, q, head)
+        result_rows(page).first.locator(".words").click()
+        page.wait_for_function(f"document.body.dataset.detail === '{head}'")
+        page.click("#back")
+        page.wait_for_selector("#detail", state="hidden")
+    open_options(page)
+    page.click("#opt-history")
+    page.wait_for_function("document.body.dataset.library === 'history:2'")
+    items = page.locator("#library-list li").all_inner_texts()
+    print("history ->", [i.split("\n")[0] for i in items])
+    assert items[0] == "TODAY" or items[0].lower() == "today", items
+    assert items[1].startswith("中国") and items[2].startswith("你好"), items
+    page.locator("#library-list li.library-item", has_text="你好").locator(".library-info").click()
+    page.wait_for_function("document.body.dataset.detail === '你好'")
+    page.click("#back")
+    page.wait_for_function("document.body.dataset.library === 'history:2'")
+    print("tap 你好 -> its entry page; Back -> history again (你好 first now):",
+          page.locator("#library-list li.library-item").first.inner_text().split("\n")[0])
+    page.locator("#library-list li.library-item", has_text="中国").locator(".library-delete").click()
+    page.wait_for_function("document.body.dataset.library === 'history:1'")
+    page.click("#history-clear")
+    print("clear ->", page.inner_text("#history-confirm").replace("\n", " "))
+    page.click("#history-clear-yes")
+    page.wait_for_function("document.body.dataset.library === 'history:0'")
+    page.check("#history-pause")
+    page.click("#library-close")
+    query(page, "nihao", "你好")
+    result_rows(page).first.locator(".words").click()
+    page.wait_for_function("document.body.dataset.detail === '你好'")
+    page.click("#back")
+    open_options(page)
+    page.click("#opt-history")
+    page.wait_for_function("document.body.dataset.library === 'history:0'")
+    print("paused -> nothing recorded:", page.inner_text("#library-status"))
+    page.uncheck("#history-pause")
+    page.click("#library-close")
+
+    query(page, "nihao", "你好")
+    result_rows(page).first.locator("button.star").click()
+    assert result_rows(page).first.locator("button.star.on").count() == 1
+    query(page, "zhongguo", "中国")
+    result_rows(page).first.locator(".words").click()
+    page.click("#detail-star")
+    assert page.locator("#detail-star.on").count() == 1
+    page.click("#back")
+    open_options(page)
+    page.click("#opt-history")
+    page.click("#tab-favourites")
+    page.wait_for_function("document.body.dataset.library === 'favourites:2'")
+    print("favourites (added) ->", [i.split("\n")[0] for i in page.locator("#library-list li").all_inner_texts()])
+    page.select_option("#favourites-sort", "headword")
+    print("favourites (headword) ->", [i.split("\n")[0] for i in page.locator("#library-list li").all_inner_texts()])
+    page.click("#favourites-export")
+    exported = page.input_value("#favourites-json")
+    assert '"favourites"' in exported and "你好" in exported
+    page.click("#favourites-text-close")
+    page.locator("#library-list li.library-item", has_text="你好").locator(".library-delete").click()
+    page.wait_for_function("document.body.dataset.library === 'favourites:1'")
+    page.click("#favourites-import")
+    page.fill("#favourites-json", exported)
+    page.click("#favourites-text-import")
+    page.wait_for_function("document.body.dataset.library === 'favourites:2'")
+    print("export, delete 你好, import ->", page.inner_text("#library-status"))
+    page.screenshot(path=str(shots / "favourites.png"))
+    context.close()
+
+
+def wikipedia(browser, base, shots):
+    """A Wikipedia title index: listed under "Wikipedia" with its flag,
+    downloaded like a language, rows show the short description and open
+    the article (here in a new tab)."""
+    context = new_context(browser)
+    context.route("https://pl.wikipedia.org/**", lambda route: route.fulfill(status=200, content_type="text/html",
+                                                                         body="<title>article</title>"))
+    page = context.new_page()
+    page.goto(base)
+    wait_language(page, "zh")
+    open_languages(page)
+    page.fill("#lang-filter", "wikipedia")
+    section = page.locator("#lang-list li.lang-section")
+    section.wait_for()
+    row = page.locator('#lang-list li[data-code="wikipedia-pl"]')
+    print("picker ->", section.inner_text(), "|", row.inner_text().replace("\n", " | "))
+    assert row.locator(".lang-mark").inner_text() == "\U0001F1F5\U0001F1F1"
+    row.get_by_role("button", name="Download dictionary").click()
+    wait_language(page, "wikipedia-pl")
+    print("placeholder ->", page.get_attribute("#q", "placeholder"))
+    query(page, "krak", "Kraków")
+    first = result_rows(page).first.inner_text()
+    assert "Miasto w Polsce" in first, first
+    with context.expect_page() as popup:
+        result_rows(page).first.locator(".words").click()
+    popup.value.wait_for_url("https://pl.wikipedia.org/**")
+    url = popup.value.url
+    print("tap Kraków ->", url)
+    assert url == "https://pl.wikipedia.org/wiki/Krak%C3%B3w", url
+    page.screenshot(path=str(shots / "wikipedia.png"))
+    context.close()
+
+
+def no_bundle(browser, base, shots):
+    """An app without a built-in language: the first start suggests Chinese
+    (with its size) and downloads it; a profile from a version that had it
+    built in is told and offered the same."""
+    context = new_context(browser, returning=False)
+    page = context.new_page()
+    page.goto(base)
+    page.wait_for_selector("body[data-screen=welcome]", timeout=LOAD_TIMEOUT_MS)
+    zh = page.locator('#lang-list li[data-code="zh"]')
+    zh.wait_for()
+    first = page.locator("#lang-list li[data-code]").first.get_attribute("data-code")
+    print("no built-in language -> first row", first, "|", zh.inner_text().replace("\n", " | "))
+    assert first == "zh" and "suggested" in zh.inner_text()
+    zh.get_by_role("button", name="Download dictionary").click()
+    wait_language(page, "zh")
+    query(page, "nihao", "你好")
+    print("downloaded Chinese -> search works")
+    page.screenshot(path=str(shots / "no-bundle.png"))
+    context.close()
+
+    context = new_context(browser, returning=False)
+    context.add_init_script("""if (!sessionStorage.getItem('seeded')) {
+        sessionStorage.setItem('seeded', '1');
+        localStorage.setItem('wiktionary-lookup.welcomed', '1');
+        localStorage.setItem('wiktionary-lookup.seenVersion', '999');
+        localStorage.setItem('wiktionary-lookup.state', JSON.stringify({
+          installed: { zh: { code: 'zh', name: 'Chinese', bundled: true } }, active: 'zh' }));
+    }""")
+    page = context.new_page()
+    page.goto(base)
+    page.wait_for_selector("body[data-screen=welcome]", timeout=LOAD_TIMEOUT_MS)
+    text = page.inner_text("#picker-welcome")
+    print("built-in Chinese of an earlier version ->", text[:80])
+    assert "built into earlier versions" in text, text
     context.close()
 
 
@@ -589,18 +860,21 @@ def first_start(browser, base, shots):
     assert zh_mark == "\U0001F1E8\U0001F1F3", zh_mark
     assert la_mark == "Aa" and "sign" in la.locator(".lang-mark").get_attribute("class"), la_mark
     page.screenshot(path=str(shots / "welcome.png"))
+    zh.get_by_role("button", name="Use").click()
+    page.wait_for_selector("body[data-screen=search]")
+    assert page.locator("#picker").is_hidden()
+    installed = installed_languages(page)
+    print("chose Chinese -> search screen, installed:", installed)
+    assert installed == [("Chinese", True)], installed
+    open_options(page)
+    page.screenshot(path=str(shots / "options.png"))
     page.click("#about")
     page.wait_for_selector("#changelog:not([hidden])")
     source = page.get_attribute('#changelog-body a[href*="github.com/d33mobile/wiktionary-lookup"]', "href")
     print("About ->", page.inner_text("#changelog-title"), "| source link", source)
     assert source == "https://github.com/d33mobile/wiktionary-lookup", source
     page.click("#changelog-close")
-    zh.get_by_role("button", name="Use").click()
-    page.wait_for_selector("body[data-screen=search]")
-    assert page.locator("#picker").is_hidden()
-    header = page.locator("#lang option:checked").inner_text()
-    print("chose Chinese -> search screen, header", repr(header))
-    assert header.startswith("\U0001F1E8\U0001F1F3"), header
+    page.click("#options-close")
     page.reload()
     wait_language(page, "zh")
     page.wait_for_selector("body[data-screen=search]")
@@ -618,14 +892,25 @@ def first_start(browser, base, shots):
     page.goto(base)
     page.wait_for_selector("#changelog:not([hidden])", timeout=LOAD_TIMEOUT_MS)
     versions = page.locator("#changelog h3").all_text_contents()
-    print("updated from 0.3 -> What's new:", versions)
-    assert versions[-1] == "Version 0.4" and "Version 0.3" not in versions and len(versions) >= 2, versions
+    new = page.locator("#changelog .changelog-version.new h3").all_text_contents()
+    print("updated from 0.3 -> What's new:", len(versions), "versions, marked new:", new)
+    assert versions[-1] == "Version 0.1" and new[-1] == "Version 0.4" and "Version 0.3" not in new, (versions, new)
     page.screenshot(path=str(shots / "changelog.png"))
+    # The notes scroll inside the dialog; OK is in view without scrolling.
+    box = page.locator("#changelog-close").bounding_box()
+    print("OK button bottom:", round(box["y"] + box["height"]), "of", page.viewport_size["height"])
+    assert box["y"] + box["height"] <= page.viewport_size["height"], box
     page.click("#changelog-close")
     page.reload()
     wait_language(page, "zh")
     page.wait_for_timeout(1000)
     assert page.locator("#changelog").is_hidden(), "the notes appear once"
+    open_options(page)
+    page.click("#about")
+    page.click("#about-changelog")
+    page.wait_for_function("document.querySelectorAll('#changelog h3').length > 5")
+    print("About -> Changelog:", page.locator("#changelog h3").count(), "versions")
+    page.click("#changelog-close")
     print("after OK and reload -> no notes")
     context.close()
 
@@ -654,6 +939,16 @@ def run(root, shots):
         shutil.copyfile(bundled, root / "web" / "manifest.json")
         build_fixture("wiktionary-zh", HERE / "fixtures" / "zh-details.jsonl", root / "web" / "zh-details.idx")
         server = serve(root, release_root, requests)
+        with tempfile.TemporaryDirectory(prefix="wiktionary-nobundle-") as plain:
+            subprocess.run(["node", str(REPO / "stage-web.js"), plain, "-", str(bundled)], check=True,
+                           stdout=subprocess.DEVNULL)
+            server2 = serve(pathlib.Path(plain), release_root, [])
+            base2 = f"http://127.0.0.1:{server2.server_address[1]}/web/index.html?data=/releases/"
+            with sync_playwright() as p2:
+                b2 = p2.chromium.launch(executable_path=CHROMIUM, args=["--no-sandbox"])
+                no_bundle(b2, base2, shots)
+                b2.close()
+            server2.shutdown()
         base = f"http://127.0.0.1:{server.server_address[1]}/web/index.html?data=/releases/"
         errors = []
         with sync_playwright() as p:
@@ -682,6 +977,9 @@ def run(root, shots):
             details(browser, base, shots, legacy=True)
             handwriting(browser, base, shots)
             two_step(browser, base, shots)
+            updates(browser, base, shots, release_root)
+            library(browser, base, shots)
+            wikipedia(browser, base, shots)
             first_start(browser, base, shots)
             broken_start(browser, base, shots)
             browser.close()

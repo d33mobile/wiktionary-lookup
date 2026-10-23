@@ -11,7 +11,10 @@
 //   clickstream-<wiki>-*.tsv.gz      optional: monthly clickstream; the clicks
 //                                    into an article summed = its views
 // and writes DIR/<wiki>-titles.tsv, one line per article (namespace 0, not a
-// redirect), in page id order:
+// redirect), sorted by headword key (lib/normalize.js foldText of the
+// title), then views, most first, so that entry ids follow the sorted
+// order and a lazily read index finds neighbouring keys in neighbouring
+// bytes:
 //   title \t views \t short description \t redirect titles joined by \x1f
 // Titles have spaces, not underscores. Redirects whose target is not an
 // existing article (another redirect, a missing page) are dropped; a
@@ -27,6 +30,7 @@ import { join } from 'node:path';
 import { once } from 'node:events';
 import { pathToFileURL } from 'node:url';
 import { sqlRows } from './wikipedia-sql.js';
+import { foldText } from '../lib/normalize.js';
 
 const SHORTDESC = 'wikibase-shortdesc';
 export const REDIRECT_SEPARATOR = '\x1f';
@@ -201,9 +205,16 @@ export async function prepare(dir, { wiki = 'enwiki', out = join(dir, `${wiki}-t
   const fill = start.slice(0, articles.length);
   const grouped = new Uint32Array(pa.length);
   for (let i = 0; i < pa.length; i++) grouped[fill[pa[i]]++] = pr[i];
-  const output = createWriteStream(out);
   const space = (t) => t.replaceAll('_', ' ');
-  for (let a = 0; a < articles.length; a++) {
+  const keys = new Array(articles.length);
+  for (let a = 0; a < articles.length; a++) keys[a] = foldText(space(artTitles.get(a)));
+  const order = new Uint32Array(articles.length);
+  for (let a = 0; a < order.length; a++) order[a] = a;
+  order.sort((x, y) => (keys[x] < keys[y] ? -1 : keys[x] > keys[y] ? 1 : views[y] - views[x] || x - y));
+  keys.length = 0;
+  log('sorted by headword key');
+  const output = createWriteStream(out);
+  for (const a of order) {
     const redirects = [];
     for (let k = start[a]; k < start[a + 1]; k++) redirects.push(space(redTitles.get(grouped[k])));
     const line = `${space(artTitles.get(a))}\t${views[a]}\t${descOf[a] >= 0 ? descs.get(descOf[a]) : ''}\t${redirects.join(REDIRECT_SEPARATOR)}\n`;

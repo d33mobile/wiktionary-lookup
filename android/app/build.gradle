@@ -46,8 +46,8 @@ android {
         applicationId 'pl.d33.wiktionary'
         minSdk 26
         targetSdk 36
-        versionCode 8
-        versionName '0.8'
+        versionCode 9
+        versionName '0.9'
         buildConfigField 'String', 'SENTRY_DSN', '"' + sentryDsn().replace('\\', '\\\\').replace('"', '\\"') + '"'
     }
 
@@ -96,12 +96,12 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 }
 
-// The web app and the index are copied into src/main/assets by build-apk.sh
+// The web app (and a built-in index, if any) are copied into src/main/assets by build-apk.sh
 // (node ../stage-web.js); the directory is not committed.
 tasks.named('preBuild') {
     doFirst {
-        if (!file('src/main/assets/web/index.idx').exists()) {
-            throw new GradleException('src/main/assets/web/index.idx missing: run android/build-apk.sh INDEX')
+        if (!file('src/main/assets/web/bundle.json').exists()) {
+            throw new GradleException('src/main/assets/web is not staged: run android/build-apk.sh INDEX|-')
         }
     }
 }

@@ -41,7 +41,7 @@ cp "$here/public/README.md" "$here/public/package.json" "$out/"
   done )
 
 # Mentions in shared files.
-sed -i "s/not a ${forbidden}-lookup index file/not a wiktionary-lookup index file/" "$out/lib/index-format.js"
+sed -i "s/not a ${forbidden}-lookup index file/not a wiktionary-lookup index file/" "$out"/lib/*.js
 sed -i -e "s/not a ${forbidden}-lookup index/not a wiktionary-lookup index/" \
        -e "s/'${forbidden}-lookup-'/'wiktionary-lookup-'/" "$out/test/index-format.test.js"
 sed -i -e "s/${forbidden^^}_LOOKUP_INDEX/LOOKUP_INDEX/" \

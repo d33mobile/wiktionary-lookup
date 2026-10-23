@@ -52,7 +52,8 @@ final class AudioCache {
 
     /** Copies `in` into the cache (at most maxFileBytes), then trims the cache. */
     File store(String name, InputStream in, long maxFileBytes) throws IOException {
-        if (!dir.isDirectory() && !dir.mkdirs()) throw new IOException("cannot create " + dir);
+        // Another thread may create it at the same time: only the result counts.
+        if (!dir.mkdirs() && !dir.isDirectory()) throw new IOException("cannot create " + dir);
         File target = file(name);
         File tmp = new File(dir, target.getName() + "." + Thread.currentThread().getId() + TMP);
         long total = 0;

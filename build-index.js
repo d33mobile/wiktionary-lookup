@@ -175,7 +175,7 @@ export async function buildIndex(entryIterable, info = {}) {
 
 // Text sections and the offsets that cut them (lib/index-format.js
 // textOffsets).
-const TEXT_TABLES = [
+export const TEXT_TABLES = [
   ['blob', 'fieldOffsets'], ['wordsBlob', 'wordOffsets'], ['glossBlob', 'glossOffsets'], ['formBlob', 'formOffsets'],
   ['audioNameBlob', 'audioNameOffsets'],
 ];

@@ -10,11 +10,12 @@
 <body>
 <header>
   <div class="bar">
-    <select id="lang" aria-label="Dictionary language"></select>
-    <input id="q" type="search" placeholder="Search" autocomplete="off" autocapitalize="off" spellcheck="false" disabled>
+    <input id="q" type="search" placeholder="Search" autocomplete="off" autocapitalize="off" spellcheck="false">
     <button id="pen" type="button" aria-label="Handwriting" title="Handwriting" hidden></button>
+    <button id="gear" type="button" aria-label="Options" title="Options"><span id="lang-badge" title="A dictionary has an update" hidden></span></button>
   </div>
   <div id="status" role="status">Loading index...</div>
+  <progress id="load-progress" hidden></progress>
   <section id="pad" hidden aria-label="Handwriting">
     <canvas id="pad-canvas" width="280" height="280"></canvas>
     <div id="pad-candidates"></div>
@@ -25,6 +26,7 @@
     </div>
     <p id="pad-status" role="status"></p>
   </section>
+  <div id="notice" hidden></div>
   <div id="speech-hint" hidden><span id="speech-hint-text"></span> <button id="speech-settings" type="button">Speech settings</button></div>
 </header>
 <main>
@@ -39,32 +41,45 @@
     </div>
     <div id="detail-body"></div>
   </section>
+  <section id="library" hidden aria-label="History and favourites">
+    <div class="picker-head">
+      <div class="tabs">
+        <button id="tab-history" type="button" class="tab">History</button>
+        <button id="tab-favourites" type="button" class="tab">Favourites</button>
+      </div>
+      <button id="library-close" type="button">Done</button>
+    </div>
+    <div id="history-tools" class="library-tools">
+      <label><input id="history-pause" type="checkbox"> Pause history</label>
+      <button id="history-clear" type="button">Clear history</button>
+      <span id="history-confirm" hidden>Clear all <span id="history-count"></span> entries?
+        <button id="history-clear-yes" type="button">Clear</button>
+        <button id="history-clear-no" type="button">Cancel</button></span>
+    </div>
+    <div id="favourites-tools" class="library-tools" hidden>
+      <label>Sort <select id="favourites-sort">
+        <option value="added">Recently added</option>
+        <option value="headword">Headword</option>
+      </select></label>
+      <button id="favourites-export" type="button">Export</button>
+      <button id="favourites-import" type="button">Import</button>
+    </div>
+    <div id="favourites-text" hidden>
+      <p class="hint" id="favourites-text-hint"></p>
+      <textarea id="favourites-json" rows="6" spellcheck="false"></textarea>
+      <button id="favourites-text-import" type="button">Import this text</button>
+      <button id="favourites-text-close" type="button">Close</button>
+    </div>
+    <p id="library-status" role="status"></p>
+    <ul id="library-list"></ul>
+  </section>
   <section id="picker" hidden aria-labelledby="picker-title">
     <div class="picker-head">
       <h2 id="picker-title">Languages</h2>
       <button id="picker-close" type="button">Done</button>
     </div>
-    <p id="picker-welcome" hidden>Choose the language of your dictionary. Chinese is built in; every other
-      language is downloaded once and then works offline. You can switch later from the menu at the top.</p>
-    <label class="setting">Pronunciation
-      <select id="pron-mode">
-        <option value="auto">Wiktionary audio when available</option>
-        <option value="speech">Always text-to-speech</option>
-      </select>
-    </label>
-    <label class="setting">Handwriting pad (Chinese, Japanese)
-      <select id="pad-mode">
-        <option value="on">Show the pen button</option>
-        <option value="off">Hide</option>
-      </select>
-    </label>
-    <label id="prefetch-setting" class="setting" hidden>Prefetch audio
-      <select id="prefetch-mode">
-        <option value="always">Always</option>
-        <option value="wifi">Wi-Fi only</option>
-        <option value="off">Off</option>
-      </select>
-    </label>
+    <p id="picker-welcome" hidden>Choose the language of your dictionary. It is downloaded once and then
+      works offline; Chinese is the suggestion. You can add or switch languages later under Options (the gear).</p>
     <input id="lang-filter" type="search" placeholder="Filter languages" autocomplete="off" autocapitalize="off" spellcheck="false">
     <p id="picker-status" role="status"></p>
     <div id="network-actions" hidden>
@@ -72,7 +87,39 @@
       <button id="open-data-saver" type="button" hidden>Data saver settings</button>
     </div>
     <ul id="lang-list" aria-label="Languages"></ul>
-    <p><button id="about" type="button">About and licenses</button></p>
+  </section>
+  <section id="options" hidden aria-labelledby="options-title">
+    <div class="picker-head">
+      <h2 id="options-title">Options</h2>
+      <button id="options-close" type="button">Done</button>
+    </div>
+    <h3 class="opt-h">Language</h3>
+    <ul id="opt-languages" aria-label="Installed languages"></ul>
+    <p class="opt-buttons">
+      <button id="opt-more" type="button">More languages...</button>
+      <button id="update-all" type="button" hidden>Update all</button>
+    </p>
+    <h3 class="opt-h">Settings</h3>
+    <label class="setting">Handwriting pad (Chinese, Japanese)
+      <select id="pad-mode">
+        <option value="on">Show the pen button</option>
+        <option value="off">Hide</option>
+      </select>
+    </label>
+    <label id="prefetch-setting" class="setting" hidden>Prefetch audio and pages
+      <select id="prefetch-mode">
+        <option value="always">Always</option>
+        <option value="wifi">Wi-Fi only</option>
+        <option value="off">Off</option>
+      </select>
+    </label>
+    <h3 class="opt-h">More</h3>
+    <p class="opt-buttons">
+      <button id="opt-history" type="button">History</button>
+      <button id="opt-favourites" type="button">Favourites</button>
+      <button id="opt-changelog" type="button">What's new</button>
+      <button id="about" type="button">About and licenses</button>
+    </p>
   </section>
 </main>
 <div id="changelog" role="dialog" aria-labelledby="changelog-title" hidden>

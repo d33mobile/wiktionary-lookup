@@ -30,7 +30,7 @@ import { createReadStream } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { definitionOf } from './wiktionary-zh.js';
 import { loadWordfreq, WORDFREQ_ATTRIBUTION, WORDFREQ_VERSION } from '../lib/wordfreq.js';
-import { addPart, detailsJson, partJson } from './wiktionary-details.js';
+import { addPart, detailsJson, partJson, sortByHeadword } from './wiktionary-details.js';
 
 const SKIPPED_POS = new Set(['soft-redirect', 'romanization']);
 export const KEYS = Object.freeze({ headword: 'fold', romanization: 'fold' });
@@ -187,7 +187,8 @@ export async function* entries(path, info = {}, options = {}) {
     }
     info.source.frequency = { name: WORDFREQ_ATTRIBUTION, version: WORDFREQ_VERSION, license: 'CC BY-SA 4.0' };
   }
-  for (const e of merged.values()) {
+  info.textOffsets = 'bytes';
+  for (const e of options.sort === false ? merged.values() : sortByHeadword([...merged.values()], KEYS)) {
     if (e.details) e.details = detailsJson(e.details);
     yield e;
   }
