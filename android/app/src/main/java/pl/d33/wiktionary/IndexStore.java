@@ -14,13 +14,14 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 /**
- * Language index files (<code>.idx, <code>.details) kept as plain files in
+ * Language index files (<code>.idx, <code>.details) and data files such as
+ * hanzi.pack (character data) kept as plain files in
  * the app's storage, downloaded and unpacked natively, so that a large index
  * never passes through JavaScript memory as a whole and can be read by byte
  * range. Plain Java, unit tested on the JVM.
  */
 final class IndexStore {
-    static final Pattern NAME = Pattern.compile("[a-z0-9][a-z0-9-]{0,40}\\.(idx|details)");
+    static final Pattern NAME = Pattern.compile("[a-z0-9][a-z0-9-]{0,40}\\.(idx|details|pack)");
     private static final int BUFFER = 64 * 1024;
 
     interface Progress {

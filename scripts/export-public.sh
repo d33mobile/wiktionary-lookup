@@ -8,7 +8,8 @@
 # stay out, public/ supplies the public README and package.json, and a few
 # mentions are rewritten. The export fails if the tree still names that
 # format. With COMMIT_MESSAGE and a git repository in OUT_DIR, the result is
-# committed there (as d33mobile), ready to push.
+# committed there (as d33mobile), ready to push. The exported tree must pass
+# its own `npm test` (log: OUT_DIR.test.log) or nothing is committed.
 set -euo pipefail
 
 out=${1:?usage: export-public.sh OUT_DIR [COMMIT_MESSAGE]}
@@ -20,7 +21,8 @@ include=(
   web android lib build-index.js lookup.js tui.js bench.js stage-web.js CHANGELOG.md LICENSE .gitignore
   data/languages.json syllables.json
   scripts/kaikki-languages.js scripts/build-all.js scripts/wikipedia-sql.js scripts/wikipedia-prepare.js
-  scripts/wikipedia-bench.js scripts/export-public.sh
+  scripts/wikipedia-bench.js scripts/hanzi-pack.js scripts/index-byte-offsets.js scripts/wikipedia-release.js
+  scripts/export-public.sh
   sources/wiktionary.js sources/wiktionary-zh.js sources/wiktionary-details.js sources/wikipedia-titles.js
   sources/cedict-text.js
   test
@@ -53,6 +55,13 @@ if found=$(grep -rIil "$forbidden" "$out" --exclude-dir=.git) || \
   echo "export-public.sh: still mentioned in:"; echo "$found"; exit 1
 fi
 echo "exported $(find "$out" -path "$out/.git" -prune -o -type f -print | wc -l) files to $out"
+
+# The public tree must pass its own tests (a file left out of `include` that
+# a test imports fails here, not in a clone).
+if ! (cd "$out" && npm test --silent > "$out.test.log" 2>&1); then
+  echo "export-public.sh: npm test fails in the exported tree, see $out.test.log"; tail -20 "$out.test.log"; exit 1
+fi
+echo "npm test in the exported tree: $(grep -E '^# (pass|fail)' "$out.test.log" | tr '\n' ' ')"
 
 if [ -n "$message" ] && [ -d "$out/.git" ]; then
   git -C "$out" add -A

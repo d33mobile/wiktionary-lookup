@@ -163,3 +163,11 @@ for (const file of FILES) {
     assert.deepEqual(problems(readFileSync(join(ROOT, file), 'utf8'), file), []);
   });
 }
+
+// Flexbox `gap` is Chromium 84: WebView 66 ignores it and the items touch
+// (seen on Android 9 in the stroke order controls). Margins instead.
+test('web/style.css does not rely on gap', () => {
+  const css = readFileSync(join(ROOT, 'web', 'style.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const uses = css.split('\n').map((line, i) => [i + 1, line]).filter(([, line]) => /(^|[;{\s])(row-|column-)?gap\s*:/.test(line));
+  assert.deepEqual(uses, []);
+});

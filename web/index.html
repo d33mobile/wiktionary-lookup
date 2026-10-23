@@ -16,6 +16,7 @@
   </div>
   <div id="status" role="status">Loading index...</div>
   <progress id="load-progress" hidden></progress>
+  <div id="transfers" hidden aria-live="polite"></div>
   <section id="pad" hidden aria-label="Handwriting">
     <canvas id="pad-canvas" width="280" height="280"></canvas>
     <div id="pad-candidates"></div>
@@ -40,6 +41,7 @@
       <div id="detail-speak-row" class="speak-row"></div>
     </div>
     <div id="detail-body"></div>
+    <div id="detail-hanzi" hidden></div>
   </section>
   <section id="library" hidden aria-label="History and favourites">
     <div class="picker-head">
@@ -113,6 +115,10 @@
         <option value="off">Off</option>
       </select>
     </label>
+    <div id="hanzi-setting" class="setting" hidden>Stroke order and character data (Chinese)
+      <span id="hanzi-state" class="hanzi-state"></span>
+      <span id="hanzi-actions" class="opt-buttons"></span>
+    </div>
     <h3 class="opt-h">More</h3>
     <p class="opt-buttons">
       <button id="opt-history" type="button">History</button>

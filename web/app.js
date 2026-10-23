@@ -11,6 +11,8 @@ import { openIndex } from '../lib/engine.js';
 import { openIndexLazy, openIndexProgressive } from '../lib/lazy-index.js';
 import { deserializeIndexWithHeader } from '../lib/index-format.js';
 import { BUNDLED_CODE, inflateText, isWikipedia, Languages, releasesBase } from './languages.js';
+import { openHanziPack } from '../lib/hanzi-pack.js';
+import { characterSection } from './hanzi.js';
 
 import {
   getPrefetchMode, openSpeechSettings, pronounce, setPrefetchMode,
@@ -54,7 +56,9 @@ let session = null;
 let lookupSession = null;
 let loadInfo = '';
 let current = [];
-// code -> {done, total, controller} for downloads in progress
+// key -> {label, done, total, controller, indeterminate} for transfers in
+// progress: downloads (code, `${code}:details`, 'hanzi'), opening an index
+// (`open:${code}`), the catalogue refresh and the handwriting recognizer.
 const downloads = new Map();
 // codes whose size warning is showing
 const warned = new Set();
@@ -199,6 +203,20 @@ function hasAudio(entry) {
 }
 
 const STAR_PATH = 'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z';
+
+// "1 entry", "2 entries", "1,395,493 entries".
+function count(n, one, many) {
+  return `${n.toLocaleString('en')} ${n === 1 ? one : many}`;
+}
+
+// The stars of the result rows, after an entry page may have changed them.
+function refreshRowStars() {
+  for (const li of results.querySelectorAll('li[data-index]')) {
+    const entry = current[Number(li.dataset.index)];
+    const old = li.querySelector('button.star');
+    if (entry && old) old.replaceWith(starButton(entry));
+  }
+}
 
 function starButton(entry, withLabel) {
   const on = isFavourite(entry, languages.active);
@@ -375,6 +393,7 @@ function renderDetail(view) {
   window.scrollTo(0, 0);
   document.body.dataset.detail = entry.simp;
   document.body.dataset.details = 'loading';
+  renderHanzi(view);
   getDetails(entry).then((full) => {
     if (stack[stack.length - 1] !== view) return;
     if (full) {
@@ -386,6 +405,123 @@ function renderDetail(view) {
     }
     document.body.dataset.details = full ? 'loaded' : 'none';
   });
+}
+
+// Character section (Chinese, one-character entries): stroke order and
+// components from the character data (a separate download, offered here),
+// words containing the character from the dictionary.
+let hanziPack = null;
+let hanziDownload = null;
+
+async function getHanziPack() {
+  if (hanziPack) return hanziPack;
+  const reader = await languages.hanziReader();
+  if (!reader) return null;
+  hanziPack = await openHanziPack(reader, { inflate: inflateText });
+  return hanziPack;
+}
+
+function hanziCharacter(entry) {
+  const chars = Array.from(entry.simp || '');
+  const isZh = ((dict && dict.language && dict.language.code) || languages.active) === 'zh';
+  return isZh && chars.length === 1 && isCjkChar(chars[0]) ? chars[0] : null;
+}
+
+async function renderHanzi(view) {
+  const box = document.getElementById('detail-hanzi');
+  replaceChildren(box);
+  const character = hanziCharacter(view.entry);
+  box.hidden = !character;
+  if (!character) {
+    delete document.body.dataset.hanzi;
+    return;
+  }
+  document.body.dataset.hanzi = 'loading';
+  let tree = null;
+  try {
+    const pack = await getHanziPack();
+    tree = pack ? await pack.tree(character) : null;
+  } catch (err) {
+    console.warn('character data:', err.message);
+  }
+  // A linear scan of the headwords: only for an index held in memory.
+  let words = [];
+  try {
+    if (dict && !dict.blockCache && dict.containing) words = dict.containing(character, 12);
+  } catch (err) {
+    console.warn('words with', character, err.message);
+  }
+  if (stack[stack.length - 1] !== view) return;
+  const section = characterSection({ character, tree, words, onTap: (text) => lookupWord(text) });
+  if (!tree || !tree.record) {
+    const entry = languages.hanziEntry;
+    if (entry) {
+      const b = button(hanziDownload ? 'Downloading stroke order...'
+        : `Download stroke order and character data (${formatSize(entry.gzBytes || entry.bytes)})`, () => downloadHanzi(b));
+      b.id = 'hanzi-get';
+      b.disabled = Boolean(hanziDownload);
+      section.insertBefore(el('p', 'detail-offer'), section.children[1] || null).appendChild(b);
+    }
+  }
+  replaceChildren(box, section);
+  document.body.dataset.hanzi = tree && tree.record ? 'loaded' : 'none';
+}
+
+async function downloadHanzi(b) {
+  const problem = networkProblem();
+  const status = (text) => {
+    if (b) b.textContent = text;
+    const opt = document.getElementById('hanzi-state');
+    if (opt) opt.textContent = text;
+  };
+  if (problem) {
+    status(problem);
+    return;
+  }
+  if (hanziDownload) return;
+  if (b) b.disabled = true;
+  hanziDownload = new AbortController();
+  status('Downloading stroke order...');
+  startTransfer('hanzi', 'Stroke order and character data', { total: languages.hanziEntry.bytes, controller: hanziDownload });
+  if (b) b.parentNode.appendChild(progressView('hanzi', false));
+  try {
+    await languages.installHanzi((done, total, phase) => setProgress('hanzi', done, total, phase), hanziDownload.signal);
+    endTransfer('hanzi');
+    hanziPack = null;
+    document.body.dataset.hanziInstalled = 'true';
+  } catch (err) {
+    endTransfer('hanzi');
+    status(err.name === 'AbortError' ? 'Stroke order: cancelled' : `Stroke order: ${err.message}`);
+    hanziDownload = null;
+    if (b) b.disabled = false;
+    return;
+  }
+  hanziDownload = null;
+  renderHanziOption();
+  if (stack.length && !detail.hidden) renderHanzi(stack[stack.length - 1]);
+}
+
+// Options: the character data, installed or offered.
+function renderHanziOption() {
+  const row = document.getElementById('hanzi-setting');
+  const state = document.getElementById('hanzi-state');
+  const actions = document.getElementById('hanzi-actions');
+  const installed = languages.extras.hanzi;
+  const entry = languages.hanziEntry;
+  row.hidden = !installed && !entry;
+  replaceChildren(actions);
+  if (installed) {
+    state.textContent = `installed, ${formatSize(installed.bytes)}`;
+    if (languages.hanziUpdate()) actions.append(button('Update', () => downloadHanzi(null)));
+    actions.append(button('Remove', async () => {
+      await languages.removeHanzi();
+      hanziPack = null;
+      renderHanziOption();
+    }));
+  } else if (entry) {
+    state.textContent = hanziDownload ? 'Downloading...' : `not installed (${formatSize(entry.gzBytes || entry.bytes)})`;
+    if (!hanziDownload) actions.append(button('Download', () => downloadHanzi(null)));
+  }
 }
 
 // Without the entry pages, the detail view offers their download.
@@ -453,6 +589,7 @@ function hideDetail() {
   detail.hidden = true;
   picker.hidden = true;
   results.hidden = false;
+  refreshRowStars();
   // Opened from History or Favourites: Back returns there.
   if (libraryReturn) {
     const tab = libraryReturn;
@@ -557,10 +694,21 @@ async function search() {
   }
   const mine = ++searchGen;
   const t0 = performance.now();
+  // The first non-empty search after an open is measured (openStats).
+  const cache = dict.blockCache;
+  const measure = openStats && !openStats.search && input.value.trim();
+  const before = measure && cache ? { reads: cache.reads, bytes: cache.readBytes } : { reads: 0, bytes: 0 };
   const rows = dict.blockCache ? await session.searchAsync(input.value, { limit: LIMIT }) : session.search(input.value, { limit: LIMIT });
   if (mine !== searchGen) return;
   const ms = performance.now() - t0;
+  if (measure && !openStats.search) {
+    openStats.search = { query: input.value, ms: Math.round(ms), reads: cache ? cache.reads - before.reads : 0,
+      bytes: cache ? cache.readBytes - before.bytes : 0 };
+    openPhase('firstResults');
+    finishOpenStats();
+  }
   render(rows);
+  if (!rows.length) results.appendChild(emptyState(input.value.trim()));
   document.body.dataset.searched = input.value;
   prefetchFor(rows);
   if (isWikipedia(languages.active) && rows.length && articleUrl(rows[0])) prefetchEntryPage(articleUrl(rows[0]));
@@ -568,6 +716,37 @@ async function search() {
   statusLine.textContent = input.value.trim() === ''
     ? loadInfo
     : `${rows.length} hits, ${ms.toFixed(2)} ms (${s.mode}, scanned ${s.searched})`;
+}
+
+// What the empty result list says: how to search (empty query) or that
+// nothing matched, with search tips and a nudge when the language has an
+// update or entry pages to download.
+function emptyState(query) {
+  const code = languages.active;
+  const name = installedName(code);
+  const box = el('li', 'empty-state');
+  box.setAttribute('role', 'presentation');
+  if (!query) {
+    box.dataset.state = 'hint';
+    const hint = code === 'zh' ? 'Type pinyin, characters or an English word'
+      : isWikipedia(code) ? 'Type an article title' : 'Type a word or its romanization';
+    box.append(el('p', 'empty-title', hint), el('p', 'empty-lang', name));
+    return box;
+  }
+  box.dataset.state = 'none';
+  box.appendChild(el('p', 'empty-title', `No results for ${query}`));
+  const tips = [];
+  if (code === 'zh') tips.push('Try pinyin without tones (nihao)', '"/" searches English only (/tea)', '"p:" searches pinyin only (p:ma)');
+  else if (!isWikipedia(code)) tips.push('"/" searches the definitions only', '"p:" searches the romanization only');
+  if (tips.length) {
+    const ul = el('ul', 'empty-tips');
+    for (const t of tips) ul.appendChild(el('li', null, t));
+    box.appendChild(ul);
+  }
+  const cat = catalogueEntry(code);
+  if (languages.updateFor(code)) box.appendChild(el('p', 'empty-nudge', `An update of ${name} is available: Options (the gear).`));
+  else if (cat && cat.details && !languages.hasDetails(code)) box.appendChild(el('p', 'empty-nudge', `The entry pages of ${name} are not downloaded yet.`));
+  return box;
 }
 
 function placeholder(code) {
@@ -609,6 +788,9 @@ function setLoadProgress(done, total) {
   loadBar.hidden = false;
   loadBar.max = total || 1;
   loadBar.value = Math.min(done, loadBar.max);
+  const t = downloads.get('open');
+  if (t) t.indeterminate = false;
+  setProgress('open', done, total);
 }
 
 function activate(code, next, info) {
@@ -623,44 +805,76 @@ function activate(code, next, info) {
   if (info) loadInfo = info;
 }
 
+// Timings of the last open and its first search (Diagnostics, logcat via
+// console, window.__openStats for the emulator tests): phases in ms since the
+// open started, reader round trips with their bytes and time.
+let openStats = null;
+
+function countingReader(reader, stats) {
+  return {
+    size: reader.size,
+    async read(offset, length) {
+      const t = performance.now();
+      const bytes = await reader.read(offset, length);
+      stats.reads += 1;
+      stats.bytes += length;
+      stats.readMs += performance.now() - t;
+      return bytes;
+    },
+  };
+}
+
+function openPhase(name) {
+  if (!openStats) return;
+  openStats.phases[name] = Math.round(performance.now() - openStats.t0);
+}
+
+function finishOpenStats() {
+  const s = openStats;
+  window.__openStats = s;
+  console.info(`[open] ${s.code} ${JSON.stringify({ phases: s.phases, open: s.open, search: s.search })}`);
+}
+
 async function useLanguage(code, bytes) {
   const mine = ++loadGen;
   document.body.dataset.ready = 'loading';
   const name = installedName(code);
   loadingName = name;
   statusLine.textContent = `Loading ${name}...`;
+  startTransfer('open', `Opening ${name}...`, { indeterminate: true });
   // Results of the previous language would be misleading meanwhile.
   dict = null;
   replaceChildren(results);
   const t0 = performance.now();
   const lang = languages.installed[code];
+  openStats = { code, t0, phases: {}, open: { reads: 0, bytes: 0, readMs: 0 }, search: null };
   try {
     let next;
     let size;
     let how;
     if (!bytes && lang && lang.storage === 'file') {
-      const reader = await languages.fileReader(code, 'idx');
+      const reader = countingReader(await languages.fileReader(code, 'idx'), openStats.open);
+      openPhase('reader');
       size = reader.size;
       const lazy = size > LAZY_BYTES || lang.kind === 'wikipedia';
       const onProgress = ({ loaded, total }) => {
         if (mine === loadGen) setLoadProgress(loaded, total);
       };
+      // Headwords are searchable before the recordings and definition tables arrive.
+      const onSearchable = (partial) => {
+        if (mine !== loadGen || partial.size === undefined) return;
+        activate(code, partial);
+        openPhase('searchable');
+        document.body.dataset.ready = 'partial';
+        statusLine.textContent = `${name}: searching headwords, still loading...`;
+        if (input.value) search();
+      };
       if (lazy) {
         how = 'lazily';
-        next = await openIndexLazy(reader, { onProgress });
+        next = await openIndexLazy(reader, { onProgress, onSearchable });
       } else {
         how = 'progressively';
-        next = await openIndexProgressive(reader, {
-          onProgress,
-          // Headwords are searchable before the definition tables arrive.
-          onSearchable: (partial) => {
-            if (mine !== loadGen || partial.size === undefined) return;
-            activate(code, partial);
-            document.body.dataset.ready = 'partial';
-            statusLine.textContent = `${name}: searching headwords, still loading...`;
-            if (input.value) search();
-          },
-        });
+        next = await openIndexProgressive(reader, { onProgress, onSearchable });
       }
       if (!lazy || !lang.details || lang.details.bytes <= LAZY_BYTES) {
         const detailsBytes = await languages.readDetails(code);
@@ -678,6 +892,9 @@ async function useLanguage(code, bytes) {
     }
     if (mine !== loadGen) return;
     const ms = performance.now() - t0;
+    openPhase('opened');
+    // Reads after this point belong to searches.
+    openStats.open = { ...openStats.open, readMs: Math.round(openStats.open.readMs) };
     activate(code, next, `${name}: ${next.size.toLocaleString('en')} entries, ${formatSize(size)}, opened ${how} in ${ms.toFixed(0)} ms`);
     statusLine.textContent = loadInfo;
     document.body.dataset.ready = 'true';
@@ -688,11 +905,11 @@ async function useLanguage(code, bytes) {
     document.body.dataset.ready = dict ? 'true' : 'error';
   }
   loadBar.hidden = true;
+  endTransfer('open');
   renderLangSelect();
   if (dict) {
     input.disabled = false;
-    if (input.value) search();
-    else replaceChildren(results);
+    search();
   }
 }
 
@@ -738,6 +955,7 @@ let libraryReturn = null;
 function openLibrary(tab) {
   if (!detail.hidden) closeDetail();
   optionsEl.hidden = true;
+  updateGear();
   libraryTab = tab || libraryTab;
   results.hidden = true;
   picker.hidden = true;
@@ -793,7 +1011,7 @@ function renderLibrary() {
   }
   replaceChildren(document.getElementById('library-list'), ...rows);
   document.getElementById('library-status').textContent = list.length
-    ? `${list.length} ${isHistory ? 'entries' : 'favourites'}`
+    ? count(list.length, isHistory ? 'entry' : 'favourite', isHistory ? 'entries' : 'favourites')
     : (isHistory ? (historyPaused() ? 'History is paused.' : 'No entries viewed yet.') : 'No favourites yet: tap the star on an entry.');
   document.body.dataset.library = `${libraryTab}:${list.length}`;
 }
@@ -909,6 +1127,7 @@ document.getElementById('favourites-text-close').addEventListener('click', () =>
 function openPicker() {
   libraryEl.hidden = true;
   optionsEl.hidden = true;
+  updateGear();
   if (!detail.hidden) closeDetail();
   results.hidden = true;
   picker.hidden = false;
@@ -929,11 +1148,83 @@ function catalogueEntry(code) {
 }
 
 function progressActions(key) {
-  const dl = downloads.get(key);
-  const bar = el('progress');
-  bar.max = dl.total || 1;
-  bar.value = Math.min(dl.done, bar.max);
-  return [bar, button('Cancel', () => dl.controller.abort())];
+  return [progressView(key, false)];
+}
+
+// The one progress component: a bar, "done of total (percent)" and Cancel
+// when the transfer can be cancelled; every view of a key is repainted by
+// setProgress. Without a known total the bar is indeterminate.
+function transferText(t) {
+  if (t.phase) return t.phase;
+  if (t.unit) {
+    const bytes = t.bytesTotal ? `, ${formatSize(Math.min(t.bytesDone || 0, t.bytesTotal))} of ${formatSize(t.bytesTotal)}` : '';
+    return `${t.done} of ${count(t.total, t.unit.replace(/s$/, ''), t.unit)}${bytes}`;
+  }
+  if (!t.total || t.indeterminate) return t.done ? formatSize(t.done) : '';
+  return `${formatSize(Math.min(t.done, t.total))} of ${formatSize(t.total)} (${Math.floor((100 * Math.min(t.done, t.total)) / t.total)}%)`;
+}
+
+function paintTransfer(box, t) {
+  const bar = box.querySelector('progress');
+  if (t.bytesTotal) {
+    bar.max = t.bytesTotal;
+    bar.value = Math.min(t.bytesDone || 0, t.bytesTotal);
+  } else if (!t.total || t.indeterminate || t.phase) {
+    bar.removeAttribute('value');
+  } else {
+    bar.max = t.total;
+    bar.value = Math.min(t.done, t.total);
+  }
+  box.querySelector('.transfer-text').textContent = transferText(t);
+}
+
+function progressView(key, withLabel) {
+  const t = downloads.get(key);
+  const box = el('div', 'transfer');
+  box.dataset.transfer = key;
+  if (withLabel) box.appendChild(el('span', 'transfer-label', t.label || key));
+  box.append(el('progress'), el('span', 'transfer-text'));
+  if (t.controller) box.appendChild(button('Cancel', () => t.controller.abort()));
+  paintTransfer(box, t);
+  return box;
+}
+
+const transfersEl = document.getElementById('transfers');
+// The language list shows its transfers in its rows: the tray follows it.
+new MutationObserver(() => renderTransfers()).observe(document.getElementById('picker'), { attributes: true, attributeFilter: ['hidden'] });
+
+// The tray under the header lists every transfer, except while the language
+// list (which shows them in its rows) is open.
+function renderTransfers() {
+  replaceChildren(transfersEl, ...Array.from(downloads.keys(), (k) => progressView(k, true)));
+  transfersEl.hidden = downloads.size === 0 || !document.getElementById('picker').hidden;
+  document.body.dataset.transfers = String(downloads.size);
+}
+
+// unit: count items ("2 of 3 languages") instead of bytes.
+function startTransfer(key, label, { total = 0, controller = null, indeterminate = false, unit = '' } = {}) {
+  const t = { label, done: 0, total: total || 0, controller, indeterminate, unit, phase: '', painted: 0 };
+  downloads.set(key, t);
+  renderTransfers();
+  return t;
+}
+
+// phase 'unpack': the download is complete and is being decompressed.
+function setProgress(key, done, total, phase) {
+  const t = downloads.get(key);
+  if (!t) return;
+  t.done = done;
+  if (total) t.total = total;
+  t.phase = phase === 'unpack' ? 'unpacking...' : '';
+  const now = performance.now();
+  if (now - t.painted < 100 && done < t.total) return;
+  t.painted = now;
+  for (const box of document.querySelectorAll(`[data-transfer="${CSS.escape(key)}"]`)) paintTransfer(box, t);
+}
+
+function endTransfer(key) {
+  downloads.delete(key);
+  renderTransfers();
 }
 
 function pickerRow(entry) {
@@ -944,7 +1235,7 @@ function pickerRow(entry) {
   const info = el('div', 'lang-info');
   info.append(markElement(code), el('span', 'lang-name', entry.name), el('span', 'lang-code', code));
   const facts = [];
-  if (entry.entries) facts.push(`${Number(entry.entries).toLocaleString('en')} entries`);
+  if (entry.entries) facts.push(count(Number(entry.entries), 'entry', 'entries'));
   if (entry.gzBytes || entry.bytes) facts.push(`dictionary ${formatSize(entry.gzBytes || entry.bytes)}`);
   if (entry.details) facts.push(`entry pages ${formatSize(entry.details.gzBytes || entry.details.bytes)}`);
   if (installed && installed.bundled) facts.push('built in');
@@ -953,7 +1244,19 @@ function pickerRow(entry) {
   li.append(info);
 
   const actions = el('div', 'lang-actions');
+  // Update all: queued, done or failed (with Retry) per row.
+  const batch = updateBatch.get(code);
+  if (batch && !downloads.get(code)) {
+    li.dataset.update = batch.state;
+    if (batch.state === 'queued') actions.append(el('span', 'lang-state', 'Update queued'));
+    else if (batch.state === 'done') actions.append(el('span', 'lang-state', 'Updated'));
+    else if (batch.state === 'failed') {
+      actions.append(el('span', 'lang-state lang-failed', `Update failed: ${batch.error}`),
+        button('Retry', () => { updateBatch.delete(code); updateLanguage(entry).then(() => updateRow(code)); }));
+    }
+  }
   if (downloads.get(code)) {
+    li.dataset.update = updateBatch.has(code) ? 'downloading' : li.dataset.update || '';
     actions.append(...progressActions(code));
   } else if (installed) {
     if (languages.active === code && !welcoming) actions.append(el('span', 'lang-active', 'Active'));
@@ -996,21 +1299,12 @@ async function downloadDetails(entry) {
     return;
   }
   const controller = new AbortController();
-  const state = { done: 0, total: entry.details.bytes, controller };
-  downloads.set(key, state);
+  startTransfer(key, `${entry.name} entry pages`, { total: entry.details.bytes, controller });
   updateRow(entry.code);
   breadcrumb(`download ${entry.code} entry pages start`);
   try {
-    const bytes = await languages.installDetails(entry, (done, total) => {
-      state.done = done;
-      state.total = total;
-      const bar = langList.querySelector(`li[data-code="${CSS.escape(entry.code)}"] progress`);
-      if (bar) {
-        bar.max = total || 1;
-        bar.value = Math.min(done, bar.max);
-      }
-    }, controller.signal);
-    downloads.delete(key);
+    const bytes = await languages.installDetails(entry, (done, total, phase) => setProgress(key, done, total, phase), controller.signal);
+    endTransfer(key);
     breadcrumb(`download ${entry.code} entry pages done`);
     if (dict && languages.active === entry.code) {
       const side = deserializeIndexWithHeader(bytes || await languages.readDetails(entry.code));
@@ -1022,7 +1316,7 @@ async function downloadDetails(entry) {
     updateRow(entry.code);
     if (stack.length) renderDetail(stack[stack.length - 1]);
   } catch (err) {
-    downloads.delete(key);
+    endTransfer(key);
     breadcrumb(`download ${entry.code} entry pages failed: ${err.message}`);
     const msg = err.name === 'AbortError' ? `${entry.name}: cancelled` : err.message;
     pickerError(msg);
@@ -1040,11 +1334,22 @@ async function removeDetails(code) {
 // navigator.deviceMemory (GiB, rounded down, Chromium and Android WebView
 // only) tells whether the index is likely to fit; without it only the size
 // is shown.
+// The Android app stores downloads as files and opens large indexes (and
+// Wikipedia) lazily: only the key tables stay in memory, measured at 23-31 %
+// of the file (en 0.234, de 0.298, Polish Wikipedia 0.307), plus a block cache.
+const LAZY_MEMORY_FACTOR = 0.35;
+
+function opensLazily(entry) {
+  const native = window.WiktionaryNative;
+  return Boolean(native && native.startIndexDownload) && (entry.bytes > LAZY_BYTES || entry.kind === 'wikipedia');
+}
+
 function sizeWarning(entry) {
   if (!entry.bytes || entry.bytes < LARGE_INDEX_BYTES) return '';
-  const need = entry.bytes * MEMORY_FACTOR;
+  const lazy = opensLazily(entry);
+  const need = entry.bytes * (lazy ? LAZY_MEMORY_FACTOR : MEMORY_FACTOR);
   let text = `This index is ${formatSize(entry.bytes)} (${formatSize(entry.gzBytes || entry.bytes)} to download) `
-    + `and needs about ${formatSize(need)} of memory while open.`;
+    + `and needs about ${formatSize(need)} of memory while open${lazy ? ' (it is read in parts)' : ''}.`;
   const device = navigator.deviceMemory;
   if (device && need > (device * GIB) / 4) text += ` This device reports ${device} GiB of memory; it may not open.`;
   return text;
@@ -1083,6 +1388,7 @@ function updateRow(code) {
 
 async function refreshCatalogue() {
   pickerStatus.textContent = `${languages.catalogue.length} languages (${languages.catalogueSource} list), checking for updates...`;
+  pickerStatus.classList.add('busy');
   try {
     await languages.refreshCatalogue();
     pickerStatus.textContent = `${languages.catalogue.length} languages available`;
@@ -1092,6 +1398,7 @@ async function refreshCatalogue() {
     pickerError(`${languages.catalogue.length} languages (${languages.catalogueSource} list); `
       + `could not check for updates: ${err.name === 'AbortError' ? 'timed out' : err.message}`);
   }
+  pickerStatus.classList.remove('busy');
   if (!picker.hidden) renderPicker();
 }
 
@@ -1132,32 +1439,21 @@ async function download(entry) {
   showNetworkActions('');
   breadcrumb(`download ${entry.code} start: ${entry.url}`);
   const controller = new AbortController();
-  const state = { done: 0, total: entry.bytes, controller };
-  downloads.set(entry.code, state);
+  startTransfer(entry.code, entry.name, { total: entry.bytes, controller });
   updateRow(entry.code);
-  let lastPaint = 0;
   try {
     const bytes = await languages.install(entry, (done, total, phase) => {
-      state.done = done;
-      state.total = total;
-      const bar = langList.querySelector(`li[data-code="${CSS.escape(entry.code)}"] progress`);
-      if (phase === 'unpack') {
-        pickerStatus.textContent = `${entry.name}: unpacking...`;
-        if (bar) bar.removeAttribute('value');
-      } else if (bar && performance.now() - lastPaint > 50) {
-        lastPaint = performance.now();
-        bar.max = total || 1;
-        bar.value = Math.min(done, bar.max);
-      }
+      if (phase === 'unpack') pickerStatus.textContent = `${entry.name}: unpacking...`;
+      setProgress(entry.code, done, total, phase);
     }, controller.signal);
-    downloads.delete(entry.code);
+    endTransfer(entry.code);
     breadcrumb(`download ${entry.code} done`);
     pickerStatus.textContent = `${entry.name} installed`;
     if (!picker.hidden) closePicker();
     await useLanguage(entry.code, bytes || undefined);
     refreshUpdateMarks();
   } catch (err) {
-    downloads.delete(entry.code);
+    endTransfer(entry.code);
     breadcrumb(`download ${entry.code} failed: ${err.message}`);
     pickerError(err.name === 'AbortError' ? `${entry.name}: cancelled` : `${entry.name}: ${err.message}`);
     updateRow(entry.code);
@@ -1167,31 +1463,28 @@ async function download(entry) {
 // A newer data release: download what changed (the dictionary, then the
 // entry pages if they were installed); the old files stay usable until the
 // new ones are complete. The active language reopens afterwards.
-async function updateLanguage(entry) {
+// Resolves with '' when updated, else the error message. onBytes(done)
+// reports the index bytes so far (Update all's overall bar).
+async function updateLanguage(entry, onBytes = null) {
   const update = languages.updateFor(entry.code);
-  if (!update) return;
+  if (!update) return '';
   const controller = new AbortController();
-  const state = { done: 0, total: entry.bytes, controller };
   if (update.index) {
-    downloads.set(entry.code, state);
+    startTransfer(entry.code, `${entry.name} (update)`, { total: entry.bytes, controller });
     updateRow(entry.code);
     try {
-      await languages.install(entry, (done, total) => {
-        state.done = done;
-        state.total = total;
-        const bar = langList.querySelector(`li[data-code="${CSS.escape(entry.code)}"] progress`);
-        if (bar) {
-          bar.max = total || 1;
-          bar.value = Math.min(done, bar.max);
-        }
+      await languages.install(entry, (done, total, phase) => {
+        setProgress(entry.code, done, total, phase);
+        if (onBytes) onBytes(done);
       }, controller.signal);
     } catch (err) {
-      downloads.delete(entry.code);
-      pickerError(`${entry.name}: ${err.message}`);
+      endTransfer(entry.code);
+      const msg = err.name === 'AbortError' ? 'cancelled' : err.message;
+      pickerError(`${entry.name}: ${msg}`);
       updateRow(entry.code);
-      return;
+      return msg;
     }
-    downloads.delete(entry.code);
+    endTransfer(entry.code);
   }
   if (update.details && entry.details) await downloadDetails(entry);
   if (languages.active === entry.code) await useLanguage(entry.code);
@@ -1199,13 +1492,62 @@ async function updateLanguage(entry) {
   breadcrumb(`update ${entry.code} done`);
   updateRow(entry.code);
   refreshUpdateMarks();
+  return '';
 }
 
+// code -> {state: 'queued' | 'done' | 'failed', error} during and after Update all.
+const updateBatch = new Map();
+
+// Every language with an update, one after another: an overall transfer
+// (languages and bytes, Cancel stops the batch and the current download),
+// row states, failures reported at the end without stopping the batch.
 async function updateAll() {
-  for (const code of Object.keys(languages.installed)) {
-    const entry = catalogueEntry(code);
-    if (entry && languages.updateFor(code)) await updateLanguage(entry);
+  if (downloads.get('update-all')) return;
+  const entries = Object.keys(languages.installed).map(catalogueEntry).filter((e) => e && languages.updateFor(e.code));
+  if (!entries.length) return;
+  updateBatch.clear();
+  for (const e of entries) updateBatch.set(e.code, { state: 'queued' });
+  const controller = new AbortController();
+  const totalBytes = entries.reduce((n, e) => n + (languages.updateFor(e.code).index ? e.bytes || 0 : 0), 0);
+  const all = startTransfer('update-all', 'Update all', { total: entries.length, controller, unit: 'languages' });
+  all.bytesTotal = totalBytes;
+  all.bytesDone = 0;
+  let current = null;
+  controller.signal.addEventListener('abort', () => {
+    const t = current && downloads.get(current);
+    if (t && t.controller) t.controller.abort();
+  });
+  for (const e of entries) updateRow(e.code);
+  const failed = [];
+  let finished = 0;
+  let before = 0;
+  for (const entry of entries) {
+    if (controller.signal.aborted) {
+      updateBatch.set(entry.code, { state: 'failed', error: 'cancelled' });
+      failed.push(`${entry.name} (cancelled)`);
+      updateRow(entry.code);
+      continue;
+    }
+    current = entry.code;
+    const withIndex = languages.updateFor(entry.code).index;
+    const error = await updateLanguage(entry, (done) => {
+      all.bytesDone = before + done;
+      setProgress('update-all', finished, entries.length);
+    });
+    if (withIndex) before += entry.bytes || 0;
+    finished += 1;
+    updateBatch.set(entry.code, error ? { state: 'failed', error } : { state: 'done' });
+    if (error) failed.push(`${entry.name} (${error})`);
+    all.bytesDone = before;
+    setProgress('update-all', finished, entries.length);
+    updateRow(entry.code);
   }
+  endTransfer('update-all');
+  const ok = entries.length - failed.length;
+  pickerStatus.textContent = failed.length
+    ? `Updated ${ok} of ${entries.length}; failed: ${failed.join(', ')}`
+    : `Updated ${count(entries.length, 'language', 'languages')}`;
+  document.body.dataset.updateAll = failed.length ? `failed:${failed.length}` : 'done';
 }
 
 // Update marks: the "Update all" button in the language screen and a dot on
@@ -1311,7 +1653,47 @@ document.getElementById('picker-close').addEventListener('click', closePicker);
 document.getElementById('update-all').addEventListener('click', updateAll);
 document.getElementById('open-app-settings').addEventListener('click', () => window.WiktionaryNative.openAppSettings());
 document.getElementById('open-data-saver').addEventListener('click', () => window.WiktionaryNative.openDataSaverSettings());
-input.addEventListener('input', search);
+// The header stays on every screen: tapping or typing in the search box
+// closes a secondary screen (options, history and favourites, the language
+// list once a language is installed) or an entry page and shows the results.
+function secondaryOpen() {
+  return !optionsEl.hidden || !libraryEl.hidden || (!picker.hidden && Boolean(dict));
+}
+
+function closeSecondary() {
+  if (!dict) return false;
+  let closed = false;
+  if (!optionsEl.hidden) { optionsEl.hidden = true; closed = true; }
+  if (!libraryEl.hidden) { libraryEl.hidden = true; libraryReturn = null; closed = true; }
+  if (!picker.hidden) { endWelcome(); picker.hidden = true; closed = true; }
+  if (closed) {
+    results.hidden = false;
+    document.body.dataset.screen = 'search';
+    updateGear();
+  }
+  return closed;
+}
+
+input.addEventListener('focus', () => {
+  if (closeSecondary() || detail.hidden || !dict) return;
+  libraryReturn = null;
+  closeDetail();
+});
+input.addEventListener('input', () => {
+  closeSecondary();
+  search();
+});
+
+// Android Back (MainActivity asks the page first): a dialog, then a
+// secondary screen; entry pages go back through the page history.
+window.onAndroidBack = () => {
+  const dialog = document.getElementById('changelog');
+  if (!dialog.hidden) {
+    document.getElementById('changelog-close').click();
+    return true;
+  }
+  return closeSecondary();
+};
 langFilter.addEventListener('input', renderPicker);
 // Options: the gear in the header.
 const optionsEl = document.getElementById('options');
@@ -1323,14 +1705,31 @@ function openOptions() {
   libraryEl.hidden = true;
   optionsEl.hidden = false;
   renderLangSelect();
+  renderHanziOption();
   document.body.dataset.screen = 'options';
+  updateGear();
 }
 
 function closeOptions() {
   optionsEl.hidden = true;
   results.hidden = false;
   document.body.dataset.screen = 'search';
+  updateGear();
   input.focus();
+}
+
+// The gear turns into an X while the options are open.
+const GEAR_X_PATH = 'M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12 5.7 16.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z';
+let gearPath = '';
+function updateGear() {
+  const gear = document.getElementById('gear');
+  const path = gear.querySelector('svg path');
+  if (!gearPath) gearPath = path.getAttribute('d');
+  const open = !optionsEl.hidden;
+  path.setAttribute('d', open ? GEAR_X_PATH : gearPath);
+  gear.setAttribute('aria-label', open ? 'Close options' : 'Options');
+  gear.title = open ? 'Close options' : 'Options';
+  gear.classList.toggle('open', open);
 }
 
 document.getElementById('gear').addEventListener('click', () => {
@@ -1461,11 +1860,14 @@ async function openPad() {
   if (!pad) {
     status.textContent = 'Loading handwriting recognition...';
     const t0 = performance.now();
+    startTransfer('recognizer', 'Loading handwriting recognition...', { indeterminate: true });
     try {
       await loadRecognizer();
     } catch (err) {
       status.textContent = err.message;
       return;
+    } finally {
+      endTransfer('recognizer');
     }
     pad = new Pad({
       canvas: document.getElementById('pad-canvas'),
@@ -1540,15 +1942,68 @@ document.getElementById('about').addEventListener('click', async () => {
     });
     return p;
   }));
-  body.appendChild(el('p')).appendChild(button('Changelog', async () => {
+  const links = body.appendChild(el('p', 'about-buttons'));
+  links.appendChild(button('Changelog', async () => {
     openChangelog(await loadChangelog(), Infinity);
   })).id = 'about-changelog';
+  links.appendChild(button('Diagnostics', showDiagnostics)).id = 'about-diagnostics';
   const dialog = document.getElementById('changelog');
   dialog.hidden = false;
   document.getElementById('changelog-close').onclick = () => {
     dialog.hidden = true;
   };
 });
+
+// Diagnostics (About): timings of the last dictionary open and of the last
+// Wiktionary panel, so numbers from a phone can be read off the screen.
+function diagnosticsLines() {
+  const lines = [];
+  const st = window.__openStats;
+  if (st) {
+    lines.push(`Last open: ${st.code}, ` + Object.entries(st.phases).map(([k, v]) => `${k} ${v} ms`).join(', '));
+    const size = (n) => (n ? formatSize(n) : '0 bytes');
+    lines.push(`  reads while opening: ${st.open.reads}, ${size(st.open.bytes)}, ${Math.round(st.open.readMs)} ms`);
+    if (st.search) lines.push(`  first search "${st.search.query}": ${st.search.ms} ms, ${st.search.reads} reads, ${size(st.search.bytes)}`);
+  } else {
+    lines.push('Last open: none since the app started');
+  }
+  const native = window.WiktionaryNative;
+  if (native && native.panelDiagnostics) {
+    const d = JSON.parse(native.panelDiagnostics());
+    const last = d.lastShow || {};
+    lines.push(`Wiktionary panel: mode ${d.mode}, network ${d.network}`);
+    lines.push(last.tapToShowMs === undefined ? '  not opened yet'
+      : `  last tap: shown after ${last.tapToShowMs} ms, first frame after ${last.tapToFirstDrawMs} ms; `
+        + `page ${last.progressAtTap} % loaded${last.finishedAtTap ? ', finished' : ''} at the tap`);
+  }
+  lines.push(`WebView: ${navigator.userAgent.replace(/.*Chrome\/(\S+).*/, 'Chrome $1')}`);
+  return lines;
+}
+
+function showDiagnostics() {
+  document.getElementById('changelog-title').textContent = 'Diagnostics';
+  const body = document.getElementById('changelog-body');
+  const pre = el('pre', 'diagnostics', diagnosticsLines().join('\n'));
+  pre.id = 'diagnostics-text';
+  replaceChildren(body, pre);
+  const native = window.WiktionaryNative;
+  if (native && native.setPanelMode && native.panelDiagnostics) {
+    const mode = JSON.parse(native.panelDiagnostics()).mode;
+    const label = el('label', 'setting', 'Wiktionary panel while hidden (after a restart) ');
+    const select = el('select');
+    select.id = 'panel-mode';
+    for (const [value, text] of [['drawn', 'kept drawn (default)'], ['gone', 'removed (0.9)']]) {
+      const o = el('option', '', text);
+      o.value = value;
+      select.appendChild(o);
+    }
+    select.value = mode;
+    select.addEventListener('change', () => native.setPanelMode(select.value));
+    label.appendChild(select);
+    body.appendChild(label);
+  }
+  body.appendChild(el('p')).appendChild(button('Refresh', showDiagnostics));
+}
 
 async function start() {
   try {

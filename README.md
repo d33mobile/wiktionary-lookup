@@ -43,7 +43,14 @@ node build-index.js wiktionary-zh kaikki.org-dictionary-Chinese.jsonl zh.idx
 node lookup.js zh.idx nihao                 # one-shot lookup
 node tui.js zh.idx                          # interactive
 node scripts/build-all.js                   # every language, see the script header
+node scripts/hanzi-pack.js graphics.txt dictionary.txt hanzi.pack   # stroke order data
 ```
+
+The stroke order data (`hanzi.pack`, read by `lib/hanzi-pack.js`) is converted
+from Make Me a Hanzi (https://github.com/skishore/makemeahanzi): `graphics.txt`
+(Arphic Public License) and `dictionary.txt` (LGPL 3.0 or later). The data
+release publishes it as `hanzi.pack.gz` (manifest key `hanzi`); the app
+downloads it on request.
 
 Web app: `node stage-web.js DEST zh.idx|- [manifest.json]` (`-`: no built-in language), then serve `DEST`
 and open `/web/index.html`.

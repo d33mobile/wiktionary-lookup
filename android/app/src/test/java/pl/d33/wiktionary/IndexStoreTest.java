@@ -74,6 +74,8 @@ public class IndexStoreTest {
         assertFalse(IndexStore.validName("../x.idx"));
         assertFalse(IndexStore.validName("x.txt"));
         assertTrue(IndexStore.validName("gem-pro.details"));
+        assertTrue(IndexStore.validName("hanzi.pack"));
+        assertFalse(IndexStore.validName("hanzi.pack.gz"));
     }
 
     @Test

@@ -16,10 +16,10 @@ import { copyFileSync, cpSync, existsSync, mkdirSync, rmSync, writeFileSync } fr
 import { join } from 'node:path';
 
 export const WEB_FILES = ['index.html', 'app.js', 'detail.js', 'languages.js', 'library.js', 'inflate.js', 'pronounce.js', 'style.css',
-  'flags.json', 'handwriting.js', 'THIRD_PARTY.md', 'LICENSE'];
+  'flags.json', 'handwriting.js', 'hanzi.js', 'THIRD_PARTY.md', 'LICENSE'];
 // Copied as a whole: vendored libraries with their licenses.
 export const WEB_DIRS = ['vendor'];
-export const ENGINE_FILES = ['engine.js', 'index-format.js', 'bisect.js', 'normalize.js', 'lazy-index.js'];
+export const ENGINE_FILES = ['engine.js', 'index-format.js', 'bisect.js', 'normalize.js', 'lazy-index.js', 'hanzi-pack.js'];
 export const INDEX_NAME = 'index.idx';
 export const MANIFEST_NAME = 'manifest.json';
 

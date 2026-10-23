@@ -14,6 +14,8 @@
 import { gunzip } from './inflate.js';
 
 export const BUNDLED_CODE = 'zh';
+export const HANZI_CODE = 'hanzi';
+const HANZI_KIND = 'pack';
 const BUNDLED_NAME = 'Chinese';
 const RELEASES = 'https://github.com/d33mobile/wiktionary-lookup-data/releases/';
 const ANDROID_HOST = 'appassets.androidplatform.net';
@@ -159,6 +161,10 @@ export class Languages {
     this.fresh = !state.installed;
     this.installed = state.installed || {};
     this.active = state.active || null;
+    // Data files that are not languages: {hanzi: {bytes, sha256, storage}}.
+    this.extras = state.extras || {};
+    // The catalogue's character data entry (manifest "hanzi"), if any.
+    this.hanziEntry = null;
     this.lostBundled = false;
   }
 
@@ -189,12 +195,14 @@ export class Languages {
   }
 
   save() {
-    writeJson(STATE_KEY, { installed: this.installed, active: this.active });
+    writeJson(STATE_KEY, { installed: this.installed, active: this.active, extras: this.extras });
   }
 
   setCatalogue(manifest, source) {
     this.catalogue = catalogueOf(manifest);
     this.catalogueSource = source;
+    const h = manifest.hanzi;
+    this.hanziEntry = h && h.url ? { code: HANZI_CODE, name: 'Stroke order and character data', ...h } : null;
     const zh = this.catalogue.find((l) => l.code === BUNDLED_CODE);
     if (zh && this.installed[BUNDLED_CODE]) this.installed[BUNDLED_CODE].name = zh.name;
   }
@@ -255,6 +263,50 @@ export class Languages {
         return new Uint8Array(await res.arrayBuffer());
       },
     });
+  }
+
+  // Character data (Make Me a Hanzi, lib/hanzi-pack.js): downloaded like an
+  // index, kept as hanzi.pack, read by range in the app.
+  hanziUpdate() {
+    const h = this.extras[HANZI_CODE];
+    return Boolean(h && this.hanziEntry && h.sha256 && this.hanziEntry.sha256 && h.sha256 !== this.hanziEntry.sha256);
+  }
+
+  async installHanzi(onProgress, signal) {
+    const entry = this.hanziEntry;
+    if (!entry) throw new Error('no character data in the catalogue');
+    const previous = this.extras[HANZI_CODE];
+    const got = await this.fetchFile(entry, HANZI_KIND, onProgress, signal);
+    if (previous && (previous.storage || 'cache') !== got.storage) await this.deleteStored(HANZI_CODE, HANZI_KIND, previous);
+    this.extras[HANZI_CODE] = { bytes: entry.bytes || (got.bytes && got.bytes.byteLength), sha256: entry.sha256 || null, storage: got.storage };
+    this.save();
+  }
+
+  async removeHanzi() {
+    const h = this.extras[HANZI_CODE];
+    if (!h) return;
+    await this.deleteStored(HANZI_CODE, HANZI_KIND, h);
+    delete this.extras[HANZI_CODE];
+    this.save();
+  }
+
+  // A byte-range reader over the installed character data, or null.
+  async hanziReader() {
+    const h = this.extras[HANZI_CODE];
+    if (!h) return null;
+    let reader = null;
+    if (h.storage === 'file') {
+      reader = await this.fileReader(HANZI_CODE, HANZI_KIND).catch(() => null);
+      if (reader) return reader;
+    }
+    const buf = reader === null && h.storage === 'file' ? null : await this.readStored(HANZI_CODE, HANZI_KIND, h);
+    if (!buf) {
+      delete this.extras[HANZI_CODE];
+      this.save();
+      return null;
+    }
+    const bytes = new Uint8Array(buf);
+    return { size: bytes.length, read: async (offset, length) => bytes.subarray(offset, offset + length) };
   }
 
   // Bytes of a downloaded file, or null when it is gone (storage cleared).

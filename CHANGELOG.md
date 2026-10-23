@@ -2,6 +2,18 @@
 
 Wiktionary Lookup, an offline dictionary built from English Wiktionary.
 
+## 0.10 (versionCode 10)
+
+- Stroke order for Chinese characters: a one-character entry has a "Character" section that draws the character stroke by stroke (Play/Pause, Step, Restart), with the stroke count, radical, etymology and its components; tap a component to open it. The stroke data (Make Me a Hanzi, about 13 MB) is a separate download, offered there and in Options.
+- Words containing the character, most common first, on the same section.
+- Progress with size, percent and Cancel for every download (entry pages, updates, "Update all", Wikipedia, stroke data) in a bar under the search box, and "Opening <language>..." while a dictionary opens.
+- An empty result list says what to type, or "No results" with search tips.
+- Large dictionaries answer sooner: English is searchable in about half a second after you switch to it; results for headwords come first, definitions and recordings follow.
+- "Update all" shows its overall progress (languages and size), the state of each language (queued, updated, failed with Retry) and carries on past a failed language.
+- The search box stays at the top of every screen: tap it or type to go back to the results from the options, history, favourites or the language list; Back closes those screens first, and the gear turns into an X while the options are open.
+- The Wiktionary page is kept laid out in the background while hidden, so opening it only slides it in (About > Diagnostics can switch back to the 0.9 behaviour). Diagnostics also shows timings of opening a dictionary and the Wiktionary page.
+- The memory estimate for a large download reflects how the app reads it (in parts), the stars in the result list follow changes made on an entry page, and "1 entry" is no longer "1 entries".
+
 ## 0.9 (versionCode 9)
 
 - Wikipedia: download the article titles of the English, German or Polish Wikipedia (with short descriptions) from the language screen; an article opens inside the app.

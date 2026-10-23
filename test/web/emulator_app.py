@@ -14,6 +14,7 @@ Usage: ADB=... python3 test/web/emulator_app.py SERIAL DEBUG_APK SHOTS_DIR
    0.5 and 0.4 notes; OK hides them.
 """
 import pathlib
+import re
 import sys
 import time
 
@@ -85,6 +86,15 @@ def main():
     dev.screenshot(shots / "05-4-whats-new.png")
     page.tap("#changelog-close")
     page.wait("document.getElementById('changelog').hidden", 10, "close notes")
+
+    # Back closes a secondary screen first; the app stays open.
+    page.tap("#gear")
+    page.wait("!document.getElementById('options').hidden", 10, "options")
+    dev.adb("shell", "input", "keyevent", "KEYCODE_BACK")
+    page.wait("document.getElementById('options').hidden && !document.getElementById('results').hidden", 10, "Back closes options")
+    focus = dev.adb("shell", "dumpsys", "activity", "activities", text=True)
+    assert pkg in (re.search(r"topResumedActivity=.*", focus) or re.search(r"mResumedActivity.*", focus)).group(0)
+    print("options -> Back -> options closed, app still in front")
     print("OK")
 
 

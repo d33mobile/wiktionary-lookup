@@ -79,6 +79,18 @@ final class PageBridge {
         return pages.state();
     }
 
+    /** Panel mode and the timings of its last show (Diagnostics). */
+    @JavascriptInterface
+    public String panelDiagnostics() {
+        return pages.diagnostics();
+    }
+
+    /** "drawn" or "gone"; applies from the next start of the app. */
+    @JavascriptInterface
+    public void setPanelMode(String mode) {
+        PagePanel.setMode(context, mode);
+    }
+
     /** Shares text (a favourites export) through the system share sheet. */
     @JavascriptInterface
     public void shareText(String title, String text) {

@@ -36,6 +36,9 @@ def main():
     code, query = (sys.argv[3], sys.argv[4]) if len(sys.argv) > 4 else ("en", "house")
     dev = emulator.Device(serial)
     pkg = "pl.d33.wiktionary.debug"
+    dev.adb("root", check=False)
+    time.sleep(3)
+    dev.adb("wait-for-device")
     print(dev.adb("install", "-r", apk, text=True).strip())
     page = emulator.connect(dev, pkg)
     page.wait("!!document.body && (document.body.dataset.screen === 'welcome' || document.body.dataset.ready === 'true')", 300, "start")
@@ -86,6 +89,23 @@ def main():
           f"{sorted(delays)[len(delays) // 2] * 1000:.0f} ms")
     print("status:", page.eval("document.getElementById('status').textContent"))
     print("first result:", page.eval("document.querySelector('#results li[data-index]').innerText.split('\\n')[0]"))
+    print("open stats (cold or as found):", json.dumps(page.eval("window.__openStats")))
+
+    def switch(to, q, label):
+        t = time.monotonic()
+        page.eval(f"(() => {{ document.getElementById('gear').click(); document.querySelector('#opt-languages button[data-code={to}]').click(); }})()")
+        page.eval(f"(() => {{ const q = document.getElementById('q'); q.value = '{q}'; q.dispatchEvent(new Event('input')); }})()")
+        page.wait(f"document.body.dataset.lang === '{to}' && !!window.__openStats && window.__openStats.code === '{to}' && !!window.__openStats.search", 300, label)
+        st = page.eval("window.__openStats")
+        print(f"{label}: wall {time.monotonic() - t:.2f} s | {json.dumps({k: st[k] for k in ('phases', 'open', 'search')})}")
+        page.wait("document.body.dataset.ready === 'true'", 300, label)
+
+    switch("zh", "hao", "zh open")
+    # Cold: the kernel's page cache dropped (needs adb root, emulator images without Play allow it).
+    dropped = dev.adb("shell", "sync; echo 3 > /proc/sys/vm/drop_caches && echo dropped", check=False, text=True).strip()
+    switch(code, query, f"{code} open, page cache {'dropped' if dropped == 'dropped' else 'not dropped (no root)'}")
+    switch("zh", "hao", "zh open")
+    switch(code, query, f"{code} open, warm")
     time.sleep(2)
     print(f"PSS app process: {rss_before} MiB before, {pss(dev, pkg)} MiB after; WebView renderer: "
           f"{renderer_before} MiB before, {pss(dev, 'sandboxed_process')} MiB after")

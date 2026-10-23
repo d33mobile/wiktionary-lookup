@@ -20,6 +20,8 @@ def network(on):
     for what in ('wifi', 'data'):
         dev.adb('shell', 'svc', what, 'enable' if on else 'disable')
     time.sleep(5)
+    if on:
+        emulator.wait_network(dev)
 
 
 # A first start without network: no language, the list from the APK.

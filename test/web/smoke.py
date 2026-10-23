@@ -104,6 +104,14 @@ def wikipedia_entry(download):
             "articleUrl": "https://pl.wikipedia.org/wiki/{title}", **base}
 
 
+def hanzi_entry(download):
+    """Character data (lib/hanzi-pack.js) of 好, 女 and 子 from the Make Me a Hanzi fixtures."""
+    pack = download / "hanzi.pack"
+    subprocess.run(["node", str(REPO / "scripts" / "hanzi-pack.js"), str(REPO / "test" / "fixtures" / "mmah-graphics.txt"),
+                    str(REPO / "test" / "fixtures" / "mmah-dictionary.txt"), str(pack), "2"], check=True, stdout=subprocess.DEVNULL)
+    return {"count": 3, **gz_entry(pack, f"../../download/{RELEASE_TAG}/hanzi.pack.gz")}
+
+
 def build_release(dest):
     """Writes the mimicked GitHub release tree under dest/releases."""
     download = dest / "releases" / "download" / RELEASE_TAG
@@ -133,8 +141,9 @@ def build_release(dest):
         {"code": "xl", "name": "Extra Large", "entries": 1, "bytes": 300 * 1048576, "sha256": None,
          "gzBytes": 100 * 1048576, "url": f"../../download/{RELEASE_TAG}/xl.idx.gz"},
     ]
-    (latest / "manifest.json").write_text(json.dumps({"languages": languages}))
-    (dest / "manifest-new.json").write_text(json.dumps({"languages": languages}))
+    hanzi = hanzi_entry(download)
+    (latest / "manifest.json").write_text(json.dumps({"languages": languages, "hanzi": hanzi}))
+    (dest / "manifest-new.json").write_text(json.dumps({"languages": languages, "hanzi": hanzi}))
     stale_language_manifest(dest, download, languages)
     bundled = dest / "bundled-manifest.json"
     bundled.write_text(json.dumps({"languages": languages[:1]}))
@@ -260,6 +269,15 @@ def languages(page, base, shots, requests):
     warning = large.locator(".lang-warning").inner_text()
     print("size warning ->", warning)
     assert "300.0 MiB" in warning and large.get_by_role("button", name="Download anyway").is_visible()
+    assert "about 600.0 MiB of memory" in warning, "a browser reads the index whole: twice its size"
+    # The Android app opens it lazily: the key tables only (0.35 of the file).
+    page.evaluate("window.__savedNative = window.WiktionaryNative; window.WiktionaryNative = new Proxy({}, { get: (t, k) => (k === 'then' ? undefined : () => '') })")
+    page.fill("#lang-filter", "extr")
+    page.fill("#lang-filter", "extra")
+    lazy_warning = large.locator(".lang-warning").inner_text()
+    print("size warning in the app ->", lazy_warning)
+    assert "about 105.0 MiB of memory while open (it is read in parts)" in lazy_warning, lazy_warning
+    page.evaluate("window.WiktionaryNative = window.__savedNative; if (!window.WiktionaryNative) delete window.WiktionaryNative")
     page.screenshot(path=str(shots / "size-warning.png"))
     page.fill("#lang-filter", "germ")
 
@@ -611,7 +629,15 @@ def two_step(browser, base, shots):
     assert offer.is_visible()
     page.screenshot(path=str(shots / "detail-offer.png"))
     offer.click()
+    # The transfer tray under the header: a bar with a partial value, bytes and percent, Cancel.
+    page.wait_for_function("""(() => { const b = document.querySelector('#transfers [data-transfer="zhd:details"] progress');
+        return b && b.hasAttribute('value') && b.value > 0 && b.value < b.max; })()""")
+    tray = page.inner_text('#transfers [data-transfer="zhd:details"]')
+    print("entry pages downloading ->", tray.replace("\n", " | "))
+    assert "entry pages" in tray and "%" in tray and "Cancel" in tray, tray
+    page.screenshot(path=str(shots / "transfer-tray.png"))
     page.wait_for_function("document.body.dataset.detailsInstalled === 'zhd' && document.body.dataset.details === 'loaded'")
+    assert page.locator("#transfers").is_hidden(), "the tray goes when nothing is left"
     print("after download ->", page.locator(".ex-text").first.inner_text(), "|", page.locator(".detail-h").all_text_contents())
     page.click("#back")
     page.wait_for_selector("#detail", state="hidden")
@@ -668,6 +694,12 @@ def updates(browser, base, shots, release_root):
     page.click("#picker-close")
     open_options(page)
     page.click("#update-all")
+    # The overall transfer: languages and bytes.
+    page.wait_for_selector('#transfers [data-transfer="update-all"]')
+    overall = page.inner_text('#transfers [data-transfer="update-all"]')
+    print("Update all ->", overall.replace("\n", " | "))
+    assert "0 of 1 language," in overall and "KiB" in overall and "Cancel" in overall, overall
+    page.wait_for_function("document.body.dataset.updateAll === 'done'")
     page.wait_for_function("document.body.dataset.updates === '0'")
     assert page.locator("#lang-badge").is_hidden() and page.locator("#update-all").is_hidden()
     assert page.locator("#notice").is_hidden(), "the note goes once nothing is left to update"
@@ -679,6 +711,25 @@ def updates(browser, base, shots, release_root):
     wait_language(page, "zhd")
     page.wait_for_timeout(1000)
     assert page.locator("#notice").is_hidden(), "the note appears once per app version"
+    context.close()
+
+
+def stars_on_return(browser, base, shots):
+    """A favourite set on the entry page shows on its result row after Back."""
+    context = new_context(browser)
+    page = context.new_page()
+    page.goto(base)
+    wait_language(page, "zh")
+    query(page, "xuexi", "学习")
+    assert "on" not in result_rows(page).first.locator("button.star").get_attribute("class")
+    result_rows(page).first.locator(".words").click()
+    page.wait_for_function("document.body.dataset.detail === '学习'")
+    page.click("#detail-star")
+    page.click("#back")
+    page.wait_for_selector("#detail", state="hidden")
+    cls = result_rows(page).first.locator("button.star").get_attribute("class")
+    print("star on the entry page, Back -> row star:", cls)
+    assert "on" in cls.split(), cls
     context.close()
 
 
@@ -711,6 +762,9 @@ def library(browser, base, shots):
           page.locator("#library-list li.library-item").first.inner_text().split("\n")[0])
     page.locator("#library-list li.library-item", has_text="中国").locator(".library-delete").click()
     page.wait_for_function("document.body.dataset.library === 'history:1'")
+    status = page.inner_text("#library-status")
+    print("one left ->", status)
+    assert status == "1 entry", status
     page.click("#history-clear")
     print("clear ->", page.inner_text("#history-confirm").replace("\n", " "))
     page.click("#history-clear-yes")
@@ -755,6 +809,133 @@ def library(browser, base, shots):
     page.wait_for_function("document.body.dataset.library === 'favourites:2'")
     print("export, delete 你好, import ->", page.inner_text("#library-status"))
     page.screenshot(path=str(shots / "favourites.png"))
+    context.close()
+
+
+def header_rules(browser, base, shots):
+    """The header stays on secondary screens: tapping the search box closes
+    the options (the gear is an X meanwhile), typing closes History and the
+    results follow the query; Back (window.onAndroidBack) closes a secondary
+    screen first; tapping the search box on an entry page returns to the list."""
+    context = new_context(browser)
+    page = context.new_page()
+    page.goto(base)
+    wait_language(page, "zh")
+    query(page, "nihao", "你好")
+    open_options(page)
+    assert page.get_attribute("#gear", "aria-label") == "Close options"
+    assert page.locator("#q").is_visible() and page.locator("#pen").is_visible()
+    page.click("#q")
+    assert page.locator("#options").is_hidden() and page.locator("#results").is_visible()
+    assert page.get_attribute("#gear", "aria-label") == "Options"
+    print("options -> tap search box -> options hidden, list visible:", first_result_text(page).splitlines()[0])
+    open_options(page)
+    page.click("#opt-history")
+    page.wait_for_selector("#library:not([hidden])")
+    page.locator("#q").press("End")
+    page.keyboard.type("ma")
+    page.wait_for_function("document.body.dataset.searched === 'nihaoma'")
+    assert page.locator("#library").is_hidden() and page.locator("#results").is_visible()
+    print("history -> type -> history hidden, results for", page.input_value("#q"), "->", first_result_text(page).splitlines()[0])
+    open_options(page)
+    assert page.evaluate("window.onAndroidBack()") is True and page.locator("#options").is_hidden()
+    assert page.evaluate("window.onAndroidBack()") is False, "nothing left to close"
+    print("Back -> options closed; Back again -> not handled (the app goes back or leaves)")
+    result_rows(page).first.click()
+    page.wait_for_selector("#detail:not([hidden])")
+    page.click("#q")
+    page.wait_for_selector("#detail", state="hidden")
+    assert page.locator("#results").is_visible()
+    print("entry page -> tap search box -> result list")
+    context.close()
+
+
+def empty_list(browser, base, shots):
+    """The empty result list: a hint with the language name for an empty
+    query, "No results for ..." with search tips for a query without hits."""
+    context = new_context(browser)
+    page = context.new_page()
+    page.goto(base)
+    wait_language(page, "zh")
+    page.fill("#q", "x")
+    wait_results(page)
+    page.fill("#q", "")
+    page.wait_for_selector("#results .empty-state[data-state=hint]")
+    hint = page.inner_text("#results .empty-state")
+    print("empty query ->", hint.replace("\n", " | "))
+    assert "Type pinyin, characters or an English word" in hint and "Chinese" in hint, hint
+    page.fill("#q", "qqqxzzz")
+    page.wait_for_selector("#results .empty-state[data-state=none]")
+    none = page.inner_text("#results .empty-state")
+    print("junk query ->", none.replace("\n", " | "))
+    assert "No results for qqqxzzz" in none and "p:" in none, none
+    page.screenshot(path=str(shots / "no-results.png"))
+    context.close()
+
+
+def hanzi(browser, base, shots):
+    """The character section of 好: words with 好 at once; stroke order and
+    components after downloading the character data it offers; Play, Step
+    and Restart; a component opens its own entry; Options remove the data."""
+    context = new_context(browser)
+    page = context.new_page()
+    page.goto(base)
+    wait_language(page, "zh")
+    query(page, "好", "好")
+    result_rows(page).first.click()
+    page.wait_for_function("document.body.dataset.detail === '好' && document.body.dataset.hanzi === 'none'")
+    words = page.locator(".hz-word").evaluate_all("(bs) => bs.map((b) => b.dataset.word)")
+    offer = page.inner_text("#hanzi-get")
+    print("好 without character data ->", offer, "| words:", words[:6])
+    assert "你好" in words and all("好" in w for w in words), words
+    page.click("#hanzi-get")
+    page.wait_for_function("document.body.dataset.hanzi === 'loaded'", timeout=LOAD_TIMEOUT_MS)
+    strokes = page.get_attribute(".hz-facts", "data-strokes")
+    comps = page.get_attribute(".hz-section", "data-components")
+    print("好 ->", page.inner_text(".hz-facts"), "|", page.inner_text(".hz-etymology"), "| components", comps,
+          "| tree:", page.locator(".hz-component-char").all_text_contents())
+    assert strokes == "6" and comps == "女子", (strokes, comps)
+    player = page.locator(".hz-player")
+    assert player.get_attribute("data-stroke") == "6", "the whole character at first"
+    page.click(".hz-restart")
+    assert player.get_attribute("data-stroke") == "0" and page.inner_text(".hz-counter") == "Stroke 0 of 6"
+    page.click(".hz-step")
+    page.click(".hz-step")
+    print("Restart, Step, Step ->", page.inner_text(".hz-counter"))
+    assert player.get_attribute("data-stroke") == "2"
+    page.click(".hz-play")
+    page.wait_for_function("document.querySelector('.hz-player').dataset.playing === 'true'")
+    page.wait_for_timeout(300)
+    page.click(".hz-play")
+    paused = int(player.get_attribute("data-stroke"))
+    page.wait_for_timeout(500)
+    assert player.get_attribute("data-playing") == "false" and int(player.get_attribute("data-stroke")) == paused
+    print("Play, Pause -> stopped at stroke", paused)
+    page.screenshot(path=str(shots / "hanzi-paused.png"))
+    page.click(".hz-play")
+    page.wait_for_function("document.querySelector('.hz-player').dataset.stroke === '6'"
+                           " && document.querySelector('.hz-player').dataset.playing === 'false'", timeout=20000)
+    visible = page.locator(".hz-ink").evaluate_all("(ps) => ps.filter((p) => p.style.visibility === 'visible').length")
+    print("Play to the end -> strokes drawn:", visible)
+    assert visible == 6
+    page.screenshot(path=str(shots / "hanzi.png"), full_page=True)
+    page.click('.hz-component[data-char="女"]')
+    page.wait_for_function("document.body.dataset.detail === '女' && document.body.dataset.hanzi === 'loaded'")
+    print("tap 女 ->", page.inner_text(".hz-facts"))
+    assert page.get_attribute(".hz-facts", "data-strokes") == "3"
+    page.go_back()
+    page.wait_for_function("document.body.dataset.detail === '好' && document.body.dataset.hanzi === 'loaded'")
+    page.click('.hz-word[data-word="你好"]')
+    page.wait_for_function("document.body.dataset.detail === '你好'")
+    assert page.locator("#detail-hanzi").is_hidden(), "no character section on a word"
+    print("tap 你好 -> its entry, no character section")
+    open_options(page)
+    state = page.inner_text("#hanzi-state")
+    print("options ->", state)
+    assert state.startswith("installed")
+    page.click('#hanzi-actions button:has-text("Remove")')
+    page.wait_for_function("document.getElementById('hanzi-state').textContent.indexOf('not installed') === 0")
+    print("Remove ->", page.inner_text("#hanzi-state"))
     context.close()
 
 
@@ -905,7 +1086,14 @@ def first_start(browser, base, shots):
     wait_language(page, "zh")
     page.wait_for_timeout(1000)
     assert page.locator("#changelog").is_hidden(), "the notes appear once"
+    query(page, "nihao", "你好")
     open_options(page)
+    page.click("#about")
+    page.click("#about-diagnostics")
+    diag = page.inner_text("#diagnostics-text")
+    print("About -> Diagnostics:", diag.replace("\n", " | ")[:200])
+    assert diag.startswith("Last open: zh") and 'first search "nihao"' in diag, diag
+    page.click("#changelog-close")
     page.click("#about")
     page.click("#about-changelog")
     page.wait_for_function("document.querySelectorAll('#changelog h3').length > 5")
@@ -979,7 +1167,11 @@ def run(root, shots):
             two_step(browser, base, shots)
             updates(browser, base, shots, release_root)
             library(browser, base, shots)
+            stars_on_return(browser, base, shots)
             wikipedia(browser, base, shots)
+            hanzi(browser, base, shots)
+            empty_list(browser, base, shots)
+            header_rules(browser, base, shots)
             first_start(browser, base, shots)
             broken_start(browser, base, shots)
             browser.close()

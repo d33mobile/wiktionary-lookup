@@ -1,0 +1,3 @@
+{"character":"好","definition":"good, excellent, fine; proper, suitable; well","pinyin":["hǎo"],"decomposition":"⿰女子","etymology":{"type":"ideographic","hint":"A woman 女 with a son 子"},"radical":"女","matches":[[0],[0],[0],[1],[1],[1]]}
+{"character":"女","definition":"woman, girl; female","pinyin":["nǚ"],"decomposition":"？","etymology":{"type":"pictographic","hint":"A woman turned to the side"},"radical":"女","matches":[null,null,null]}
+{"character":"子","definition":"son, child; seed, egg; fruit; small thing","pinyin":["zi"],"decomposition":"⿻了一","etymology":{"type":"pictographic","hint":"A child in a wrap, with outstretched arms but bundled legs"},"radical":"子","matches":[[0],[0],[1]]}

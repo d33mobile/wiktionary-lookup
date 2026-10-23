@@ -13,6 +13,16 @@ It includes or uses:
   Hanzi (https://github.com/skishore/makemeahanzi) graphics data, which comes
   from the Arphic PL KaitiM GB and Arphic PL UKai fonts. Arphic Public
   License, reproduced in full in vendor/hanzilookup/LICENSE-APL.
+- Stroke order and character data (an optional download, hanzi.pack in the
+  data release), converted from Make Me a Hanzi
+  (https://github.com/skishore/makemeahanzi): the stroke outlines and medians
+  (graphics.txt) derive from the Arphic PL KaitiM GB and Arphic PL UKai fonts
+  and are under the Arphic Public License (vendor/hanzilookup/LICENSE-APL);
+  the decompositions, radicals and etymologies (dictionary.txt) derive from
+  Unihan and CJKlib and are under the GNU Lesser General Public License,
+  version 3 or later (https://www.gnu.org/licenses/lgpl-3.0.html; the data
+  release carries both license texts, LGPL-3.0.txt and
+  Arphic-Public-License.txt, next to hanzi.pack.gz).
 - Dictionary data: English Wiktionary (https://en.wiktionary.org/), extracted
   by wiktextract and published by kaikki.org. CC BY-SA 4.0 and GFDL. Credit to
   the Wiktionary contributors.

@@ -160,18 +160,29 @@ public class MainActivity extends Activity {
         }
     }
 
-    // The page pushes a history entry when it opens a detail view; Back pops
-    // it before it closes the app.
+    // Back closes the Wiktionary panel, then whatever the page closes itself
+    // (window.onAndroidBack: a dialog or a secondary screen), then goes back
+    // through the page history (entry pages), then leaves the app.
     @Override
     @SuppressWarnings("deprecation")
     public void onBackPressed() {
         if (pages.visible()) {
             pages.hide();
-        } else if (webView.canGoBack()) {
-            webView.goBack();
-        } else {
-            super.onBackPressed();
+            return;
         }
+        webView.evaluateJavascript("(function () { return window.onAndroidBack ? window.onAndroidBack() === true : false; })()", handled -> {
+            if ("true".equals(handled)) return;
+            if (webView.canGoBack()) {
+                webView.goBack();
+            } else {
+                finishAfterBack();
+            }
+        });
+    }
+
+    @SuppressWarnings("deprecation")
+    private void finishAfterBack() {
+        super.onBackPressed();
     }
 
     @Override

@@ -1,6 +1,6 @@
 {
   "name": "wiktionary-lookup",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Offline dictionary for every language of English Wiktionary: incremental prefix lookup engine, index builder, web app and Android app",
   "type": "module",
   "main": "lookup.js",

@@ -95,19 +95,38 @@ class Page:
         raise TimeoutError(f"{what}: {self.eval('document.getElementById(\"status\").textContent')}")
 
 
+def wait_network(dev, timeout_s=120):
+    """After Wi-Fi or mobile data were switched back on: waits until the
+    emulator reaches the internet again (a test right after a toggle otherwise
+    starts downloads on a half-restored network that stall)."""
+    t0 = time.monotonic()
+    while time.monotonic() - t0 < timeout_s:
+        out = dev.adb("shell", "ping -c 1 -W 3 8.8.8.8 >/dev/null 2>&1 && echo up", check=False, text=True)
+        if "up" in out:
+            return time.monotonic() - t0
+        time.sleep(2)
+    raise TimeoutError("network not back")
+
+
 def connect(dev, package, restart=True):
     if restart:
         dev.adb("shell", "am", "force-stop", package)
         # The debug build adds ".debug" to the package; the activity keeps its class name.
         dev.adb("shell", "am", "start", "-n", f"{package}/pl.d33.wiktionary.MainActivity")
     t0 = time.monotonic()
+    restarted = t0
     while True:
         pid = dev.adb("shell", "pidof", package, check=False, text=True).strip()
         sockets = dev.adb("shell", "cat", "/proc/net/unix", text=True)
         if pid and f"webview_devtools_remote_{pid}" in sockets:
             break
         if time.monotonic() - t0 > START_TIMEOUT_S:
-            raise TimeoutError("no DevTools socket")
+            raise TimeoutError(f"no DevTools socket (pid {pid!r})")
+        # A start right after a force-stop is sometimes dropped: start again.
+        if restart and not pid and time.monotonic() - restarted > 20:
+            print("connect: no process after 20 s, starting the activity again")
+            dev.adb("shell", "am", "start", "-n", f"{package}/pl.d33.wiktionary.MainActivity")
+            restarted = time.monotonic()
         time.sleep(3)
     dev.adb("forward", f"tcp:{DEVTOOLS_PORT}", f"localabstract:webview_devtools_remote_{pid}")
     while True:
@@ -128,10 +147,21 @@ def past_welcome(page):
             return
         page.wait("!/checking for updates/.test(document.getElementById('picker-status').textContent)", 60, "catalogue")
         # "Use" with a built-in Chinese, "Download dictionary" without one.
-        page.tap('#lang-list li[data-code="zh"] .lang-actions button')
+        # The list may be redrawn between finding the button and tapping it.
+        page.wait("!!document.querySelector('#lang-list li[data-code=\"zh\"] .lang-actions button')", 60, "Chinese row")
+        try:
+            page.tap('#lang-list li[data-code="zh"] .lang-actions button')
+        except RuntimeError as err:
+            print("past_welcome: tap missed a redrawn list, again:", str(err)[:80])
         time.sleep(1)
-    page.wait("document.body.dataset.screen === 'search' && document.body.dataset.lang === 'zh'"
-              " && document.body.dataset.ready === 'true'", 600, "Chinese")
+    try:
+        page.wait("document.body.dataset.screen === 'search' && document.body.dataset.lang === 'zh'"
+                  " && document.body.dataset.ready === 'true'", 600, "Chinese")
+    except TimeoutError:
+        print("past_welcome: picker status:", page.eval("document.getElementById('picker-status').textContent"),
+              "| transfers:", page.eval("document.getElementById('transfers').innerText"),
+              "| zh row:", page.eval("(document.querySelector('#lang-list li[data-code=\"zh\"]') || {}).innerText"))
+        raise
 
 
 def open_entry_pages(page, word):

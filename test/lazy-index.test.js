@@ -107,6 +107,28 @@ for (const [name, make, queries] of [['CC-CEDICT fixture', cedictFile, CEDICT_QU
     assert.equal(d.blockCache, undefined, 'an in-memory dictionary');
     await d.close();
   });
+
+  test(`openIndexLazy: ${name}, searchable before the recordings and definition tables`, async () => {
+    const file = await make();
+    const eager = openIndex(readFileSync(file));
+    const reader = await nodeFileReader(file);
+    let partial = null;
+    const order = [];
+    const d = await openIndexLazy(reader, {
+      residentBytes: 0,
+      onProgress: (p) => { if (order.at(-1) !== p.section) order.push(p.section); },
+      onSearchable: (dict) => { partial = dict; order.push('SEARCHABLE'); },
+    });
+    const at = order.indexOf('SEARCHABLE');
+    assert.ok(at > 0 && at < order.length - 1, order.join(' '));
+    assert.ok(order.slice(at + 1).every((n) => /^(audio|words|wordOffsets|postStart|postings|gloss)/.test(n)), order.join(' '));
+    const q = queries === TITLE_QUERIES ? 'new york' : 'nihao';
+    const head = await partial.searchAsync(q);
+    assert.ok(head.length > 0, 'headwords searchable early, lazily');
+    assert.deepEqual(head.map((r) => r.id), eager.search(q).filter((r) => r.matchedOn !== 'definition').map((r) => r.id).slice(0, head.length));
+    for (const qq of queries) assert.deepEqual(await d.searchAsync(qq), eager.search(qq), qq);
+    await d.close();
+  });
 }
 
 test('BlockCache: NeedBytes until loaded, spans, eviction', async () => {
