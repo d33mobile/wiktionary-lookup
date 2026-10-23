@@ -163,6 +163,10 @@ export class Languages {
     this.active = state.active || null;
     // Data files that are not languages: {hanzi: {bytes, sha256, storage}}.
     this.extras = state.extras || {};
+    // The newest catalogue date (manifest "generated") seen so far: an older
+    // catalogue never offers updates (a downgrade).
+    this.newestSeen = state.newestSeen || '';
+    this.catalogueGenerated = '';
     // The catalogue's character data entry (manifest "hanzi"), if any.
     this.hanziEntry = null;
     this.lostBundled = false;
@@ -195,12 +199,30 @@ export class Languages {
   }
 
   save() {
-    writeJson(STATE_KEY, { installed: this.installed, active: this.active, extras: this.extras });
+    writeJson(STATE_KEY, { installed: this.installed, active: this.active, extras: this.extras, newestSeen: this.newestSeen });
   }
 
   setCatalogue(manifest, source) {
     this.catalogue = catalogueOf(manifest);
     this.catalogueSource = source;
+    const generated = typeof manifest.generated === 'string' ? manifest.generated : '';
+    this.catalogueGenerated = generated;
+    let changed = false;
+    if (generated && generated > this.newestSeen) {
+      this.newestSeen = generated;
+      changed = true;
+    }
+    // Installs from before 0.11 have no date: the catalogue whose file they match dates them.
+    if (generated) {
+      for (const lang of Object.values(this.installed)) {
+        const cat = this.catalogue.find((l) => l.code === lang.code);
+        if (!lang.generated && cat && cat.sha256 && cat.sha256 === lang.sha256) {
+          lang.generated = generated;
+          changed = true;
+        }
+      }
+    }
+    if (changed) this.save();
     const h = manifest.hanzi;
     this.hanziEntry = h && h.url ? { code: HANZI_CODE, name: 'Stroke order and character data', ...h } : null;
     const zh = this.catalogue.find((l) => l.code === BUNDLED_CODE);
@@ -269,7 +291,8 @@ export class Languages {
   // index, kept as hanzi.pack, read by range in the app.
   hanziUpdate() {
     const h = this.extras[HANZI_CODE];
-    return Boolean(h && this.hanziEntry && h.sha256 && this.hanziEntry.sha256 && h.sha256 !== this.hanziEntry.sha256);
+    return Boolean(h && this.hanziEntry && h.sha256 && this.hanziEntry.sha256 && h.sha256 !== this.hanziEntry.sha256
+      && this.catalogueIsNewer(h));
   }
 
   async installHanzi(onProgress, signal) {
@@ -278,7 +301,10 @@ export class Languages {
     const previous = this.extras[HANZI_CODE];
     const got = await this.fetchFile(entry, HANZI_KIND, onProgress, signal);
     if (previous && (previous.storage || 'cache') !== got.storage) await this.deleteStored(HANZI_CODE, HANZI_KIND, previous);
-    this.extras[HANZI_CODE] = { bytes: entry.bytes || (got.bytes && got.bytes.byteLength), sha256: entry.sha256 || null, storage: got.storage };
+    this.extras[HANZI_CODE] = {
+      bytes: entry.bytes || (got.bytes && got.bytes.byteLength), sha256: entry.sha256 || null, storage: got.storage,
+      generated: this.catalogueGenerated || undefined,
+    };
     this.save();
   }
 
@@ -380,10 +406,20 @@ export class Languages {
   // What a newer data release changed for an installed language: the
   // dictionary and/or the installed entry pages differ (by SHA-256) from
   // the catalogue. {index, details, bytes (download size)} or null.
+  // Whether the catalogue is newer than what `record` was installed from:
+  // never for an older catalogue (no silent downgrade).
+  catalogueIsNewer(record) {
+    const generated = this.catalogueGenerated;
+    if (!generated) return true;
+    if (record.generated) return generated > record.generated;
+    return generated >= this.newestSeen;
+  }
+
   updateFor(code) {
     const lang = this.installed[code];
     const cat = this.catalogue.find((l) => l.code === code);
     if (!lang || lang.bundled || !cat || !cat.url) return null;
+    if (!this.catalogueIsNewer(lang)) return null;
     const index = Boolean(cat.sha256 && lang.sha256 && cat.sha256 !== lang.sha256);
     // A new index invalidates installed pages too (they are per build).
     const details = Boolean(lang.details && cat.details
@@ -445,6 +481,7 @@ export class Languages {
     this.installed[entry.code] = {
       code: entry.code, name: entry.name, entries: entry.entries, bytes: entry.bytes || (got.bytes && got.bytes.byteLength),
       sha256: entry.sha256 || null, storage: got.storage, kind: entry.kind || 'wiktionary', lang: entry.lang || entry.code,
+      generated: this.catalogueGenerated || undefined,
     };
     // Entry pages belong to one build of the index: a new index drops them.
     if (previous && previous.details) {

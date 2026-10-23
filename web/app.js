@@ -482,7 +482,9 @@ async function downloadHanzi(b) {
   if (b) b.disabled = true;
   hanziDownload = new AbortController();
   status('Downloading stroke order...');
-  startTransfer('hanzi', 'Stroke order and character data', { total: languages.hanziEntry.bytes, controller: hanziDownload });
+  startTransfer('hanzi', 'Stroke order and character data', {
+    total: languages.hanziEntry.bytes, download: languages.hanziEntry.gzBytes, controller: hanziDownload,
+  });
   if (b) b.parentNode.appendChild(progressView('hanzi', false));
   try {
     await languages.installHanzi((done, total, phase) => setProgress('hanzi', done, total, phase), hanziDownload.signal);
@@ -688,6 +690,8 @@ let searchGen = 0;
 
 async function search() {
   if (!detail.hidden) closeDetail();
+  // The first query typed since the open began (Diagnostics: query -> results).
+  if (openStats && !openStats.queryAt && input.value.trim()) openStats.queryAt = performance.now();
   if (!dict) {
     if (input.value.trim() && loadingName) statusLine.textContent = `Loading ${loadingName}... results follow`;
     return;
@@ -703,7 +707,8 @@ async function search() {
   const ms = performance.now() - t0;
   if (measure && !openStats.search) {
     openStats.search = { query: input.value, ms: Math.round(ms), reads: cache ? cache.reads - before.reads : 0,
-      bytes: cache ? cache.readBytes - before.bytes : 0 };
+      bytes: cache ? cache.readBytes - before.bytes : 0,
+      sinceQuery: Math.round(performance.now() - (openStats.queryAt || t0)) };
     openPhase('firstResults');
     finishOpenStats();
   }
@@ -847,7 +852,9 @@ async function useLanguage(code, bytes) {
   replaceChildren(results);
   const t0 = performance.now();
   const lang = languages.installed[code];
-  openStats = { code, t0, phases: {}, open: { reads: 0, bytes: 0, readMs: 0 }, search: null };
+  openStats = { code, t0, phases: {}, open: { reads: 0, bytes: 0, readMs: 0 }, search: null, how: '', queryAt: 0 };
+  // Visible to Diagnostics from the start, also for the open at app start.
+  window.__openStats = openStats;
   try {
     let next;
     let size;
@@ -893,6 +900,7 @@ async function useLanguage(code, bytes) {
     if (mine !== loadGen) return;
     const ms = performance.now() - t0;
     openPhase('opened');
+    openStats.how = how;
     // Reads after this point belong to searches.
     openStats.open = { ...openStats.open, readMs: Math.round(openStats.open.readMs) };
     activate(code, next, `${name}: ${next.size.toLocaleString('en')} entries, ${formatSize(size)}, opened ${how} in ${ms.toFixed(0)} ms`);
@@ -1157,11 +1165,16 @@ function progressActions(key) {
 function transferText(t) {
   if (t.phase) return t.phase;
   if (t.unit) {
-    const bytes = t.bytesTotal ? `, ${formatSize(Math.min(t.bytesDone || 0, t.bytesTotal))} of ${formatSize(t.bytesTotal)}` : '';
+    const shownTotal = t.downloadTotal || t.bytesTotal;
+    const shownDone = t.bytesTotal ? (Math.min(t.bytesDone || 0, t.bytesTotal) / t.bytesTotal) * shownTotal : 0;
+    const bytes = t.bytesTotal ? `, ${formatSize(shownDone)} of ${formatSize(shownTotal)}` : '';
     return `${t.done} of ${count(t.total, t.unit.replace(/s$/, ''), t.unit)}${bytes}`;
   }
   if (!t.total || t.indeterminate) return t.done ? formatSize(t.done) : '';
-  return `${formatSize(Math.min(t.done, t.total))} of ${formatSize(t.total)} (${Math.floor((100 * Math.min(t.done, t.total)) / t.total)}%)`;
+  // Progress counts unpacked bytes; it is shown in download size (as on the buttons).
+  const fraction = Math.min(t.done, t.total) / t.total;
+  const shown = t.download || t.total;
+  return `${formatSize(fraction * shown)} of ${formatSize(shown)} (${Math.floor(100 * fraction)}%)`;
 }
 
 function paintTransfer(box, t) {
@@ -1202,8 +1215,9 @@ function renderTransfers() {
 }
 
 // unit: count items ("2 of 3 languages") instead of bytes.
-function startTransfer(key, label, { total = 0, controller = null, indeterminate = false, unit = '' } = {}) {
-  const t = { label, done: 0, total: total || 0, controller, indeterminate, unit, phase: '', painted: 0 };
+// download: the download (gzip) size shown for `total` unpacked bytes.
+function startTransfer(key, label, { total = 0, download = 0, controller = null, indeterminate = false, unit = '' } = {}) {
+  const t = { label, done: 0, total: total || 0, download: download || 0, controller, indeterminate, unit, phase: '', painted: 0 };
   downloads.set(key, t);
   renderTransfers();
   return t;
@@ -1299,7 +1313,7 @@ async function downloadDetails(entry) {
     return;
   }
   const controller = new AbortController();
-  startTransfer(key, `${entry.name} entry pages`, { total: entry.details.bytes, controller });
+  startTransfer(key, `${entry.name} entry pages`, { total: entry.details.bytes, download: entry.details.gzBytes, controller });
   updateRow(entry.code);
   breadcrumb(`download ${entry.code} entry pages start`);
   try {
@@ -1439,7 +1453,7 @@ async function download(entry) {
   showNetworkActions('');
   breadcrumb(`download ${entry.code} start: ${entry.url}`);
   const controller = new AbortController();
-  startTransfer(entry.code, entry.name, { total: entry.bytes, controller });
+  startTransfer(entry.code, entry.name, { total: entry.bytes, download: entry.gzBytes, controller });
   updateRow(entry.code);
   try {
     const bytes = await languages.install(entry, (done, total, phase) => {
@@ -1470,7 +1484,7 @@ async function updateLanguage(entry, onBytes = null) {
   if (!update) return '';
   const controller = new AbortController();
   if (update.index) {
-    startTransfer(entry.code, `${entry.name} (update)`, { total: entry.bytes, controller });
+    startTransfer(entry.code, `${entry.name} (update)`, { total: entry.bytes, download: entry.gzBytes, controller });
     updateRow(entry.code);
     try {
       await languages.install(entry, (done, total, phase) => {
@@ -1511,6 +1525,8 @@ async function updateAll() {
   const totalBytes = entries.reduce((n, e) => n + (languages.updateFor(e.code).index ? e.bytes || 0 : 0), 0);
   const all = startTransfer('update-all', 'Update all', { total: entries.length, controller, unit: 'languages' });
   all.bytesTotal = totalBytes;
+  // Shown as download size, the size on the "Update all" button.
+  all.downloadTotal = entries.reduce((n, e) => n + (languages.updateFor(e.code).index ? e.gzBytes || e.bytes || 0 : 0), 0);
   all.bytesDone = 0;
   let current = null;
   controller.signal.addEventListener('abort', () => {
@@ -1960,10 +1976,20 @@ function diagnosticsLines() {
   const lines = [];
   const st = window.__openStats;
   if (st) {
-    lines.push(`Last open: ${st.code}, ` + Object.entries(st.phases).map(([k, v]) => `${k} ${v} ms`).join(', '));
+    const p = st.phases;
+    const name = installedName(st.code) || st.code;
+    const parts = [];
+    if (p.searchable !== undefined) parts.push(`searchable after ${p.searchable} ms`);
+    if (p.opened !== undefined) parts.push(`fully open after ${p.opened} ms${st.how ? ` (${st.how})` : ''}`);
+    lines.push(`Last open: ${name}, ${parts.join(', ') || 'still opening'}`);
     const size = (n) => (n ? formatSize(n) : '0 bytes');
     lines.push(`  reads while opening: ${st.open.reads}, ${size(st.open.bytes)}, ${Math.round(st.open.readMs)} ms`);
-    if (st.search) lines.push(`  first search "${st.search.query}": ${st.search.ms} ms, ${st.search.reads} reads, ${size(st.search.bytes)}`);
+    if (st.search) {
+      lines.push(`  first query "${st.search.query}": results ${st.search.sinceQuery} ms after it was typed `
+        + `(search ${st.search.ms} ms, ${st.search.reads} reads, ${size(st.search.bytes)})`);
+    } else {
+      lines.push('  no query typed since');
+    }
   } else {
     lines.push('Last open: none since the app started');
   }

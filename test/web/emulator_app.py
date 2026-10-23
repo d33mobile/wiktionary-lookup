@@ -87,6 +87,19 @@ def main():
     page.tap("#changelog-close")
     page.wait("document.getElementById('changelog').hidden", 10, "close notes")
 
+    # A favourite set on the entry page shows on its result row after Back (K.3).
+    emulator.set_query(page, "xuexi")
+    page.wait("document.querySelectorAll('#results li[data-index]').length > 0", 60, "xuexi")
+    page.tap("#results li[data-index] .words")
+    page.wait("document.body.dataset.detail === '学习'", 30, "学习")
+    page.tap("#detail-star")
+    page.wait("document.getElementById('detail-star').classList.contains('on')", 10, "star on the entry page")
+    dev.adb("shell", "input", "keyevent", "KEYCODE_BACK")
+    page.wait("document.getElementById('detail').hidden", 30, "back to the list")
+    star = page.eval("document.querySelector('#results li[data-index] button.star').className")
+    print("star on the entry page, Back -> row star:", star)
+    assert "on" in star.split(), star
+
     # Back closes a secondary screen first; the app stays open.
     page.tap("#gear")
     page.wait("!document.getElementById('options').hidden", 10, "options")

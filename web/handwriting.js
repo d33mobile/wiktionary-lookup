@@ -55,7 +55,6 @@ export function recognize(strokes, limit) {
 export class Pad {
   constructor({ canvas, candidates, status, onPick }) {
     this.canvas = canvas;
-    this.ctx = canvas.getContext('2d');
     this.candidates = candidates;
     this.status = status;
     this.onPick = onPick;
@@ -63,6 +62,21 @@ export class Pad {
     this.current = null;
     this.generation = 0;
     canvas.style.touchAction = 'none';
+    // The ink is drawn as SVG over the canvas (which only takes the touches):
+    // an accelerated 2D canvas showed no ink on Android 9 (WebView 66) with
+    // some GL paths although it held the strokes; SVG goes through the
+    // ordinary compositing everywhere.
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const surface = document.createElement('div');
+    surface.className = 'pad-surface';
+    canvas.parentNode.insertBefore(surface, canvas);
+    surface.appendChild(canvas);
+    this.ink = document.createElementNS(SVG_NS, 'svg');
+    this.ink.setAttribute('viewBox', `0 0 ${UNITS} ${UNITS}`);
+    this.ink.setAttribute('aria-hidden', 'true');
+    this.ink.id = 'pad-ink';
+    surface.appendChild(this.ink);
+    this.svgNs = SVG_NS;
     canvas.addEventListener('pointerdown', (ev) => this.down(ev));
     canvas.addEventListener('pointermove', (ev) => this.move(ev));
     canvas.addEventListener('pointerup', (ev) => this.up(ev));
@@ -133,25 +147,17 @@ export class Pad {
     this.update();
   }
 
+  // One SVG path per stroke, in pad units (the viewBox).
   draw() {
-    const { ctx, canvas } = this;
-    ctx.setTransform(canvas.width / UNITS, 0, 0, canvas.height / UNITS, 0, 0);
-    ctx.clearRect(0, 0, UNITS, UNITS);
-    // The theme's text color, with a literal fallback should the computed
-    // value be empty or rejected.
-    ctx.strokeStyle = '#1c1c1a';
-    ctx.strokeStyle = getComputedStyle(canvas).color || '#1c1c1a';
-    ctx.lineWidth = 6;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
     const all = this.current ? this.strokes.concat([this.current]) : this.strokes;
+    while (this.ink.firstChild) this.ink.removeChild(this.ink.firstChild);
     for (const s of all) {
-      ctx.beginPath();
-      ctx.moveTo(s[0][0], s[0][1]);
-      for (let i = 1; i < s.length; i++) ctx.lineTo(s[i][0], s[i][1]);
-      if (s.length === 1) ctx.lineTo(s[0][0] + 0.1, s[0][1]);
-      ctx.stroke();
+      const path = document.createElementNS(this.svgNs, 'path');
+      const end = s.length === 1 ? ` L ${s[0][0] + 0.1} ${s[0][1]}` : '';
+      path.setAttribute('d', s.map((p, i) => `${i ? 'L' : 'M'} ${p[0]} ${p[1]}`).join(' ') + end);
+      this.ink.appendChild(path);
     }
+    this.ink.dataset.strokes = String(all.length);
   }
 
   async update() {

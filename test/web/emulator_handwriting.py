@@ -65,6 +65,15 @@ def main():
     print("十 ->", ten, "|", page.eval("document.getElementById('pad-status').textContent"))
     assert "十" in ten, ten
     dev.screenshot(shots / "06-handwriting.png")
+    # The ink must be on the screen, not only in the page: dark pixels inside the pad
+    # (Android 9 with some emulator GL paths showed an empty 2D canvas).
+    from PIL import Image
+    box = page.eval("(() => { const r = document.getElementById('pad-canvas').getBoundingClientRect();"
+                    " const d = window.devicePixelRatio; return [r.left * d, r.top * d, r.right * d, r.bottom * d]; })()")
+    pad = Image.open(shots / "06-handwriting.png").convert("L").crop(tuple(round(v) for v in box))
+    ink = sum(1 for v in pad.getdata() if v < 100)
+    print(f"ink pixels on the screen inside the pad: {ink} of {pad.width * pad.height}")
+    assert ink > 500, ink
     index = ten.index("十") + 1
     page.tap(f"#pad-candidates .pad-candidate:nth-child({index})")
     page.wait("document.getElementById('q').value === '十' && document.querySelectorAll('#results li[data-index]').length > 0", 30, "query")

@@ -30,6 +30,7 @@ import hashlib
 import http.server
 import json
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -93,7 +94,7 @@ def stale_language_manifest(dest, download, current):
     details = gz_entry(download / "zhd-old.details", f"../../download/{RELEASE_TAG}/zhd-old.details.gz")
     details["entries"] = 6
     languages = [dict(l, **base, details=details) if l["code"] == "zhd" else l for l in current]
-    (dest / "manifest-old.json").write_text(json.dumps({"languages": languages}))
+    (dest / "manifest-old.json").write_text(json.dumps({"generated": "2026-10-22T00:00:00.000Z", "languages": languages}))
 
 
 def wikipedia_entry(download):
@@ -142,8 +143,9 @@ def build_release(dest):
          "gzBytes": 100 * 1048576, "url": f"../../download/{RELEASE_TAG}/xl.idx.gz"},
     ]
     hanzi = hanzi_entry(download)
-    (latest / "manifest.json").write_text(json.dumps({"languages": languages, "hanzi": hanzi}))
-    (dest / "manifest-new.json").write_text(json.dumps({"languages": languages, "hanzi": hanzi}))
+    current = {"generated": "2026-10-23T00:00:00.000Z", "languages": languages, "hanzi": hanzi}
+    (latest / "manifest.json").write_text(json.dumps(current))
+    (dest / "manifest-new.json").write_text(json.dumps(current))
     stale_language_manifest(dest, download, languages)
     bundled = dest / "bundled-manifest.json"
     bundled.write_text(json.dumps({"languages": languages[:1]}))
@@ -573,6 +575,7 @@ def handwriting(browser, base, shots):
     ten = candidates(page, 2)
     print("十 ->", ten, "|", page.inner_text("#pad-status"))
     assert "十" in ten, ten
+    assert page.get_attribute("#pad-ink", "data-strokes") == "2" and page.locator("#pad-ink path").count() == 2
     page.screenshot(path=str(shots / "handwriting.png"))
     page.locator("#pad-candidates .pad-candidate", has_text="十").first.click()
     page.wait_for_function("document.getElementById('q').value === '十'")
@@ -693,12 +696,14 @@ def updates(browser, base, shots, release_root):
     print("row ->", row.inner_text().replace("\n", " | "))
     page.click("#picker-close")
     open_options(page)
+    button_size = re.search(r"\(1, (.+)\)", page.inner_text("#update-all")).group(1)
     page.click("#update-all")
     # The overall transfer: languages and bytes.
     page.wait_for_selector('#transfers [data-transfer="update-all"]')
     overall = page.inner_text('#transfers [data-transfer="update-all"]')
     print("Update all ->", overall.replace("\n", " | "))
-    assert "0 of 1 language," in overall and "KiB" in overall and "Cancel" in overall, overall
+    assert "0 of 1 language," in overall and "Cancel" in overall, overall
+    assert f"of {button_size}" in overall, (button_size, overall)
     page.wait_for_function("document.body.dataset.updateAll === 'done'")
     page.wait_for_function("document.body.dataset.updates === '0'")
     assert page.locator("#lang-badge").is_hidden() and page.locator("#update-all").is_hidden()
@@ -711,6 +716,22 @@ def updates(browser, base, shots, release_root):
     wait_language(page, "zhd")
     page.wait_for_timeout(1000)
     assert page.locator("#notice").is_hidden(), "the note appears once per app version"
+
+    # An older catalogue (the release before) offers no "update": no silent downgrade.
+    shutil.copyfile(release_root / "manifest-old.json", manifest)
+    try:
+        page.reload()
+        wait_language(page, "zhd")
+        open_languages(page)
+        page.wait_for_function("/languages available/.test(document.getElementById('picker-status').textContent)")
+        page.fill("#lang-filter", "test pages")
+        buttons = row.locator("button").all_text_contents()
+        print("older catalogue ->", page.inner_text("#picker-status"), "| row buttons:", buttons,
+              "| updates:", page.evaluate("document.body.dataset.updates"))
+        assert not any(b.startswith("Update") for b in buttons), buttons
+        assert page.evaluate("document.body.dataset.updates") == "0"
+    finally:
+        shutil.copyfile(release_root / "manifest-new.json", manifest)
     context.close()
 
 
@@ -1086,13 +1107,21 @@ def first_start(browser, base, shots):
     wait_language(page, "zh")
     page.wait_for_timeout(1000)
     assert page.locator("#changelog").is_hidden(), "the notes appear once"
+    # Diagnostics: the open at start is recorded; a typed query separately.
+    open_options(page)
+    page.click("#about")
+    page.click("#about-diagnostics")
+    diag = page.inner_text("#diagnostics-text")
+    print("Diagnostics after start ->", diag.replace("\n", " | ")[:200])
+    assert diag.startswith("Last open: Chinese, ") and "fully open after" in diag and "no query typed since" in diag, diag
+    page.click("#changelog-close")
     query(page, "nihao", "你好")
     open_options(page)
     page.click("#about")
     page.click("#about-diagnostics")
     diag = page.inner_text("#diagnostics-text")
-    print("About -> Diagnostics:", diag.replace("\n", " | ")[:200])
-    assert diag.startswith("Last open: zh") and 'first search "nihao"' in diag, diag
+    print("Diagnostics after a query ->", diag.replace("\n", " | ")[:260])
+    assert re.search(r'first query "nihao": results \d+ ms after it was typed', diag), diag
     page.click("#changelog-close")
     page.click("#about")
     page.click("#about-changelog")

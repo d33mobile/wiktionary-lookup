@@ -2,6 +2,14 @@
 
 Wiktionary Lookup, an offline dictionary built from English Wiktionary.
 
+## 0.11 (versionCode 11)
+
+- Handwriting: the strokes you draw are visible again on some Android 9 devices, where the pad stayed empty although recognition worked.
+- Updates are offered only when the data on the server is newer than what is installed; an older list never downgrades a dictionary.
+- Download progress and "Update all" show the download size, the same as the buttons.
+- Diagnostics shows the dictionary opened at start, and the time from typing the first query to its results.
+- The stroke order data comes with the GNU GPL text next to the LGPL in the data release.
+
 ## 0.10 (versionCode 10)
 
 - Stroke order for Chinese characters: a one-character entry has a "Character" section that draws the character stroke by stroke (Play/Pause, Step, Restart), with the stroke count, radical, etymology and its components; tap a component to open it. The stroke data (Make Me a Hanzi, about 13 MB) is a separate download, offered there and in Options.

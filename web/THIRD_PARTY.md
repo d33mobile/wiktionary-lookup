@@ -20,9 +20,10 @@ It includes or uses:
   and are under the Arphic Public License (vendor/hanzilookup/LICENSE-APL);
   the decompositions, radicals and etymologies (dictionary.txt) derive from
   Unihan and CJKlib and are under the GNU Lesser General Public License,
-  version 3 or later (https://www.gnu.org/licenses/lgpl-3.0.html; the data
-  release carries both license texts, LGPL-3.0.txt and
-  Arphic-Public-License.txt, next to hanzi.pack.gz).
+  version 3 or later (https://www.gnu.org/licenses/lgpl-3.0.html), which
+  adds permissions to the GNU GPL version 3. The data release carries the
+  license texts next to hanzi.pack.gz: Arphic-Public-License.txt,
+  LGPL-3.0.txt and GPL-3.0.txt.
 - Dictionary data: English Wiktionary (https://en.wiktionary.org/), extracted
   by wiktextract and published by kaikki.org. CC BY-SA 4.0 and GFDL. Credit to
   the Wiktionary contributors.
