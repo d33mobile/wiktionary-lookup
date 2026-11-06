@@ -8,7 +8,7 @@ import { serializeIndex } from '../lib/index-format.js';
 import { openIndex } from '../lookup.js';
 import { entries as zhEntries } from '../sources/wiktionary-zh.js';
 import { entries as genericEntries } from '../sources/wiktionary.js';
-import { recordDetails, etymologyText, MAX_EXAMPLES } from '../sources/wiktionary-details.js';
+import { recordDetails, etymologyText, MAX_EXAMPLES, MAX_LINKS } from '../sources/wiktionary-details.js';
 import { entries as cedictEntries } from '../sources/cedict-text.js';
 import { FIXTURE as CEDICT_FIXTURE } from './helpers.js';
 
@@ -70,6 +70,43 @@ test('record details: caps, relations, examples left out on request', () => {
   assert.equal(etymologyText({ etymology_text: 'plain' }), 'plain');
   assert.equal(recordDetails(record, { examples: false }).senses[0].examples, undefined);
   assert.equal(recordDetails({ word: 'x', pos: 'noun', senses: [] }), null);
+});
+
+test('links: "Misspelling of ingenious" links to ingenious in the built index', async () => {
+  const d = await open(genericEntries, fixture('en'));
+  const ingenius = await d.getDetails(d.search('ingenius')[0].id);
+  assert.deepEqual(ingenius.records[0].senses[0], { gloss: 'Misspelling of ingenious.', links: [['ingenious', 'ingenious']] });
+  const ingenious = await d.getDetails(d.search('ingenious')[0].id);
+  assert.deepEqual(ingenious.records[0].senses[0].links, [['genius', 'genius'], ['brilliance', 'brilliance'], ['invent', 'invent']]);
+  const house = await d.getDetails(d.search('house')[0].id);
+  assert.ok(house.records.every((r) => r.senses.every((s) => !('links' in s))), 'no links: no field');
+});
+
+test('links: language, form_of without links, gloss text, own word, dedupe and cap', () => {
+  const base = { word: 'Häuser', pos: 'noun', lang: 'German' };
+  const links = (senses) => recordDetails({ ...base, senses }).senses.map((s) => s.links);
+  // form_of alone, as in the plural forms of most languages.
+  assert.deepEqual(links([{ glosses: ['nominative plural of Haus'], form_of: [{ word: 'Haus' }] }]), [[['Haus', 'Haus']]]);
+  assert.deepEqual(links([{
+    glosses: ['house (Haus), see Gebäude or building'],
+    links: [
+      ['house', 'house#English'], // another language: dropped
+      ['Gebäude', 'Gebäude#German'],
+      ['building', 'building'], // no language: kept
+      ['Häuser', 'Häuser#German'], // the record's own word
+      ['Hütte', 'Hütte#German'], // text not in the gloss
+      ['see', 'sehen#German'], // text differs from the word
+      ['Gebäude', 'Gebäude#German'], // twice
+      ['Haus', 'Haus#Old_High_German'],
+      'junk', [null, 'x'],
+    ],
+    form_of: [{ word: 'Haus' }, { word: 'Gebäude' }],
+  }]), [[['Gebäude', 'Gebäude'], ['building', 'building'], ['see', 'sehen'], ['Haus', 'Haus']]]);
+  const many = Array.from({ length: 20 }, (_, i) => `w${i}`);
+  const capped = links([{ glosses: [many.join(' ')], links: many.map((w) => [w, `${w}#German`]) }])[0];
+  assert.equal(capped.length, MAX_LINKS);
+  assert.deepEqual(capped[0], ['w0', 'w0']);
+  assert.deepEqual(links([{ glosses: ['a house'], links: [['home', 'home#German']] }]), [undefined], 'none kept: no field');
 });
 
 test('blocks: every entry finds its own details across block boundaries', async () => {

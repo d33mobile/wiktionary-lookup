@@ -9,7 +9,7 @@ import { createInterface } from 'node:readline';
 import { join } from 'node:path';
 
 const WORDS = {
-  en: ['house', 'shit', 'tea', 'New York', 'café', 'tee'],
+  en: ['house', 'shit', 'tea', 'New York', 'café', 'tee', 'ingenius', 'ingenious'],
   de: ['Haus', 'Häuser', 'groß', 'Straße', 'Tee'],
   ja: ['猫', '食べる', '東京', 'お茶', 'ネコ'],
   ru: ['дом', 'дома', 'Москва', 'чай', 'ёж'],
@@ -35,7 +35,7 @@ for (const [code, words] of Object.entries(WORDS)) {
     r.sounds = (d.sounds ?? []).filter((s) => 'other' in s || 'audio' in s || 'ipa' in s).slice(0, 8)
       .map((s) => pick(s, ['other', 'audio', 'ipa', 'tags']));
     r.senses = (d.senses ?? []).slice(0, MAX_SENSES).map((s) => ({
-      ...pick(s, ['glosses', 'raw_glosses', 'tags']),
+      ...pick(s, ['glosses', 'raw_glosses', 'tags', 'links', 'form_of', 'alt_of']),
       ...(s.examples ? { examples: s.examples.slice(0, 4).map((x) => pick(x, ['text', 'roman', 'english', 'translation', 'type'])) } : {}),
     }));
     if (d.etymology_text) r.etymology_text = d.etymology_text;

@@ -1,5 +1,5 @@
 {
- "extracted": "2026-10-21",
+ "extracted": "2026-10-30",
  "dumpDate": "2026-10-01",
  "languages": [
   {
@@ -55,7 +55,7 @@
    "code": "ain",
    "name": "Ainu",
    "senses": 2550,
-   "bytes": 3350967,
+   "bytes": 3351547,
    "url": "https://kaikki.org/dictionary/Ainu/kaikki.org-dictionary-Ainu.jsonl"
   },
   {
@@ -83,7 +83,7 @@
    "code": "gsw",
    "name": "Alemannic German",
    "senses": 3017,
-   "bytes": 4305645,
+   "bytes": 4306423,
    "url": "https://kaikki.org/dictionary/Alemannic%20German/kaikki.org-dictionary-AlemannicGerman.jsonl"
   },
   {
@@ -104,7 +104,7 @@
    "code": "grc",
    "name": "Ancient Greek",
    "senses": 91594,
-   "bytes": 409139523,
+   "bytes": 409139720,
    "url": "https://kaikki.org/dictionary/Ancient%20Greek/kaikki.org-dictionary-AncientGreek.jsonl"
   },
   {
@@ -125,14 +125,14 @@
    "code": "ar",
    "name": "Arabic",
    "senses": 256920,
-   "bytes": 868082262,
+   "bytes": 868082330,
    "url": "https://kaikki.org/dictionary/Arabic/kaikki.org-dictionary-Arabic.jsonl"
   },
   {
    "code": "an",
    "name": "Aragonese",
    "senses": 2303,
-   "bytes": 3764281,
+   "bytes": 3764233,
    "url": "https://kaikki.org/dictionary/Aragonese/kaikki.org-dictionary-Aragonese.jsonl"
   },
   {
@@ -167,7 +167,7 @@
    "code": "aii",
    "name": "Assyrian Neo-Aramaic",
    "senses": 12102,
-   "bytes": 47100533,
+   "bytes": 47244729,
    "url": "https://kaikki.org/dictionary/Assyrian%20Neo-Aramaic/kaikki.org-dictionary-AssyrianNeoAramaic.jsonl"
   },
   {
@@ -237,7 +237,7 @@
    "code": "eu",
    "name": "Basque",
    "senses": 20766,
-   "bytes": 61561254,
+   "bytes": 61560997,
    "url": "https://kaikki.org/dictionary/Basque/kaikki.org-dictionary-Basque.jsonl"
   },
   {
@@ -433,7 +433,7 @@
    "code": "zh",
    "name": "Chinese",
    "senses": 392965,
-   "bytes": 1214691473,
+   "bytes": 1214692243,
    "url": "https://kaikki.org/dictionary/Chinese/kaikki.org-dictionary-Chinese.jsonl"
   },
   {
@@ -552,7 +552,7 @@
    "code": "da",
    "name": "Danish",
    "senses": 68361,
-   "bytes": 98996783,
+   "bytes": 98996678,
    "url": "https://kaikki.org/dictionary/Danish/kaikki.org-dictionary-Danish.jsonl"
   },
   {
@@ -643,7 +643,7 @@
    "code": "en",
    "name": "English",
    "senses": 1795048,
-   "bytes": 3430807113,
+   "bytes": 3431211190,
    "url": "https://kaikki.org/dictionary/English/kaikki.org-dictionary-English.jsonl"
   },
   {
@@ -657,7 +657,7 @@
    "code": "eo",
    "name": "Esperanto",
    "senses": 137530,
-   "bytes": 173562908,
+   "bytes": 173566015,
    "url": "https://kaikki.org/dictionary/Esperanto/kaikki.org-dictionary-Esperanto.jsonl"
   },
   {
@@ -727,14 +727,14 @@
    "code": "frp",
    "name": "Franco-Provençal",
    "senses": 2877,
-   "bytes": 4074330,
+   "bytes": 4074852,
    "url": "https://kaikki.org/dictionary/Franco-Proven%C3%A7al/kaikki.org-dictionary-FrancoProven%C3%A7al.jsonl"
   },
   {
    "code": "fr",
    "name": "French",
    "senses": 460826,
-   "bytes": 592859335,
+   "bytes": 592920809,
    "url": "https://kaikki.org/dictionary/French/kaikki.org-dictionary-French.jsonl"
   },
   {
@@ -867,7 +867,7 @@
    "code": "ht",
    "name": "Haitian Creole",
    "senses": 2538,
-   "bytes": 2691629,
+   "bytes": 2691743,
    "url": "https://kaikki.org/dictionary/Haitian%20Creole/kaikki.org-dictionary-HaitianCreole.jsonl"
   },
   {
@@ -1063,7 +1063,7 @@
    "code": "ja",
    "name": "Japanese",
    "senses": 237987,
-   "bytes": 387569356,
+   "bytes": 387569265,
    "url": "https://kaikki.org/dictionary/Japanese/kaikki.org-dictionary-Japanese.jsonl"
   },
   {
@@ -1077,7 +1077,7 @@
    "code": "jje",
    "name": "Jeju",
    "senses": 1518,
-   "bytes": 1881295,
+   "bytes": 1879202,
    "url": "https://kaikki.org/dictionary/Jeju/kaikki.org-dictionary-Jeju.jsonl"
   },
   {
@@ -1238,7 +1238,7 @@
    "code": "ko",
    "name": "Korean",
    "senses": 82555,
-   "bytes": 207613877,
+   "bytes": 207649961,
    "url": "https://kaikki.org/dictionary/Korean/kaikki.org-dictionary-Korean.jsonl"
   },
   {
@@ -1273,7 +1273,7 @@
    "code": "lad",
    "name": "Ladino",
    "senses": 3190,
-   "bytes": 4884513,
+   "bytes": 4889319,
    "url": "https://kaikki.org/dictionary/Ladino/kaikki.org-dictionary-Ladino.jsonl"
   },
   {
@@ -1469,7 +1469,7 @@
    "code": "mak",
    "name": "Makasar",
    "senses": 9576,
-   "bytes": 11677446,
+   "bytes": 11682793,
    "url": "https://kaikki.org/dictionary/Makasar/kaikki.org-dictionary-Makasar.jsonl"
   },
   {
@@ -1700,7 +1700,7 @@
    "code": "mn",
    "name": "Mongolian",
    "senses": 8635,
-   "bytes": 12952503,
+   "bytes": 12994727,
    "url": "https://kaikki.org/dictionary/Mongolian/kaikki.org-dictionary-Mongolian.jsonl"
   },
   {
@@ -1847,7 +1847,7 @@
    "code": "nb",
    "name": "Norwegian Bokmål",
    "senses": 94218,
-   "bytes": 93359520,
+   "bytes": 93359512,
    "url": "https://kaikki.org/dictionary/Norwegian%20Bokm%C3%A5l/kaikki.org-dictionary-NorwegianBokm%C3%A5l.jsonl"
   },
   {
@@ -1889,7 +1889,7 @@
    "code": "or",
    "name": "Odia",
    "senses": 5111,
-   "bytes": 4610094,
+   "bytes": 4610166,
    "url": "https://kaikki.org/dictionary/Odia/kaikki.org-dictionary-Odia.jsonl"
   },
   {
@@ -1903,7 +1903,7 @@
    "code": "ryu",
    "name": "Okinawan",
    "senses": 1396,
-   "bytes": 1860016,
+   "bytes": 1859892,
    "url": "https://kaikki.org/dictionary/Okinawan/kaikki.org-dictionary-Okinawan.jsonl"
   },
   {
@@ -2134,7 +2134,7 @@
    "code": "phl",
    "name": "Palula",
    "senses": 3390,
-   "bytes": 6113799,
+   "bytes": 6115698,
    "url": "https://kaikki.org/dictionary/Palula/kaikki.org-dictionary-Palula.jsonl"
   },
   {
@@ -2225,14 +2225,14 @@
    "code": "pl",
    "name": "Polish",
    "senses": 267966,
-   "bytes": 897521880,
+   "bytes": 897507064,
    "url": "https://kaikki.org/dictionary/Polish/kaikki.org-dictionary-Polish.jsonl"
   },
   {
    "code": "pt",
    "name": "Portuguese",
    "senses": 527775,
-   "bytes": 610118460,
+   "bytes": 610118098,
    "url": "https://kaikki.org/dictionary/Portuguese/kaikki.org-dictionary-Portuguese.jsonl"
   },
   {
@@ -2246,7 +2246,7 @@
    "code": "pra",
    "name": "Prakrit",
    "senses": 2986,
-   "bytes": 16593872,
+   "bytes": 16593956,
    "url": "https://kaikki.org/dictionary/Prakrit/kaikki.org-dictionary-Prakrit.jsonl"
   },
   {
@@ -2379,7 +2379,7 @@
    "code": "trk-pro",
    "name": "Proto-Turkic",
    "senses": 1459,
-   "bytes": 7734485,
+   "bytes": 7734484,
    "url": "https://kaikki.org/dictionary/Proto-Turkic/kaikki.org-dictionary-ProtoTurkic.jsonl"
   },
   {
@@ -2442,7 +2442,7 @@
    "code": "ru",
    "name": "Russian",
    "senses": 493243,
-   "bytes": 948499810,
+   "bytes": 948499874,
    "url": "https://kaikki.org/dictionary/Russian/kaikki.org-dictionary-Russian.jsonl"
   },
   {
@@ -2512,7 +2512,7 @@
    "code": "sa",
    "name": "Sanskrit",
    "senses": 31278,
-   "bytes": 147853708,
+   "bytes": 147956911,
    "url": "https://kaikki.org/dictionary/Sanskrit/kaikki.org-dictionary-Sanskrit.jsonl"
   },
   {
@@ -2575,7 +2575,7 @@
    "code": "sh",
    "name": "Serbo-Croatian",
    "senses": 92304,
-   "bytes": 384952867,
+   "bytes": 385655385,
    "url": "https://kaikki.org/dictionary/Serbo-Croatian/kaikki.org-dictionary-SerboCroatian.jsonl"
   },
   {
@@ -2610,7 +2610,7 @@
    "code": "szl",
    "name": "Silesian",
    "senses": 3730,
-   "bytes": 14982820,
+   "bytes": 14982610,
    "url": "https://kaikki.org/dictionary/Silesian/kaikki.org-dictionary-Silesian.jsonl"
   },
   {
@@ -2701,7 +2701,7 @@
    "code": "es",
    "name": "Spanish",
    "senses": 879175,
-   "bytes": 1119672956,
+   "bytes": 1119672965,
    "url": "https://kaikki.org/dictionary/Spanish/kaikki.org-dictionary-Spanish.jsonl"
   },
   {
@@ -2722,7 +2722,7 @@
    "code": "su",
    "name": "Sundanese",
    "senses": 4280,
-   "bytes": 3943660,
+   "bytes": 3952727,
    "url": "https://kaikki.org/dictionary/Sundanese/kaikki.org-dictionary-Sundanese.jsonl"
   },
   {
@@ -2792,7 +2792,7 @@
    "code": "ta",
    "name": "Tamil",
    "senses": 28744,
-   "bytes": 89384238,
+   "bytes": 89383804,
    "url": "https://kaikki.org/dictionary/Tamil/kaikki.org-dictionary-Tamil.jsonl"
   },
   {
@@ -2953,7 +2953,7 @@
    "code": "mul",
    "name": "Translingual",
    "senses": 107566,
-   "bytes": 145276168,
+   "bytes": 145276026,
    "url": "https://kaikki.org/dictionary/Translingual/kaikki.org-dictionary-Translingual.jsonl"
   },
   {
@@ -2981,7 +2981,7 @@
    "code": "tr",
    "name": "Turkish",
    "senses": 60762,
-   "bytes": 462890080,
+   "bytes": 462889173,
    "url": "https://kaikki.org/dictionary/Turkish/kaikki.org-dictionary-Turkish.jsonl"
   },
   {
@@ -3023,7 +3023,7 @@
    "code": "uk",
    "name": "Ukrainian",
    "senses": 82051,
-   "bytes": 322794961,
+   "bytes": 322795063,
    "url": "https://kaikki.org/dictionary/Ukrainian/kaikki.org-dictionary-Ukrainian.jsonl"
   },
   {
@@ -3100,7 +3100,7 @@
    "code": "vi",
    "name": "Vietnamese",
    "senses": 62555,
-   "bytes": 83304305,
+   "bytes": 83424329,
    "url": "https://kaikki.org/dictionary/Vietnamese/kaikki.org-dictionary-Vietnamese.jsonl"
   },
   {
@@ -3261,7 +3261,7 @@
    "code": "yo",
    "name": "Yoruba",
    "senses": 8106,
-   "bytes": 11225113,
+   "bytes": 11221937,
    "url": "https://kaikki.org/dictionary/Yoruba/kaikki.org-dictionary-Yoruba.jsonl"
   },
   {

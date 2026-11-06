@@ -624,11 +624,15 @@ function sameWord(a, b) {
   return a === b || a.toLowerCase() === b.toLowerCase();
 }
 
-// Entries whose headword (or traditional / alternative form) is `word`.
+// Entries whose headword (or traditional / alternative form) is `word`;
+// those spelled exactly like it come first (a link to "dog" opens dog, with
+// DOG and Dog as other entries).
 async function exactEntries(word) {
   if (!lookupSession) return [];
   const rows = dict && dict.blockCache ? await lookupSession.searchAsync(word, { limit: 30 }) : lookupSession.search(word, { limit: 30 });
-  return rows.filter((e) => sameWord(e.simp, word) || (e.trad && sameWord(e.trad, word)));
+  const found = rows.filter((e) => sameWord(e.simp, word) || (e.trad && sameWord(e.trad, word)));
+  const exact = (e) => e.simp === word || e.trad === word;
+  return [...found.filter(exact), ...found.filter((e) => !exact(e))];
 }
 
 function entryLabel(e) {
@@ -1641,6 +1645,12 @@ detail.addEventListener('click', (ev) => {
   if (link && native && native.showPage) {
     ev.preventDefault();
     native.showPage(mobileUrl(link.href));
+    return;
+  }
+  const wordLink = ev.target.closest('a.word-link');
+  if (wordLink) {
+    ev.preventDefault();
+    lookupWord(wordLink.dataset.word);
     return;
   }
   const ch = ev.target.closest('.ch');

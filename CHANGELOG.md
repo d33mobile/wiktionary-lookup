@@ -2,6 +2,11 @@
 
 Wiktionary Lookup, an offline dictionary built from English Wiktionary.
 
+## 0.12 (versionCode 12)
+
+- Words an entry refers to are links: "Misspelling of ingenious" opens the entry for ingenious, "plural of dog" opens dog, and the words a definition links on Wiktionary open their entries too. Needs the entry pages from the data release of 2026-11-06 or later: use Update (or Update all) on the language screen.
+- Dictionaries rebuilt from the kaikki.org extract of 2026-10-30.
+
 ## 0.11 (versionCode 11)
 
 - Handwriting: the strokes you draw are visible again on some Android 9 devices, where the pad stayed empty although recognition worked.

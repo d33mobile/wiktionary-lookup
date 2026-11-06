@@ -69,7 +69,7 @@ versionCode and versionName come from the source (`android/app/build.gradle`,
 ```sh
 # The language list shipped with the app (no built-in language since 0.9),
 # from the data release current at the time of the app release:
-curl -L https://github.com/d33mobile/wiktionary-lookup-data/releases/download/data-2026-10-23b/manifest.json -o manifest.json
+curl -L https://github.com/d33mobile/wiktionary-lookup-data/releases/download/data-2026-11-06/manifest.json -o manifest.json
 node stage-web.js android/app/src/main/assets - manifest.json
 cd android && ./gradlew assembleRelease     # app/build/outputs/apk/release/app-release-unsigned.apk
 ```

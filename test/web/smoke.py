@@ -21,7 +21,8 @@ The language part runs twice: in plain Chromium and with the APIs Chromium
 66 lacks removed (DecompressionStream, TransformStream, replaceChildren,
 replaceAll, matchAll), so the download goes through web/inflate.js. Last, a
 broken app.js must show "Could not start: ..." instead of "Loading index...".
-Screenshots go to --shots. Exit status 0 on success.
+Gloss links: ingenius's "Misspelling of ingenious." opens ingenious and Back
+returns; data without links renders plain glosses. Screenshots go to --shots. Exit status 0 on success.
 """
 import argparse
 import functools
@@ -528,6 +529,101 @@ def details(browser, base, shots, legacy=False):
     assert result_rows(page).first.is_visible()
     print("Back x3 -> 好 -> 你好 -> result list")
     context.close()
+
+
+def word_links(browser, base, shots, legacy=False):
+    """Links in glosses (test/fixtures/wiktionary-en.jsonl): ingenius's
+    "Misspelling of ingenious." links to ingenious; a tap on the link opens
+    ingenious's page and Back returns to ingenius. The same records without
+    links (data built before them, en-nolinks.idx) render plain glosses."""
+    context = new_context(browser)
+    if legacy:
+        context.add_init_script(LEGACY_WEBVIEW)
+    page = context.new_page()
+    errors = []
+    page.on("pageerror", lambda e: errors.append(str(e)))
+    page.goto(base + "&index=en-links.idx")
+    wait_language(page, "zh")  # ?index= fills the bundled language's slot
+    query(page, "ingenius", "ingenius")
+    result_rows(page).first.click()
+    page.wait_for_function("document.body.dataset.detail === 'ingenius' && document.body.dataset.details === 'loaded'")
+    gloss = page.locator("#detail-senses li.sense .gloss").first
+    assert gloss.inner_text() == "Misspelling of ingenious.", gloss.inner_text()
+    link = gloss.locator("a.word-link")
+    assert link.count() == 1 and link.inner_text() == "ingenious" and link.get_attribute("data-word") == "ingenious"
+    color = link.evaluate("a => getComputedStyle(a).color")
+    assert color == "rgb(6, 69, 173)", color
+    if not legacy:
+        page.screenshot(path=str(shots / "detail-ingenius.png"), full_page=True)
+    link.click()
+    page.wait_for_function("document.body.dataset.detail === 'ingenious' && document.body.dataset.details === 'loaded'")
+    first = page.locator("#detail-senses li.sense .gloss").first
+    assert first.inner_text().startswith("Displaying genius"), first.inner_text()
+    assert first.locator("a.word-link").all_text_contents() == ["genius", "brilliance", "invent"]
+    print("link ingenious ->", page.inner_text("#detail-head").splitlines()[0], "|", first.inner_text())
+    if not legacy:
+        page.screenshot(path=str(shots / "detail-ingenious.png"), full_page=True)
+    page.go_back()
+    page.wait_for_function("document.body.dataset.detail === 'ingenius' && document.body.dataset.details === 'loaded'")
+    page.go_back()
+    page.wait_for_selector("#detail", state="hidden")
+    print("Back -> ingenius -> result list")
+
+    page.goto(base + "&index=en-nolinks.idx")
+    wait_language(page, "zh")
+    query(page, "ingenius", "ingenius")
+    result_rows(page).first.click()
+    page.wait_for_function("document.body.dataset.detail === 'ingenius' && document.body.dataset.details === 'loaded'")
+    gloss = page.locator("#detail-senses li.sense .gloss").first
+    assert gloss.inner_text() == "Misspelling of ingenious." and gloss.locator("a").count() == 0
+    print("data without links ->", gloss.inner_text())
+
+    # A link opens the entry spelled exactly like its target: "plural of dog"
+    # opens dog, not DOG or Dog, which come first in the index (en-case.idx).
+    page.goto(base + "&index=en-case.idx")
+    wait_language(page, "zh")
+    query(page, "dogs", "dogs")
+    result_rows(page).first.click()
+    page.wait_for_function("document.body.dataset.detail === 'dogs' && document.body.dataset.details === 'loaded'")
+    link = page.locator("#detail-senses li.sense .gloss a.word-link").first
+    assert link.inner_text() == "dog", link.inner_text()
+    link.click()
+    page.wait_for_function("document.body.dataset.detail !== 'dogs' && document.body.dataset.details === 'loaded'")
+    shown = page.evaluate("document.body.dataset.detail")
+    assert shown == "dog", f"link dog opened {shown!r}"
+    print("link dog -> dog, other entries:", page.locator("#detail button.chip").all_text_contents())
+    assert not errors, errors
+    context.close()
+
+
+def links_fixtures(web):
+    """en-links.idx from the English fixture, en-nolinks.idx from the same
+    records without the fields links come from."""
+    jsonl = REPO / "test" / "fixtures" / "wiktionary-en.jsonl"
+    build_fixture("wiktionary", jsonl, web / "en-links.idx")
+    plain = web / "en-nolinks.jsonl"
+    with open(jsonl, encoding="utf-8") as src, open(plain, "w", encoding="utf-8") as out:
+        for line in src:
+            record = json.loads(line)
+            for sense in record.get("senses", []):
+                for key in ("links", "form_of", "alt_of"):
+                    sense.pop(key, None)
+            out.write(json.dumps(record, ensure_ascii=False) + "\n")
+    build_fixture("wiktionary", plain, web / "en-nolinks.idx")
+    # Headwords differing only in case, the upper-case ones first.
+    case = web / "en-case.jsonl"
+    with open(case, "w", encoding="utf-8") as out:
+        for word, gloss, links in (
+                ("DOG", "Initialism of digital on-screen graphic.", [["digital on-screen graphic", "digital on-screen graphic#English"]]),
+                ("Dog", "A surname.", []),
+                ("dog", "A mammal, Canis familiaris.", [["mammal", "mammal#English"]]),
+                ("dogs", "plural of dog", [["dog", "dog#English"]])):
+            sense = {"glosses": [gloss], "links": links}
+            if word == "dogs":
+                sense["form_of"] = [{"word": "dog"}]
+            out.write(json.dumps({"word": word, "lang": "English", "lang_code": "en", "pos": "noun",
+                                  "senses": [sense]}) + "\n")
+    build_fixture("wiktionary", case, web / "en-case.idx")
 
 
 def draw(page, strokes):
@@ -1155,6 +1251,7 @@ def run(root, shots):
         bundled = build_release(release_root)
         shutil.copyfile(bundled, root / "web" / "manifest.json")
         build_fixture("wiktionary-zh", HERE / "fixtures" / "zh-details.jsonl", root / "web" / "zh-details.idx")
+        links_fixtures(root / "web")
         server = serve(root, release_root, requests)
         with tempfile.TemporaryDirectory(prefix="wiktionary-nobundle-") as plain:
             subprocess.run(["node", str(REPO / "stage-web.js"), plain, "-", str(bundled)], check=True,
@@ -1192,6 +1289,8 @@ def run(root, shots):
             prefetch(browser, base, shots)
             details(browser, base, shots)
             details(browser, base, shots, legacy=True)
+            word_links(browser, base, shots)
+            word_links(browser, base, shots, legacy=True)
             handwriting(browser, base, shots)
             two_step(browser, base, shots)
             updates(browser, base, shots, release_root)

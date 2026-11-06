@@ -58,8 +58,9 @@ const CHILD_HEAP_MB = 12000;
 // rebuilt. 2: frequencies (zh) and pronunciation audio. 3: details
 // embedded. 4: details in a sidecar file; a revision 3 index of the same
 // extract is split into index and sidecar instead of rebuilt. 5: entries
-// sorted by headword key, byte text offsets (lazy opening).
-const BUILD_REV = 5;
+// sorted by headword key, byte text offsets (lazy opening). 6: senses
+// carry links to the words their gloss refers to (details sidecar).
+const BUILD_REV = 6;
 const SPLITTABLE_REV = 3;
 
 function parseArgs(argv) {

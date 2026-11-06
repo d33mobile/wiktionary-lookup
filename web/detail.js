@@ -4,13 +4,14 @@
 //
 // The content comes from the index's optional details payload
 // (await dict.getDetails(id): {title, records: [{pos, senses: [{gloss,
-// examples: [{text, roman, english}]}], etymology, forms: [{form, tags}],
+// examples: [{text, roman, english}], links: [[text, word]]}], etymology, forms: [{form, tags}],
 // sounds: [{text, kind, tags}], synonyms, antonyms, related, derived:
 // [{word, roman, sense}]}]}, see README); without it the entry's own
 // definition is shown. CJK
 // characters in the text are tap targets (span.ch, with the surrounding
 // text in data-text of the closest .tap-text), words in lists are chips
-// (button.chip with data-word); app.js handles the taps.
+// (button.chip with data-word), words a gloss links to are a.word-link
+// with data-word; app.js handles the taps.
 
 const CJK_CHAR_RE = /^(?:[々〇㐀-䶿一-鿿豈-﫿]|[\uD840-\uD8BF][\uDC00-\uDFFF])$/;
 const WIKTIONARY = 'https://en.wiktionary.org/wiki/';
@@ -35,13 +36,11 @@ function el(tag, className, text) {
   return node;
 }
 
-// Text whose CJK characters are tap targets.
-export function tapText(tag, className, text) {
-  const node = el(tag, className ? `${className} tap-text` : 'tap-text');
-  const chars = Array.from(text || '');
-  node.dataset.text = text || '';
+// Appends text to node with its CJK characters as tap targets; first is the
+// index of its first character in the node's data-text.
+function appendTapRun(node, text, first) {
   let run = '';
-  chars.forEach((ch, i) => {
+  Array.from(text).forEach((ch, i) => {
     if (!isCjkChar(ch)) {
       run += ch;
       return;
@@ -49,10 +48,60 @@ export function tapText(tag, className, text) {
     if (run) node.appendChild(document.createTextNode(run));
     run = '';
     const span = el('span', 'ch', ch);
-    span.dataset.i = String(i);
+    span.dataset.i = String(first + i);
     node.appendChild(span);
   });
   if (run) node.appendChild(document.createTextNode(run));
+}
+
+// Text whose CJK characters are tap targets.
+export function tapText(tag, className, text) {
+  const node = el(tag, className ? `${className} tap-text` : 'tap-text');
+  node.dataset.text = text || '';
+  appendTapRun(node, text || '', 0);
+  return node;
+}
+
+// [{start, end, word}] of the links ([text, word]) in text: the first
+// occurrence of each text that overlaps no other, longest texts first so a
+// shorter link never cuts a longer one; ordered by start.
+export function linkRanges(text, links) {
+  const ranges = [];
+  const sorted = (links || []).filter((l) => Array.isArray(l) && l[0] && l[1])
+    .sort((a, b) => b[0].length - a[0].length);
+  for (const [linkText, word] of sorted) {
+    let at = text.indexOf(linkText);
+    while (at >= 0 && ranges.some((r) => at < r.end && at + linkText.length > r.start)) {
+      at = text.indexOf(linkText, at + 1);
+    }
+    if (at >= 0) ranges.push({ start: at, end: at + linkText.length, word });
+  }
+  return ranges.sort((a, b) => a.start - b.start);
+}
+
+// A gloss: its links (sense.links) are a.word-link with data-word, the rest
+// is tap text.
+export function glossText(text, links) {
+  const node = el('span', 'gloss tap-text');
+  node.dataset.text = text;
+  let pos = 0;
+  let chars = 0;
+  const plain = (end) => {
+    const part = text.slice(pos, end);
+    appendTapRun(node, part, chars);
+    chars += Array.from(part).length;
+  };
+  for (const r of linkRanges(text, links)) {
+    plain(r.start);
+    const part = text.slice(r.start, r.end);
+    const a = el('a', 'word-link', part);
+    a.href = '#';
+    a.dataset.word = r.word;
+    node.appendChild(a);
+    chars += Array.from(part).length;
+    pos = r.end;
+  }
+  plain(text.length);
   return node;
 }
 
@@ -98,7 +147,7 @@ function heading(text) {
 function senseItem(sense) {
   const li = el('li', 'sense');
   if (sense.tags && sense.tags.length) li.appendChild(el('span', 'sense-tags', `(${sense.tags.join(', ')}) `));
-  li.appendChild(tapText('span', 'gloss', sense.gloss || ''));
+  li.appendChild(glossText(sense.gloss || '', sense.links));
   if (sense.examples && sense.examples.length) {
     const ul = el('ul', 'examples');
     for (const ex of sense.examples) {

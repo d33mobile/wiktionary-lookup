@@ -4,7 +4,10 @@
 //
 //   {title, records: [{
 //     pos,                                   part of speech ("noun")
-//     senses: [{gloss, examples?: [{text, roman?, english?}]}],
+//     senses: [{gloss, examples?: [{text, roman?, english?}],
+//               links?: [[text, word]]}],    words the gloss refers to: text
+//                                            occurs in gloss, word is the
+//                                            entry to open (same language)
 //     etymology?,                            etymology_text, at most ETYMOLOGY_MAX chars
 //     forms?: [{form, tags?}],               inflections, alternative/variant forms
 //     sounds?: [{text, kind, tags?}],        pronunciations other than recordings:
@@ -23,6 +26,7 @@ export const MAX_FORMS = 150;
 export const MAX_SOUNDS = 24;
 export const MAX_RELATED = 20;
 export const MAX_RECORDS = 12;
+export const MAX_LINKS = 12;
 const RELATIONS = ['synonyms', 'antonyms', 'related', 'derived'];
 const SKIPPED_FORM_TAGS = new Set(['table-tags', 'inflection-template', 'class', 'romanization']);
 const SOUND_KINDS = ['ipa', 'zh_pron', 'enpr', 'other'];
@@ -93,6 +97,35 @@ export function etymologyText(record) {
   return lines.slice(end > 0 ? end + 1 : 1).join('\n');
 }
 
+// Links of a sense: the wikilinks of its gloss (sense.links, [text,
+// "word#Language"]) to entries of the record's own language, then the words
+// of form_of / alt_of ("plural of X", "Misspelling of X"). Only links whose
+// text occurs in the gloss are kept (the page marks that text), without the
+// record's own word, one per word.
+export function senseLinks(sense, gloss, record) {
+  const out = [];
+  const seen = new Set([record.word]);
+  const add = (text, word) => {
+    if (!text || !word || seen.has(word) || !gloss.includes(text) || out.length >= MAX_LINKS) return;
+    seen.add(word);
+    out.push([text, word]);
+  };
+  for (const link of Array.isArray(sense.links) ? sense.links : []) {
+    if (!Array.isArray(link)) continue;
+    const text = str(link[0]);
+    const target = str(link[1]);
+    if (!text || !target) continue;
+    const hash = target.indexOf('#');
+    if (hash >= 0 && target.slice(hash + 1).replace(/_/g, ' ') !== record.lang) continue;
+    add(text, str(hash >= 0 ? target.slice(0, hash) : target));
+  }
+  for (const x of [...(sense.form_of ?? []), ...(sense.alt_of ?? [])]) {
+    const word = str(x && x.word);
+    add(word, word);
+  }
+  return out;
+}
+
 // One record -> its part of the details, or null without senses.
 // options.examples false leaves examples out (size measurements).
 export function recordDetails(record, { chinese = false, examples = true } = {}) {
@@ -106,6 +139,8 @@ export function recordDetails(record, { chinese = false, examples = true } = {})
       const ex = examplesOf(s, chinese);
       if (ex.length) sense.examples = ex;
     }
+    const links = senseLinks(s, gloss, record);
+    if (links.length) sense.links = links;
     senses.push(sense);
   }
   if (senses.length === 0) return null;
