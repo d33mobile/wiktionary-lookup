@@ -21,6 +21,8 @@ The language part runs twice: in plain Chromium and with the APIs Chromium
 66 lacks removed (DecompressionStream, TransformStream, replaceChildren,
 replaceAll, matchAll), so the download goes through web/inflate.js. Last, a
 broken app.js must show "Could not start: ..." instead of "Loading index...".
+A typo ("nihoa") shows "No exact match" and similar words with a "~" badge,
+in both modes.
 Gloss links: ingenius's "Misspelling of ingenious." opens ingenious and Back
 returns; data without links renders plain glosses. Screenshots go to --shots. Exit status 0 on success.
 """
@@ -144,7 +146,8 @@ def build_release(dest):
          "gzBytes": 100 * 1048576, "url": f"../../download/{RELEASE_TAG}/xl.idx.gz"},
     ]
     hanzi = hanzi_entry(download)
-    current = {"generated": "2026-10-23T00:00:00.000Z", "languages": languages, "hanzi": hanzi}
+    current = {"generated": "2026-10-23T00:00:00.000Z", "source": {"name": "test", "extracted": "2026-10-20"},
+               "languages": languages, "hanzi": hanzi}
     (latest / "manifest.json").write_text(json.dumps(current))
     (dest / "manifest-new.json").write_text(json.dumps(current))
     stale_language_manifest(dest, download, languages)
@@ -254,6 +257,28 @@ def chinese(page, shots):
     page.screenshot(path=str(shots / "english.png"))
 
 
+def similar_words(page, shots):
+    """A typo finds nothing exactly: the list says so and shows similar
+    words, each with a "~" badge; a real match has neither."""
+    page.fill("#q", "nihoa")
+    page.wait_for_selector("#results li.fuzzy-note")
+    note = page.inner_text("#results li.fuzzy-note")
+    first = first_result_text(page)
+    badges = page.locator("#results li[data-index] .fuzzy-badge").count()
+    print("nihoa ->", first.splitlines()[0], "|", note, "|", badges, "badges")
+    assert note == "No exact match for nihoa. Similar words:", note
+    assert first.startswith("你好"), first
+    assert badges == result_rows(page).count() > 0, badges
+    assert page.locator("#results li.group").count() == 0, "no group headings over similar words"
+    assert page.locator("#results .empty-state").count() == 0
+    page.screenshot(path=str(shots / "similar-words.png"))
+    page.fill("#q", "nihao")
+    page.wait_for_function("!document.querySelector('#results li.fuzzy-note')")
+    wait_results(page)
+    assert page.locator("#results .fuzzy-badge").count() == 0
+    assert first_result_text(page).startswith("你好")
+
+
 def languages(page, base, shots, requests):
     assert ("Chinese", True) in installed_languages(page)
     open_languages(page)
@@ -304,6 +329,14 @@ def languages(page, base, shots, requests):
     query(page, "Haus", "Haus")
     assert sum(r.endswith(".idx.gz") for r in requests) == downloads, "reload must not download again"
     print("reload -> German still active, no second download")
+    open_languages(page)
+    page.fill("#lang-filter", "germ")
+    row = page.locator('#lang-list li[data-code="de"] .lang-facts').inner_text()
+    catalogue = page.inner_text("#catalogue-info")
+    print("data versions ->", row, "|", catalogue)
+    assert "installed: data of 2026-10-23 (Wiktionary extract 2026-10-20)" in row, row
+    assert re.fullmatch(r"Data catalogue: 2026-10-23 \((latest|saved) list\), checked \d{4}-\d\d-\d\d \d\d:\d\d", catalogue), catalogue
+    page.click("#picker-close")
 
     switch_language(page, "zh")
     wait_language(page, "zh")
@@ -926,6 +959,29 @@ def library(browser, base, shots):
     page.wait_for_function("document.body.dataset.library === 'favourites:2'")
     print("export, delete 你好, import ->", page.inner_text("#library-status"))
     page.screenshot(path=str(shots / "favourites.png"))
+    data = json.loads(exported)
+    print("exported settings ->", data.get("settings"))
+    assert data["settings"] == {"prefetch": "wifi", "pad": "on", "historyPaused": False}, data.get("settings")
+    data["settings"] = {"prefetch": "always", "pad": "off", "historyPaused": True}
+    page.click("#favourites-import")
+    page.fill("#favourites-json", json.dumps(data))
+    page.click("#favourites-text-import")
+    status = page.inner_text("#library-status")
+    assert status == "Imported 0 new favourites and the settings", status
+    page.click("#library-close")
+    open_options(page)
+    applied = page.evaluate("[document.getElementById('pad-mode').value, document.getElementById('prefetch-mode').value,"
+                            " localStorage.getItem('wiktionary-lookup.historyPaused')]")
+    print("import with other settings ->", status, "| pad, prefetch, history paused:", applied)
+    assert applied == ["off", "always", "1"], applied
+    page.click("#opt-favourites")
+    page.click("#favourites-export")
+    assert json.loads(page.input_value("#favourites-json"))["settings"] == data["settings"]
+    page.click("#favourites-text-close")
+    data["settings"] = {"prefetch": "wifi", "pad": "on", "historyPaused": False}
+    page.click("#favourites-import")
+    page.fill("#favourites-json", json.dumps(data))
+    page.click("#favourites-text-import")
     context.close()
 
 
@@ -964,6 +1020,57 @@ def header_rules(browser, base, shots):
     page.wait_for_selector("#detail", state="hidden")
     assert page.locator("#results").is_visible()
     print("entry page -> tap search box -> result list")
+    context.close()
+
+
+def keyboard(browser, base, shots):
+    """"/" focuses the search box, the arrow keys move from it through the
+    results and back, Enter opens one, Escape closes the entry page, the
+    options and the About dialog; theme-color follows the colour scheme."""
+    context = new_context(browser)
+    page = context.new_page()
+    page.goto(base)
+    wait_language(page, "zh")
+    query(page, "nihao", "你好")
+    page.evaluate("document.activeElement.blur()")
+    page.keyboard.press("/")
+    focused = page.evaluate("document.activeElement.id")
+    assert focused == "q" and page.input_value("#q") == "nihao", (focused, page.input_value("#q"))
+    active = "(() => { const li = document.activeElement.closest('li[data-index]'); return li ? li.dataset.index : document.activeElement.id; })()"
+    moves = []
+    for key in ("ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp"):
+        page.keyboard.press(key)
+        moves.append(page.evaluate(active))
+    print("/ -> search box; Down, Down, Up, Up ->", moves)
+    assert moves == ["0", "1", "0", "q"], moves
+    page.keyboard.press("ArrowDown")
+    page.keyboard.press("Enter")
+    page.wait_for_function("document.body.dataset.detail === '你好'")
+    page.keyboard.press("Escape")
+    page.wait_for_selector("#detail", state="hidden")
+    print("Enter -> 你好's page; Escape -> the results:", page.locator("#results").is_visible())
+    assert page.locator("#results").is_visible()
+    page.evaluate("document.activeElement.blur()")
+    page.keyboard.press("/")
+    page.keyboard.type("x")
+    assert page.input_value("#q") == "x", "/ selects the query, typing replaces it"
+    page.keyboard.press("Escape")
+    assert page.input_value("#q") == "", "with nothing open, Escape clears the search box"
+    open_options(page)
+    page.keyboard.press("Escape")
+    page.wait_for_selector("#options", state="hidden")
+    open_options(page)
+    page.click("#about")
+    page.wait_for_selector("#changelog:not([hidden])")
+    page.keyboard.press("Escape")
+    page.wait_for_selector("#changelog", state="hidden")
+    assert page.locator("#options").is_visible(), "Escape closes the dialog first, then the screen"
+    page.keyboard.press("Escape")
+    page.wait_for_selector("#options", state="hidden")
+    print("Escape closes Options; About, then Options")
+    colours = page.evaluate("Array.from(document.querySelectorAll('meta[name=theme-color]'), (m) => [m.media, m.content])")
+    print("theme-color ->", colours)
+    assert colours == [["(prefers-color-scheme: light)", "#fdfdfb"], ["(prefers-color-scheme: dark)", "#161615"]], colours
     context.close()
 
 
@@ -1036,6 +1143,21 @@ def hanzi(browser, base, shots):
     print("Play to the end -> strokes drawn:", visible)
     assert visible == 6
     page.screenshot(path=str(shots / "hanzi.png"), full_page=True)
+    # Reduced motion: Play shows whole strokes one after another, never a partly drawn one.
+    page.emulate_media(reduced_motion="reduce")
+    page.click(".hz-restart")
+    page.click(".hz-play")
+    partial = set()
+    for _ in range(12):
+        partial.update(page.locator(".hz-ink").evaluate_all(
+            "(ps) => ps.filter((p) => p.style.visibility === 'visible' && Number(p.getAttribute('stroke-dashoffset')) > 0.01)"
+            ".map((p) => p.getAttribute('stroke-dashoffset'))"))
+        page.wait_for_timeout(100)
+    page.wait_for_function("document.querySelector('.hz-player').dataset.stroke === '6'"
+                           " && document.querySelector('.hz-player').dataset.playing === 'false'", timeout=20000)
+    print("reduced motion: Play to the end, partly drawn strokes seen:", sorted(partial))
+    assert not partial, partial
+    page.emulate_media(reduced_motion="no-preference")
     page.click('.hz-component[data-char="女"]')
     page.wait_for_function("document.body.dataset.detail === '女' && document.body.dataset.hanzi === 'loaded'")
     print("tap 女 ->", page.inner_text(".hz-facts"))
@@ -1168,9 +1290,10 @@ def first_start(browser, base, shots):
     page.screenshot(path=str(shots / "options.png"))
     page.click("#about")
     page.wait_for_selector("#changelog:not([hidden])")
-    source = page.get_attribute('#changelog-body a[href*="github.com/d33mobile/wiktionary-lookup"]', "href")
+    source = page.get_attribute('#changelog-body a[href="https://github.com/d33mobile/wiktionary-lookup"]', "href")
     print("About ->", page.inner_text("#changelog-title"), "| source link", source)
     assert source == "https://github.com/d33mobile/wiktionary-lookup", source
+    about_version(page, shots)
     page.click("#changelog-close")
     page.click("#options-close")
     page.reload()
@@ -1208,8 +1331,12 @@ def first_start(browser, base, shots):
     page.click("#about")
     page.click("#about-diagnostics")
     diag = page.inner_text("#diagnostics-text")
-    print("Diagnostics after start ->", diag.replace("\n", " | ")[:200])
-    assert diag.startswith("Last open: Chinese, ") and "fully open after" in diag and "no query typed since" in diag, diag
+    print("Diagnostics after start ->", diag.replace("\n", " | ")[:400])
+    assert diag.startswith("Wiktionary Lookup Version "), diag
+    assert "\nDictionaries:\n  Chinese (zh, active, built in): data date unknown" in diag, diag
+    assert "\nLast open: Chinese, " in diag and "fully open after" in diag and "no query typed since" in diag, diag
+    assert diag.endswith("\nLast error: none"), diag
+    page.screenshot(path=str(shots / "diagnostics.png"))
     page.click("#changelog-close")
     query(page, "nihao", "你好")
     open_options(page)
@@ -1225,6 +1352,67 @@ def first_start(browser, base, shots):
     print("About -> Changelog:", page.locator("#changelog h3").count(), "versions")
     page.click("#changelog-close")
     print("after OK and reload -> no notes")
+    context.close()
+
+
+def about_version(page, shots):
+    """About: "Version <name> (<code>) · <commit> · <date>" from version.json,
+    the commit linking to the public repository, and Report a problem with
+    the diagnostics in the new-issue link."""
+    version = page.inner_text("#about-version")
+    staged = page.evaluate("fetch('version.json').then((r) => r.json())")
+    print("About version ->", version, "| version.json", staged)
+    assert re.fullmatch(r"Version \S+ \(\d+\) · ([0-9a-f]{12}(-dirty)?|dev)( · \d{4}-\d\d-\d\d)?", version), version
+    assert staged["commit"] in version and staged["source"] == "https://github.com/d33mobile/wiktionary-lookup", staged
+    if staged["commit"] != "dev":
+        commit = page.get_attribute("#about-commit", "href")
+        assert commit == "https://github.com/d33mobile/wiktionary-lookup/commit/" + staged["commit"].replace("-dirty", ""), commit
+    report = page.get_attribute("#about-report", "href")
+    print("Report a problem ->", len(report), "characters:", report[:120], "...")
+    assert report.startswith("https://github.com/d33mobile/wiktionary-lookup/issues/new?title=Problem%20in%20Wiktionary%20Lookup"), report
+    assert len(report) < 2000 and "Diagnostics%3A%0AWiktionary%20Lookup%20Version" in report, report
+    page.screenshot(path=str(shots / "about.png"))
+
+
+def copy_diagnostics(browser, base, shots):
+    """Copy diagnostics: the Clipboard API where it is allowed, else the text
+    selected in a box to copy by hand."""
+    context = new_context(browser)
+    context.grant_permissions(["clipboard-read", "clipboard-write"], origin=base.split("/web/")[0])
+    page = context.new_page()
+    page.goto(base)
+    wait_language(page, "zh")
+    open_options(page)
+    page.click("#about")
+    page.click("#about-diagnostics")
+    shown = page.inner_text("#diagnostics-text")
+    page.click("#diagnostics-copy")
+    page.wait_for_function("document.body.dataset.diagnosticsCopy")
+    copied = page.evaluate("navigator.clipboard.readText()")
+    status = page.inner_text("#diagnostics-copy-status")
+    print("Copy diagnostics ->", status, "|", len(copied), "characters on the clipboard")
+    assert copied == shown and status == "Copied to the clipboard.", (copied, shown, status)
+    assert page.locator("#diagnostics-box").is_hidden()
+    context.close()
+
+    context = new_context(browser)
+    context.add_init_script("Object.defineProperty(navigator, 'clipboard', { value: undefined });")
+    page = context.new_page()
+    page.goto(base)
+    wait_language(page, "zh")
+    open_options(page)
+    page.click("#about")
+    page.click("#about-diagnostics")
+    shown = page.inner_text("#diagnostics-text")
+    page.click("#diagnostics-copy")
+    page.wait_for_function("document.body.dataset.diagnosticsCopy")
+    box = page.locator("#diagnostics-box")
+    selected = page.evaluate("(() => { const b = document.getElementById('diagnostics-box');"
+                             " return b.value.slice(b.selectionStart, b.selectionEnd); })()")
+    print("Copy diagnostics without the Clipboard API ->", page.inner_text("#diagnostics-copy-status"),
+          "| text box shown and selected:", box.is_visible(), len(selected))
+    assert box.is_visible() and box.input_value() == shown and selected == shown
+    page.screenshot(path=str(shots / "diagnostics-fallback.png"))
     context.close()
 
 
@@ -1283,6 +1471,7 @@ def run(root, shots):
                     chinese(page, mode_shots)
                 else:
                     query(page, "nihao", "你好")
+                similar_words(page, mode_shots)
                 languages(page, base, mode_shots, requests)
                 context.close()
             speech(browser, base, shots)
@@ -1300,7 +1489,9 @@ def run(root, shots):
             hanzi(browser, base, shots)
             empty_list(browser, base, shots)
             header_rules(browser, base, shots)
+            keyboard(browser, base, shots)
             first_start(browser, base, shots)
+            copy_diagnostics(browser, base, shots)
             broken_start(browser, base, shots)
             browser.close()
         server.shutdown()

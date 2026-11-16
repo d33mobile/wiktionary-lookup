@@ -166,7 +166,11 @@ export class Languages {
     // The newest catalogue date (manifest "generated") seen so far: an older
     // catalogue never offers updates (a downgrade).
     this.newestSeen = state.newestSeen || '';
+    // When the latest catalogue was last fetched (ISO time), for Diagnostics.
+    this.catalogueChecked = state.catalogueChecked || '';
     this.catalogueGenerated = '';
+    // The Wiktionary extract the catalogue was built from (manifest source.extracted).
+    this.catalogueExtracted = '';
     // The catalogue's character data entry (manifest "hanzi"), if any.
     this.hanziEntry = null;
     this.lostBundled = false;
@@ -199,7 +203,10 @@ export class Languages {
   }
 
   save() {
-    writeJson(STATE_KEY, { installed: this.installed, active: this.active, extras: this.extras, newestSeen: this.newestSeen });
+    writeJson(STATE_KEY, {
+      installed: this.installed, active: this.active, extras: this.extras, newestSeen: this.newestSeen,
+      catalogueChecked: this.catalogueChecked,
+    });
   }
 
   setCatalogue(manifest, source) {
@@ -207,6 +214,8 @@ export class Languages {
     this.catalogueSource = source;
     const generated = typeof manifest.generated === 'string' ? manifest.generated : '';
     this.catalogueGenerated = generated;
+    const from = manifest.source;
+    this.catalogueExtracted = from && typeof from.extracted === 'string' ? from.extracted : '';
     let changed = false;
     if (generated && generated > this.newestSeen) {
       this.newestSeen = generated;
@@ -218,6 +227,12 @@ export class Languages {
         const cat = this.catalogue.find((l) => l.code === lang.code);
         if (!lang.generated && cat && cat.sha256 && cat.sha256 === lang.sha256) {
           lang.generated = generated;
+          changed = true;
+        }
+        // Installs from before 0.13 have no extract date: the same file is the same extract.
+        if (!lang.extracted && lang.generated === generated && cat && cat.sha256 && cat.sha256 === lang.sha256
+          && this.extractedOf(cat)) {
+          lang.extracted = this.extractedOf(cat);
           changed = true;
         }
       }
@@ -254,10 +269,41 @@ export class Languages {
       const m = await res.json();
       if (!validManifest(m)) throw new Error('manifest: unexpected format');
       writeJson(MANIFEST_KEY, m);
+      this.catalogueChecked = new Date().toISOString();
       this.setCatalogue(m, 'remote');
+      this.save();
     } finally {
       clearTimeout(timer);
     }
+  }
+
+  // The source extract date of a catalogue entry: its own source's, else
+  // (Wiktionary languages) the catalogue's; '' when unknown.
+  extractedOf(entry) {
+    if (entry.source && typeof entry.source.extracted === 'string') return entry.source.extracted;
+    return entry.kind === 'wikipedia' ? '' : this.catalogueExtracted;
+  }
+
+  // What Diagnostics and the language screen show about installed data:
+  // [{code, name, active, bundled, generated, extracted, bytes, details, update}].
+  dataVersions() {
+    return this.list().map((l) => ({
+      code: l.code,
+      name: l.name,
+      active: l.code === this.active,
+      bundled: Boolean(l.bundled),
+      generated: l.generated || '',
+      extracted: l.extracted || '',
+      bytes: l.bytes || 0,
+      details: this.hasDetails(l.code),
+      update: Boolean(this.updateFor(l.code)),
+    }));
+  }
+
+  // {generated, source, checked}: the catalogue's date, where it came from
+  // ('remote', 'saved', 'bundled' or 'none') and when it was last fetched.
+  catalogueInfo() {
+    return { generated: this.catalogueGenerated, source: this.catalogueSource, checked: this.catalogueChecked };
   }
 
   list() {
@@ -481,7 +527,7 @@ export class Languages {
     this.installed[entry.code] = {
       code: entry.code, name: entry.name, entries: entry.entries, bytes: entry.bytes || (got.bytes && got.bytes.byteLength),
       sha256: entry.sha256 || null, storage: got.storage, kind: entry.kind || 'wiktionary', lang: entry.lang || entry.code,
-      generated: this.catalogueGenerated || undefined,
+      generated: this.catalogueGenerated || undefined, extracted: this.extractedOf(entry) || undefined,
     };
     // Entry pages belong to one build of the index: a new index drops them.
     if (previous && previous.details) {

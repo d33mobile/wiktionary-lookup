@@ -17,14 +17,16 @@ them).
 
 ```
 lib/                 lookup engine (browser-safe ES modules, no dependencies)
-  engine.js          Dictionary, Session (incremental prefix search), openIndex
+  engine.js          Dictionary, Session (incremental prefix search, similar-spelling fallback), openIndex
+  fuzzy.js           edit distance for the similar-spelling fallback
   index-format.js    binary index container
   normalize.js       search key derivation shared by builder and engine
 build-index.js       SOURCE FILE OUT: entries -> index (+ .details sidecar)
 sources/             entry sources: wiktionary (any language), wiktionary-zh,
                      wiktionary-details (entry pages), wikipedia-titles, cedict-text
 scripts/             kaikki-languages.js (language list, downloads), build-all.js
-                     (every language + manifest.json), wikipedia-*.js, export-public.sh
+                     (every language + manifest.json), wikipedia-*.js, export-public.sh,
+                     fuzzy-bench.js (latency of the similar-spelling fallback)
 lookup.js, tui.js    Node API / one-shot CLI, terminal UI
 web/                 the app: index.html, app.js and modules, vendored HanziLookupJS
 android/             Android app (Gradle, Java): WebView, release download proxy,
@@ -73,6 +75,11 @@ curl -L https://github.com/d33mobile/wiktionary-lookup-data/releases/download/da
 node stage-web.js android/app/src/main/assets - manifest.json
 cd android && ./gradlew assembleRelease     # app/build/outputs/apk/release/app-release-unsigned.apk
 ```
+
+`stage-web.js` writes `web/version.json` with the commit of the checkout it
+runs from (`-dirty` when the app's files differ from it); About shows it and
+links to it here. The published APKs are built from a clean checkout of the
+commit their About names.
 
 To sign during the build, set `RELEASE_STORE_FILE`, `RELEASE_STORE_PASSWORD`,
 `RELEASE_KEY_ALIAS` and `RELEASE_KEY_PASSWORD` (Gradle properties, environment

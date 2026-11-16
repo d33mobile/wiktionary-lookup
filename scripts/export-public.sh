@@ -22,7 +22,7 @@ include=(
   data/languages.json syllables.json
   scripts/kaikki-languages.js scripts/build-all.js scripts/wikipedia-sql.js scripts/wikipedia-prepare.js
   scripts/wikipedia-bench.js scripts/hanzi-pack.js scripts/index-byte-offsets.js scripts/wikipedia-release.js
-  scripts/export-public.sh
+  scripts/export-public.sh scripts/fuzzy-bench.js
   sources/wiktionary.js sources/wiktionary-zh.js sources/wiktionary-details.js sources/wikipedia-titles.js
   sources/cedict-text.js
   test

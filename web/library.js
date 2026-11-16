@@ -118,8 +118,34 @@ export function sortedFavourites(order) {
   return list;
 }
 
-export function exportFavourites() {
-  return JSON.stringify({ format: 'wiktionary-lookup-favourites', version: 1, favourites: favourites() }, null, 1);
+// The settings an export carries (since 0.13) and their valid values;
+// historyPaused is a boolean.
+export const SETTING_VALUES = { prefetch: ['always', 'wifi', 'off'], pad: ['on', 'off'] };
+
+// settings: {prefetch, pad, historyPaused}, kept next to the favourites.
+export function exportFavourites(settings) {
+  const data = { format: 'wiktionary-lookup-favourites', version: 1, favourites: favourites() };
+  if (settings) data.settings = settings;
+  return JSON.stringify(data, null, 1);
+}
+
+// The settings in an export, the known ones with valid values only; null
+// when there are none (exports before 0.13, a plain array, broken JSON).
+export function settingsOf(text) {
+  let data = null;
+  try {
+    data = JSON.parse(text);
+  } catch (err) {
+    return null;
+  }
+  const s = data && !Array.isArray(data) ? data.settings : null;
+  if (!s || typeof s !== 'object') return null;
+  const out = {};
+  for (const key of Object.keys(SETTING_VALUES)) {
+    if (SETTING_VALUES[key].indexOf(s[key]) >= 0) out[key] = s[key];
+  }
+  if (typeof s.historyPaused === 'boolean') out.historyPaused = s.historyPaused;
+  return Object.keys(out).length ? out : null;
 }
 
 // Merges an export (or a plain array of items); returns how many were new.

@@ -1,9 +1,13 @@
 package pl.d33.wiktionary;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Base64;
 import android.webkit.JavascriptInterface;
@@ -102,6 +106,15 @@ final class PageBridge {
         Intent chooser = Intent.createChooser(send, title);
         chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(chooser);
+    }
+
+    /** Puts text on the clipboard (About > Diagnostics > Copy diagnostics). */
+    @JavascriptInterface
+    public void copyText(String label, String text) {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            if (clipboard != null) clipboard.setPrimaryClip(ClipData.newPlainText(label, text));
+        });
     }
 
     /** Lets the user pick a text file (a favourites export); see window.onPickedText. */

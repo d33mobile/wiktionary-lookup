@@ -28,6 +28,15 @@ function suite(name, open) {
       }
     });
 
+    test('a pinyin typo falls back to a fuzzy match', () => {
+      const rows = d.search('nihoa');
+      assert.equal(rows[0].simp, '你好');
+      assert.equal(rows[0].fuzzy, 1);
+      assert.ok(rows.every((r) => r.fuzzy), 'only fuzzy results');
+      assert.ok(d.search('nihao').every((r) => r.fuzzy === undefined), 'none once the query matches');
+      assert.deepEqual(d.search('ni4hao3'), [], 'a wrong tone is no typo');
+    });
+
     test('extending the query bisects inside the previous range', () => {
       const session = d.newSession();
       session.search('ni');

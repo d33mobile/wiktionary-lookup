@@ -13,6 +13,7 @@ import { deserializeIndexWithHeader } from '../lib/index-format.js';
 import { BUNDLED_CODE, inflateText, isWikipedia, Languages, releasesBase } from './languages.js';
 import { openHanziPack } from '../lib/hanzi-pack.js';
 import { characterSection } from './hanzi.js';
+import { catalogueLine, commitUrl, diagnosticsText, issueUrl, versionParts } from './about.js';
 
 import {
   getPrefetchMode, openSpeechSettings, pronounce, setPrefetchMode,
@@ -21,7 +22,7 @@ import { detailBody, isCjkChar, pronunciationLines, tapText, wiktionaryUrl } fro
 import { loadRecognizer, Pad } from './handwriting.js';
 import {
   clearHistory, dayLabel, exportFavourites, history as historyItems, historyPaused, importFavourites, isFavourite,
-  itemKey, recordView, removeFavourite, removeHistory, setHistoryPaused, sortedFavourites, toggleFavourite,
+  itemKey, recordView, removeFavourite, removeHistory, setHistoryPaused, settingsOf, sortedFavourites, toggleFavourite,
 } from './library.js';
 
 const LIMIT = 50;
@@ -144,20 +145,31 @@ function groupLabel(matchedOn) {
 }
 
 // Groups keep the engine's order inside them and appear in the order of
-// their best entry.
-function render(rows) {
+// their best entry. When nothing matched exactly and the engine fell back to
+// similar spellings (every row has `fuzzy`), one line says so instead of
+// the group headings, and each row carries a "~" badge.
+function render(rows, query) {
   const groups = new Map();
+  const similar = rows.length > 0 && rows.every((entry) => entry.fuzzy);
   for (const entry of rows) {
-    const label = groupLabel(entry.matchedOn);
+    const label = similar ? '' : groupLabel(entry.matchedOn);
     if (!groups.has(label)) groups.set(label, []);
     groups.get(label).push(entry);
   }
   current = [];
   const items = [];
+  if (similar) {
+    const note = el('li', 'fuzzy-note');
+    note.setAttribute('role', 'presentation');
+    note.append('No exact match for ', el('strong', null, query), '. Similar words:');
+    items.push(note);
+  }
   for (const [label, entries] of groups) {
-    const heading = el('li', 'group', label);
-    heading.setAttribute('role', 'presentation');
-    items.push(heading);
+    if (label) {
+      const heading = el('li', 'group', label);
+      heading.setAttribute('role', 'presentation');
+      items.push(heading);
+    }
     for (const entry of entries) {
       const li = el('li');
       li.tabIndex = 0;
@@ -166,6 +178,12 @@ function render(rows) {
       const line = el('div', 'line');
       const words = el('div', 'words');
       words.append(headword(entry));
+      if (entry.fuzzy) {
+        const badge = el('span', 'fuzzy-badge', '~');
+        badge.title = entry.fuzzy === 1 ? 'Similar spelling: one letter differs' : 'Similar spelling: two letters differ';
+        badge.setAttribute('aria-label', 'similar spelling');
+        words.append(badge);
+      }
       line.append(words);
       const speak = rowSpeakButton(entry);
       if (speak) line.append(speak);
@@ -716,7 +734,7 @@ async function search() {
     openPhase('firstResults');
     finishOpenStats();
   }
-  render(rows);
+  render(rows, input.value.trim());
   if (!rows.length) results.appendChild(emptyState(input.value.trim()));
   document.body.dataset.searched = input.value;
   prefetchFor(rows);
@@ -1098,12 +1116,36 @@ function showFavouritesText(hint, text) {
   area.select();
 }
 
+// The settings an export carries along with the favourites.
+function currentSettings() {
+  return { prefetch: getPrefetchMode(), pad: padEnabled() ? 'on' : 'off', historyPaused: historyPaused() };
+}
+
+function applySettings(settings) {
+  if (settings.prefetch) {
+    setPrefetchMode(settings.prefetch);
+    prefetchMode.value = settings.prefetch;
+  }
+  if (settings.pad) {
+    try {
+      localStorage.setItem(PAD_KEY, settings.pad);
+    } catch (err) {
+      // Applies until the page reloads.
+    }
+    padMode.value = settings.pad;
+    updatePen();
+  }
+  if (settings.historyPaused !== undefined) setHistoryPaused(settings.historyPaused);
+}
+
 function importText(text) {
   try {
     const added = importFavourites(text);
+    const settings = settingsOf(text);
+    if (settings) applySettings(settings);
     document.getElementById('favourites-text').hidden = true;
     renderLibrary();
-    document.getElementById('library-status').textContent = `Imported ${added} new favourites`;
+    document.getElementById('library-status').textContent = `Imported ${added} new favourites${settings ? ' and the settings' : ''}`;
   } catch (err) {
     document.getElementById('library-status').textContent = `Import failed: ${err.message}`;
   }
@@ -1112,7 +1154,7 @@ window.onPickedText = importText;
 
 document.getElementById('favourites-export').addEventListener('click', () => {
   const native = window.WiktionaryNative;
-  const text = exportFavourites();
+  const text = exportFavourites(currentSettings());
   if (native && native.shareText) native.shareText('wiktionary-lookup-favourites.json', text);
   else showFavouritesText('Copy this text to keep your favourites:', text);
 });
@@ -1257,6 +1299,11 @@ function pickerRow(entry) {
   if (entry.gzBytes || entry.bytes) facts.push(`dictionary ${formatSize(entry.gzBytes || entry.bytes)}`);
   if (entry.details) facts.push(`entry pages ${formatSize(entry.details.gzBytes || entry.details.bytes)}`);
   if (installed && installed.bundled) facts.push('built in');
+  // The installed data's dates (the catalogue row's size may be a newer release's).
+  if (installed && installed.generated) {
+    facts.push(`installed: data of ${installed.generated.slice(0, 10)}`
+      + `${installed.extracted ? ` (Wiktionary extract ${installed.extracted.slice(0, 10)})` : ''}`);
+  }
   if (!installed && code === BUNDLED_CODE) facts.push('suggested');
   info.append(el('div', 'lang-facts', facts.join(', ')));
   li.append(info);
@@ -1396,6 +1443,7 @@ function renderPicker() {
   // Wikipedia: article titles with short descriptions, opened as articles.
   if (wikipedia.length) rows.push(el('li', 'lang-section', 'Wikipedia'), ...wikipedia.map(pickerRow));
   replaceChildren(langList, ...rows);
+  document.getElementById('catalogue-info').textContent = languages.catalogue.length ? catalogueLine(languages.catalogueInfo()) : '';
 }
 
 function updateRow(code) {
@@ -1443,6 +1491,7 @@ function showNetworkActions(message) {
 }
 
 function pickerError(text) {
+  noteError(text);
   pickerStatus.textContent = text;
   showNetworkActions(text);
 }
@@ -1720,6 +1769,53 @@ window.onAndroidBack = () => {
   }
   return closeSecondary();
 };
+// Keyboard: "/" focuses the search box, Escape closes a dialog, a screen,
+// the handwriting pad or the entry page, the arrow keys move between the
+// search box and the results (Enter opens one, see the results' keydown).
+function typingIn(target) {
+  const tag = target && target.tagName;
+  return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || Boolean(target && target.isContentEditable);
+}
+
+document.addEventListener('keydown', (ev) => {
+  if (ev.defaultPrevented || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+  if (ev.key === '/' && !typingIn(ev.target)) {
+    ev.preventDefault();
+    input.focus();
+    input.select();
+    return;
+  }
+  if (ev.key === 'Escape') {
+    let closed = window.onAndroidBack();
+    if (!closed && !padEl.hidden) {
+      padEl.hidden = true;
+      closed = true;
+    }
+    if (!closed && !detail.hidden) {
+      history.back();
+      closed = true;
+    }
+    // Otherwise Escape keeps its default (it clears the search box).
+    if (closed) ev.preventDefault();
+    return;
+  }
+  if ((ev.key !== 'ArrowDown' && ev.key !== 'ArrowUp') || results.hidden || !detail.hidden) return;
+  const items = Array.from(results.querySelectorAll('li[data-index]'));
+  if (!items.length) return;
+  const down = ev.key === 'ArrowDown';
+  if (ev.target === input) {
+    if (!down) return;
+    items[0].focus();
+    ev.preventDefault();
+    return;
+  }
+  const at = items.indexOf(ev.target.closest ? ev.target.closest('li[data-index]') : null);
+  if (at < 0) return;
+  const next = at + (down ? 1 : -1);
+  if (next < 0) input.focus();
+  else if (next < items.length) items[next].focus();
+  ev.preventDefault();
+});
 langFilter.addEventListener('input', renderPicker);
 // Options: the gear in the header.
 const optionsEl = document.getElementById('options');
@@ -1939,8 +2035,82 @@ padMode.addEventListener('change', () => {
   updatePen();
 });
 
-// About: version and the third-party notices (THIRD_PARTY.md), in the
-// changelog's dialog.
+// The build (web/version.json, written by stage-web.js): {version,
+// versionCode, commit, committed, source}; {} when it is missing.
+let buildInfoPromise = null;
+function loadBuildInfo() {
+  if (!buildInfoPromise) {
+    buildInfoPromise = fetch('version.json').then((res) => (res.ok ? res.json() : {})).catch(() => ({}));
+  }
+  return buildInfoPromise;
+}
+
+function appVersionCode() {
+  const native = window.WiktionaryNative;
+  return native && native.appVersionCode ? native.appVersionCode() : 0;
+}
+
+// The last error, for Diagnostics: uncaught ones and those the language
+// screen reports.
+let lastError = '';
+function noteError(text) {
+  lastError = `${text} (${new Date().toISOString().slice(0, 19).replace('T', ' ')} UTC)`;
+}
+window.addEventListener('error', (ev) => {
+  const where = ev.filename ? ` (${String(ev.filename).replace(/^.*\//, '')}:${ev.lineno})` : '';
+  noteError(`${ev.message}${where}`);
+});
+window.addEventListener('unhandledrejection', (ev) => {
+  const reason = ev.reason;
+  noteError(`Unhandled rejection: ${reason && reason.message ? reason.message : String(reason)}`);
+});
+
+// "Version 0.13 (13) · <commit> · <commit date>", the commit linking to its
+// page in the public repository.
+function versionElement(info) {
+  const p = el('p', 'about-version');
+  p.id = 'about-version';
+  const parts = versionParts(info, appVersionCode());
+  p.appendChild(document.createTextNode(`Version ${parts.version || '?'}${parts.code ? ` (${parts.code})` : ''}`));
+  const url = commitUrl(info);
+  p.appendChild(document.createTextNode(' · '));
+  if (url) {
+    const a = el('a', '', parts.commit);
+    a.id = 'about-commit';
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    p.appendChild(a);
+  } else {
+    p.appendChild(document.createTextNode(parts.commit));
+  }
+  if (parts.date) p.append(' · ', el('span', 'nowrap', parts.date));
+  return p;
+}
+
+function settingsSummary() {
+  const native = window.WiktionaryNative;
+  const parts = [`handwriting pad ${padEnabled() ? 'on' : 'off'}`, `history ${historyPaused() ? 'paused' : 'on'}`];
+  if (native && native.prefetchAudio) parts.push(`prefetch ${getPrefetchMode()}`);
+  return parts.join(', ');
+}
+
+// The plain-text diagnostics (shown, copied, sent with a problem report).
+function diagnosticsReport(info) {
+  return diagnosticsText({
+    info,
+    versionCode: appVersionCode(),
+    userAgent: navigator.userAgent,
+    dictionaries: languages.dataVersions(),
+    catalogue: languages.catalogueInfo(),
+    settings: settingsSummary(),
+    lines: diagnosticsLines(),
+    lastError,
+  }, formatSize);
+}
+
+// About: version, the third-party notices (THIRD_PARTY.md), Changelog,
+// Diagnostics and Report a problem, in the changelog's dialog.
 document.getElementById('about').addEventListener('click', async () => {
   let text = '';
   try {
@@ -1948,12 +2118,12 @@ document.getElementById('about').addEventListener('click', async () => {
   } catch (err) {
     text = err.message;
   }
-  const native = window.WiktionaryNative;
-  const version = native && native.appVersionCode ? ` (versionCode ${native.appVersionCode()})` : '';
-  document.getElementById('changelog-title').textContent = `Wiktionary Lookup${version}`;
+  const info = await loadBuildInfo();
+  document.getElementById('changelog-title').textContent = 'Wiktionary Lookup';
   const body = document.getElementById('changelog-body');
   // Paragraphs, with their URLs as links (opened in the browser by the app).
-  replaceChildren(body, ...text.split(/\n\n+/).map((para) => {
+  const links = el('p', 'about-buttons');
+  replaceChildren(body, versionElement(info), links, ...text.split(/\n\n+/).map((para) => {
     const p = el('p', 'about-para');
     para.replace(/^# /, '').split(/(https?:\/\/[^\s)]+)/).forEach((part, i) => {
       if (i % 2) {
@@ -1968,13 +2138,24 @@ document.getElementById('about').addEventListener('click', async () => {
     });
     return p;
   }));
-  const links = body.appendChild(el('p', 'about-buttons'));
   links.appendChild(button('Changelog', async () => {
     openChangelog(await loadChangelog(), Infinity);
   })).id = 'about-changelog';
   links.appendChild(button('Diagnostics', showDiagnostics)).id = 'about-diagnostics';
+  // A link, so the app opens it in the browser; the text is filled in again
+  // on the tap, with the diagnostics of that moment.
+  const report = el('a', 'button-link', 'Report a problem');
+  report.id = 'about-report';
+  report.target = '_blank';
+  report.rel = 'noopener';
+  report.href = issueUrl(diagnosticsReport(info), info);
+  report.addEventListener('click', () => {
+    report.href = issueUrl(diagnosticsReport(info), info);
+  });
+  links.appendChild(report);
   const dialog = document.getElementById('changelog');
   dialog.hidden = false;
+  dialog.querySelector('.dialog').scrollTop = 0;
   document.getElementById('changelog-close').onclick = () => {
     dialog.hidden = true;
   };
@@ -2012,24 +2193,72 @@ function diagnosticsLines() {
       : `  last tap: shown after ${last.tapToShowMs} ms, first frame after ${last.tapToFirstDrawMs} ms; `
         + `page ${last.progressAtTap} % loaded${last.finishedAtTap ? ', finished' : ''} at the tap`);
   }
-  lines.push(`WebView: ${navigator.userAgent.replace(/.*Chrome\/(\S+).*/, 'Chrome $1')}`);
   return lines;
 }
 
-function showDiagnostics() {
+// Copies `text`: through the app (Android's clipboard), else the Clipboard
+// API, else a selected text box (with the old copy command, which WebViews
+// without the Clipboard API still run). -> 'copied' | 'select'.
+async function copyText(text, box) {
+  const native = window.WiktionaryNative;
+  if (native && native.copyText) {
+    native.copyText('Wiktionary Lookup diagnostics', text);
+    return 'copied';
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return 'copied';
+    } catch (err) {
+      // Denied or unavailable here: the text box below.
+    }
+  }
+  box.hidden = false;
+  box.value = text;
+  box.focus();
+  box.select();
+  let copied = false;
+  try {
+    copied = document.execCommand('copy');
+  } catch (err) {
+    copied = false;
+  }
+  return copied ? 'copied' : 'select';
+}
+
+async function showDiagnostics() {
+  const text = diagnosticsReport(await loadBuildInfo());
   document.getElementById('changelog-title').textContent = 'Diagnostics';
   const body = document.getElementById('changelog-body');
-  const pre = el('pre', 'diagnostics', diagnosticsLines().join('\n'));
+  const pre = el('pre', 'diagnostics', text);
   pre.id = 'diagnostics-text';
-  replaceChildren(body, pre);
+  const actions = el('p', 'about-buttons');
+  const status = el('p', 'hint');
+  status.id = 'diagnostics-copy-status';
+  status.setAttribute('role', 'status');
+  const box = el('textarea', 'diagnostics-box');
+  box.id = 'diagnostics-box';
+  box.rows = 8;
+  box.readOnly = true;
+  box.spellcheck = false;
+  box.hidden = true;
+  actions.appendChild(button('Copy diagnostics', async () => {
+    const how = await copyText(text, box);
+    status.textContent = how === 'copied' ? 'Copied to the clipboard.' : 'Select the text below and copy it.';
+    document.body.dataset.diagnosticsCopy = how;
+  })).id = 'diagnostics-copy';
   const native = window.WiktionaryNative;
+  if (native && native.shareText) {
+    actions.appendChild(button('Share', () => native.shareText('Wiktionary Lookup diagnostics', text))).id = 'diagnostics-share';
+  }
+  replaceChildren(body, pre, actions, status, box);
   if (native && native.setPanelMode && native.panelDiagnostics) {
     const mode = JSON.parse(native.panelDiagnostics()).mode;
     const label = el('label', 'setting', 'Wiktionary panel while hidden (after a restart) ');
     const select = el('select');
     select.id = 'panel-mode';
-    for (const [value, text] of [['drawn', 'kept drawn (default)'], ['gone', 'removed (0.9)']]) {
-      const o = el('option', '', text);
+    for (const [value, label2] of [['drawn', 'kept drawn (default)'], ['gone', 'removed (0.9)']]) {
+      const o = el('option', '', label2);
       o.value = value;
       select.appendChild(o);
     }

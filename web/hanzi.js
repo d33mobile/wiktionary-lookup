@@ -107,6 +107,10 @@ export function strokePlayer(record) {
   let timer = 0;
   let last = 0;
 
+  function reduceMotion() {
+    return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
   function draw() {
     strokes.forEach((s, i) => {
       const p = i < done ? 1 : i === done ? progress : 0;
@@ -128,7 +132,8 @@ export function strokePlayer(record) {
       draw();
       return;
     }
-    progress += (dt * UNITS_PER_MS) / strokes[done].length;
+    // Reduced motion: each stroke appears whole, one per pause, no moving ink.
+    progress = reduceMotion() ? 1 : progress + (dt * UNITS_PER_MS) / strokes[done].length;
     if (progress >= 1) {
       done += 1;
       progress = 0;

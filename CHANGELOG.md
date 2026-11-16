@@ -2,6 +2,14 @@
 
 Wiktionary Lookup, an offline dictionary built from English Wiktionary.
 
+## 0.13 (versionCode 13)
+
+- Typos find the word: when nothing matches, the list says "No exact match" and shows similar words marked with ~ (howizer finds howitzer, nihoa finds 你好).
+- About shows the version with the source commit it was built from (a link to it in the public repository) and the commit date, and has "Report a problem", which opens a new issue with the diagnostics filled in.
+- Diagnostics lists the installed dictionaries with the date of their data and of the Wiktionary extract, and the date of the data catalogue with when it was last checked; "Copy diagnostics" copies all of it. The language screen shows the dates of installed dictionaries too.
+- The favourites export keeps the settings (prefetch, handwriting pad, history pause); importing it restores them.
+- Keyboard: "/" goes to the search box, the arrow keys move through the results, Enter opens one and Escape closes what is open. With "reduce motion" set in the system, stroke order shows each stroke whole.
+
 ## 0.12 (versionCode 12)
 
 - Words an entry refers to are links: "Misspelling of ingenious" opens the entry for ingenious, "plural of dog" opens dog, and the words a definition links on Wiktionary open their entries too. Needs the entry pages from the data release of 2026-11-06 or later: use Update (or Update all) on the language screen.

@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Wiktionary Lookup</title>
+<!-- The browser bar's colour: --bg of style.css in each scheme. -->
+<meta name="theme-color" content="#fdfdfb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161615" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -84,6 +87,7 @@
       works offline; Chinese is the suggestion. You can add or switch languages later under Options (the gear).</p>
     <input id="lang-filter" type="search" placeholder="Filter languages" autocomplete="off" autocapitalize="off" spellcheck="false">
     <p id="picker-status" role="status"></p>
+    <p id="catalogue-info" class="hint"></p>
     <div id="network-actions" hidden>
       <button id="open-app-settings" type="button">Open app settings</button>
       <button id="open-data-saver" type="button" hidden>Data saver settings</button>
